@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>It's a Match! - SawaLove</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#b30065",
+                    "on-tertiary-fixed": "#002732",
+                    "surface-variant": "#ffd1e1",
+                    "secondary": "#8329c8",
+                    "surface-container-highest": "#ffd1e1",
+                    "on-surface-variant": "#7e4d61",
+                    "outline": "#9c677d",
+                    "primary-dim": "#9d0058",
+                    "on-surface": "#4a2134",
+                    "secondary-fixed-dim": "#deb3ff",
+                    "error-container": "#fb5151",
+                    "surface-container": "#ffe0ea",
+                    "on-primary": "#ffeff2",
+                    "error-dim": "#9f0519",
+                    "tertiary": "#00647c",
+                    "surface-container-low": "#ffecf1",
+                    "secondary-fixed": "#e7c5ff",
+                    "on-background": "#4a2134",
+                    "primary-fixed": "#ff6ea9",
+                    "surface-tint": "#b30065",
+                    "inverse-on-surface": "#c68da3",
+                    "background": "#fff4f6",
+                    "surface-container-high": "#ffd8e5",
+                    "error": "#b31b25",
+                    "secondary-container": "#e7c5ff",
+                    "on-primary-container": "#4b0027",
+                    "inverse-primary": "#ff479c",
+                    "on-error": "#ffefee",
+                    "on-secondary": "#fceeff",
+                    "primary-container": "#ff6ea9",
+                    "primary-fixed-dim": "#ff4e9e",
+                    "on-tertiary": "#e2f6ff",
+                    "inverse-surface": "#220213",
+                    "on-error-container": "#570008",
+                    "surface": "#fff4f6",
+                    "on-primary-fixed-variant": "#5c0031",
+                    "tertiary-fixed-dim": "#39bce2",
+                    "on-primary-fixed": "#000000",
+                    "on-secondary-container": "#6c00b0",
+                    "secondary-dim": "#7613bb",
+                    "surface-dim": "#ffc4da",
+                    "surface-bright": "#fff4f6",
+                    "tertiary-dim": "#00576c",
+                    "on-tertiary-container": "#003e4e",
+                    "on-tertiary-fixed-variant": "#00485a",
+                    "tertiary-fixed": "#4dc9f1",
+                    "tertiary-container": "#4dc9f1",
+                    "on-secondary-fixed": "#510085",
+                    "on-secondary-fixed-variant": "#7716bc",
+                    "outline-variant": "#d89cb4",
+                    "surface-container-lowest": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Be Vietnam Pro"],
+                    "label": ["Be Vietnam Pro"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .radiant-sunburst {
+            background: radial-gradient(circle, rgba(255,110,169,0.2) 0%, rgba(179,0,101,0) 70%);
+        }
+        .asymmetric-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(2deg); }
+        }
+        .confetti-particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container min-h-screen overflow-hidden flex flex-col items-center justify-center relative">
+<div class="fixed inset-0 radiant-sunburst pointer-events-none"></div>
+<div class="absolute inset-0 overflow-hidden pointer-events-none opacity-40">
+<div class="confetti-particle bg-primary left-[10%] top-[20%] rotate-45"></div>
+<div class="confetti-particle bg-secondary left-[80%] top-[15%] rotate-[20deg]"></div>
+<div class="confetti-particle bg-tertiary left-[15%] top-[70%] rotate-[15deg]"></div>
+<div class="confetti-particle bg-primary-container left-[85%] top-[65%] rotate-[35deg]"></div>
+<div class="confetti-particle bg-secondary-fixed left-[50%] top-[5%] rotate-[10deg]"></div>
+</div>
+<main class="relative z-10 w-full max-w-md px-6 flex flex-col items-center">
+<div class="text-center mb-12">
+<h2 class="font-headline text-primary font-black text-2xl tracking-tight mb-2">SawaLove</h2>
+<h1 class="font-headline text-[3.5rem] leading-[0.9] font-extrabold text-on-surface -tracking-[0.04em] italic">
+                It's a <br/>
+<span class="text-primary not-italic">Match!</span>
+</h1>
+</div>
+<div class="relative w-full h-80 flex items-center justify-center mb-16">
+<div class="absolute inset-0 bg-primary/5 rounded-full scale-110 blur-3xl"></div>
+<div class="relative flex items-center">
+<div class="w-48 h-48 rounded-full border-8 border-surface-container-lowest shadow-2xl overflow-hidden -rotate-6 transform translate-x-6 z-10 hover:rotate-0 transition-transform duration-500">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="Stunning close-up portrait of a radiant young woman with glowing skin and a warm smile against a soft-focus urban sunset background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsAjAmCssdtZM33jZO5-Cw6L_lBoh3K2jxK_-F5z9sWClB9nWyNW_lejv3qXDgingKL3L7OEHQulNGwrUBf_523FPFSpcNHoBmdpXNouHrz0FcjzsHSZJ0MMDwNE97lV8ObL7N-sgulNTasn2vr3_1DdrvXzTpa4jtkDZTx5n7zf4p947oBOI0gfngdy5ZFdoIsz6dar-qYC_PcOhFgn4N1kryCuS6amn5b42KUBrXyuX3yDgUyNBYiJJLwzUL-dDaHxNZCmCHVdE"/>
+</div>
+<div class="w-48 h-48 rounded-full border-8 border-surface-container-lowest shadow-2xl overflow-hidden rotate-6 transform -translate-x-6 z-20 hover:rotate-0 transition-transform duration-500">
+<img alt="Amaka Profile" class="w-full h-full object-cover" data-alt="Beautiful West African woman with braided hair and vibrant accessories, smiling joyfully with warm, golden-hour natural lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcS-ERIskl2MWtc6EUVvacFQksk1OH4Uu4nmBrW5vs4_tUj7lOnywxSAqnLwahyD6QQg-6HqfnlJB7BIClS1iQWDtgwnqhdHTpwxq4Kf_GHGt3_rzQyyOQcwEJFgLbZgouCuje3Ti1rsc879xXLRWt89XxHb1zfTYRh_I2E1xe9qtZr0jmRM7Q6Kpv-ENvHIvqtp3qra7utrDQye6vBbtLC4Gh4n6B296JdxNTgyMbioOXZd3GIcrftzx2mIkiYioxwZEbX1tHsOI"/>
+</div>
+<div class="absolute z-30 bottom-[-20px] left-1/2 -translate-x-1/2">
+<div class="bg-primary text-on-primary w-16 h-16 rounded-full flex items-center justify-center shadow-lg border-4 border-surface-container-lowest">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+</div>
+</div>
+</div>
+<p class="font-body text-on-surface-variant text-center mb-10 max-w-[280px]">
+            You and <span class="text-on-surface font-bold">Amaka</span> have liked each other. Why not say hello?
+        </p>
+<div class="w-full space-y-4">
+<button class="w-full bg-primary text-on-primary py-5 rounded-full font-headline font-bold text-lg shadow-[0_8px_24px_rgba(179,0,101,0.25)] hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-3">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">forum</span>
+                Send a Message
+            </button>
+<button class="w-full bg-surface-container-low text-primary py-5 rounded-full font-headline font-bold text-lg hover:bg-surface-container-high active:scale-95 transition-all flex items-center justify-center gap-3">
+<span class="material-symbols-outlined">style</span>
+                Keep Swiping
+            </button>
+</div>
+<div class="mt-12 flex items-center gap-2">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-surface-container-highest overflow-hidden">
+<img alt="Recent" data-alt="Portrait of a young man with a friendly expression in a casual setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAB-TLHRWrb03Lt03Go0odrp_Hcza_CWzdS1ADwWqSPubiLTDczp0P07POUZJSGtean7kZ-lJmhxibv6qA6VPpD7tapE5-uql_uE-UWq8EhCv6XYJIJWeyd8R4K-u_Hwu5MVQnWmcAmP4uj3HsuS1hbA3Kd8BUjXL-jZpeSmYKkqrsi9YjXy6syxiB_1Fv5kf1QeXWOO2r0agzdlAi_rxwjEcmqMZoi-JNuxkMbxVIKVg2KN3V8kQgtF95rMSKq-giX7-YWkKBxcZc"/>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-surface-container-highest overflow-hidden">
+<img alt="Recent" data-alt="Close up of a smiling woman with stylish glasses." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8IVvC1jr2aH_fBOPwkXfpZ2_R0atZK-rjGgPjqhhNubs0YZWpwqmQaqf7EUIR09gKIzX8t6g0tU_5OohFP_18cInNKKEXLKZGS4rDRucNbOAH-LxCzG80O7E5IsXVqS4aGfOMtifLlXaItzHxw03xxUFwWVRLsoedqA732YqiRoK23fi9NBDGG2dj93lJArmZYowJ5-o-_KbO_Ky93564Nd6yOmC4WJ1VcHUU4wS6xA2YqitXjmQ7-Rlvsolc9vdzrOuCUM6bkic"/>
+</div>
+</div>
+<span class="text-label-md text-on-surface-variant font-medium">3 other potential matches waiting</span>
+</div>
+</main>
+<div class="fixed top-8 right-8 z-50">
+<button class="w-12 h-12 rounded-full bg-surface-container-lowest/20 backdrop-blur-md flex items-center justify-center hover:bg-surface-container-lowest/40 transition-colors">
+<span class="material-symbols-outlined text-on-surface">close</span>
+</button>
+</div>
+</body></html>

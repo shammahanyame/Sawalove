@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SawaLove Premium Checkout</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Be_Vietnam_Pro:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "primary": "#b30065",
+                "on-tertiary-fixed": "#002732",
+                "surface-variant": "#ffd1e1",
+                "secondary": "#8329c8",
+                "surface-container-highest": "#ffd1e1",
+                "on-surface-variant": "#7e4d61",
+                "outline": "#9c677d",
+                "primary-dim": "#9d0058",
+                "on-surface": "#4a2134",
+                "secondary-fixed-dim": "#deb3ff",
+                "error-container": "#fb5151",
+                "surface-container": "#ffe0ea",
+                "on-primary": "#ffeff2",
+                "error-dim": "#9f0519",
+                "tertiary": "#00647c",
+                "surface-container-low": "#ffecf1",
+                "secondary-fixed": "#e7c5ff",
+                "on-background": "#4a2134",
+                "primary-fixed": "#ff6ea9",
+                "surface-tint": "#b30065",
+                "inverse-on-surface": "#c68da3",
+                "background": "#fff4f6",
+                "surface-container-high": "#ffd8e5",
+                "error": "#b31b25",
+                "secondary-container": "#e7c5ff",
+                "on-primary-container": "#4b0027",
+                "inverse-primary": "#ff479c",
+                "on-error": "#ffefee",
+                "on-secondary": "#fceeff",
+                "primary-container": "#ff6ea9",
+                "primary-fixed-dim": "#ff4e9e",
+                "on-tertiary": "#e2f6ff",
+                "inverse-surface": "#220213",
+                "on-error-container": "#570008",
+                "surface": "#fff4f6",
+                "on-primary-fixed-variant": "#5c0031",
+                "tertiary-fixed-dim": "#39bce2",
+                "on-primary-fixed": "#000000",
+                "on-secondary-container": "#6c00b0",
+                "secondary-dim": "#7613bb",
+                "surface-dim": "#ffc4da",
+                "surface-bright": "#fff4f6",
+                "tertiary-dim": "#00576c",
+                "on-tertiary-container": "#003e4e",
+                "on-tertiary-fixed-variant": "#00485a",
+                "tertiary-fixed": "#4dc9f1",
+                "tertiary-container": "#4dc9f1",
+                "on-secondary-fixed": "#510085",
+                "on-secondary-fixed-variant": "#7716bc",
+                "outline-variant": "#d89cb4",
+                "surface-container-lowest": "#ffffff"
+            },
+            "borderRadius": {
+                "DEFAULT": "1rem",
+                "lg": "2rem",
+                "xl": "3rem",
+                "full": "9999px"
+            },
+            "fontFamily": {
+                "headline": ["Plus Jakarta Sans"],
+                "body": ["Be Vietnam Pro"],
+                "label": ["Be Vietnam Pro"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .premium-gradient {
+            background: linear-gradient(135deg, #b30065 0%, #ff6ea9 100%);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface antialiased min-h-screen">
+<!-- TopAppBar -->
+<header class="bg-[#fff4f6]/80 backdrop-blur-md fixed top-0 z-50 w-full flex justify-between items-center px-6 py-4">
+<div class="flex items-center gap-4">
+<button class="hover:opacity-70 transition-opacity active:scale-95 duration-200">
+<span class="material-symbols-outlined text-[#b30065]">arrow_back</span>
+</button>
+<h1 class="font-headline font-bold tracking-tight text-[#b30065] text-xl">SawaLove Premium</h1>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center overflow-hidden">
+<img alt="Profile" class="w-full h-full object-cover" data-alt="Close up portrait of a young elegant Cameroonian woman with braided hair and glowing skin smiling warmly" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCD4d7IhqFH_FKsPWOtn_BpNRu52I007KU2q8z0ma3bfXASRsOE_bobaoYL0sBQXVAcy1pqFtDDYOLnXePCQ_C_2kDoGGESdXdAFAiil8CtoBPov4MxdTppcaxbEDWcZ_3vQIQn3AqKFjmByLsxbzr0wcygeCNi_XOk5c8Aq1uWDtN3ykKOoL5qyvG6PURndwqS1r2fcaXgwa-ogYNzcoeTakq76BOvgfSjya0dV-Q1EZzzaU8qXuDY-Ce1lbh7E_YiipJXu72awss"/>
+</div>
+</header>
+<main class="pt-24 pb-32 px-6 max-w-2xl mx-auto">
+<!-- Hero Section -->
+<section class="mb-10 text-center">
+<h2 class="font-headline text-3xl font-extrabold -tracking-[0.02em] text-on-surface mb-3">Elevate Your Connection</h2>
+<p class="text-on-surface-variant text-lg">Choose a plan designed for the modern Cameroonian heart.</p>
+</section>
+<!-- Plan Selection Asymmetric Layout -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+<!-- Plus Plan -->
+<div class="bg-surface-container-lowest rounded-lg p-6 flex flex-col items-center text-center shadow-sm relative group cursor-pointer border-2 border-transparent hover:border-primary-fixed transition-all">
+<span class="material-symbols-outlined text-primary text-3xl mb-4">star</span>
+<h3 class="font-headline font-bold text-xl mb-1">Plus</h3>
+<p class="text-label text-primary font-bold mb-4">5,000 CFA<span class="text-on-surface-variant font-normal">/mo</span></p>
+<ul class="text-sm space-y-2 text-on-surface-variant mb-6 text-left w-full">
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-xs text-primary">check_circle</span> Unlimited Likes</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-xs text-primary">check_circle</span> See who likes you</li>
+</ul>
+</div>
+<!-- Gold Plan (Featured) -->
+<div class="premium-gradient rounded-lg p-8 flex flex-col items-center text-center shadow-lg relative cursor-pointer transform md:-translate-y-4 ring-4 ring-primary/20">
+<div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-secondary text-on-secondary px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Most Popular</div>
+<span class="material-symbols-outlined text-on-primary text-4xl mb-4" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+<h3 class="font-headline font-bold text-2xl text-on-primary mb-1">Gold</h3>
+<p class="text-label text-on-primary font-extrabold text-lg mb-6">12,500 CFA<span class="opacity-80 font-normal">/mo</span></p>
+<ul class="text-sm space-y-3 text-on-primary mb-8 text-left w-full">
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-xs">check_circle</span> Everything in Plus</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-xs">check_circle</span> 5 Super Likes weekly</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-xs">check_circle</span> Passport to Douala &amp; Yaoundé</li>
+</ul>
+</div>
+<!-- Platinum Plan -->
+<div class="bg-surface-container-lowest rounded-lg p-6 flex flex-col items-center text-center shadow-sm cursor-pointer border-2 border-transparent hover:border-primary-fixed transition-all">
+<span class="material-symbols-outlined text-secondary text-3xl mb-4" style="font-variation-settings: 'FILL' 1;">diamond</span>
+<h3 class="font-headline font-bold text-xl mb-1">Platinum</h3>
+<p class="text-label text-secondary font-bold mb-4">25,000 CFA<span class="text-on-surface-variant font-normal">/mo</span></p>
+<ul class="text-sm space-y-2 text-on-surface-variant mb-6 text-left w-full">
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-xs text-secondary">check_circle</span> Everything in Gold</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-xs text-secondary">check_circle</span> Priority Messaging</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-xs text-secondary">check_circle</span> Message before matching</li>
+</ul>
+</div>
+</div>
+<!-- Localized Payment Section -->
+<section class="bg-surface-container-low rounded-lg p-8">
+<h3 class="font-headline font-bold text-xl mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+                Localized Payment Methods
+            </h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+<!-- MTN Mobile Money -->
+<label class="relative flex items-center p-4 bg-surface-container-lowest rounded-lg cursor-pointer border-2 border-transparent has-[:checked]:border-primary transition-all">
+<input checked="" class="hidden peer" name="payment" type="radio"/>
+<div class="flex items-center gap-4 w-full">
+<div class="w-12 h-12 rounded-md bg-[#ffcc00] flex items-center justify-center font-black text-[#000] text-sm">MTN</div>
+<div class="flex-1">
+<p class="font-bold text-on-surface">MTN Mobile Money</p>
+<p class="text-xs text-on-surface-variant">Instant Activation</p>
+</div>
+<span class="material-symbols-outlined text-primary opacity-0 peer-checked:opacity-100">check_circle</span>
+</div>
+</label>
+<!-- Orange Money -->
+<label class="relative flex items-center p-4 bg-surface-container-lowest rounded-lg cursor-pointer border-2 border-transparent has-[:checked]:border-primary transition-all">
+<input class="hidden peer" name="payment" type="radio"/>
+<div class="flex items-center gap-4 w-full">
+<div class="w-12 h-12 rounded-md bg-[#ff6600] flex items-center justify-center font-black text-white text-sm">ORANGE</div>
+<div class="flex-1">
+<p class="font-bold text-on-surface">Orange Money</p>
+<p class="text-xs text-on-surface-variant">Fast &amp; Secure</p>
+</div>
+<span class="material-symbols-outlined text-primary opacity-0 peer-checked:opacity-100">check_circle</span>
+</div>
+</label>
+</div>
+<!-- Phone Number Input -->
+<div class="mb-8">
+<label class="block text-sm font-medium text-on-surface-variant mb-2">Mobile Money Number</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-4 flex items-center text-on-surface-variant font-medium">+237</span>
+<input class="w-full pl-16 pr-4 py-4 bg-surface-container-highest border-none rounded-md focus:ring-2 focus:ring-primary text-on-surface font-medium transition-all" placeholder="6XX XXX XXX" type="tel"/>
+</div>
+<p class="text-xs text-on-surface-variant mt-2 px-1">A payment prompt will be sent directly to your phone.</p>
+</div>
+<!-- Summary Table -->
+<div class="border-t border-outline-variant/20 pt-6 mb-8 space-y-3">
+<div class="flex justify-between text-sm">
+<span class="text-on-surface-variant">Selected Plan: Gold Monthly</span>
+<span class="font-bold text-on-surface">12,500 CFA</span>
+</div>
+<div class="flex justify-between text-sm">
+<span class="text-on-surface-variant">Processing Fee</span>
+<span class="font-bold text-on-surface">0 CFA</span>
+</div>
+<div class="flex justify-between text-lg font-headline font-extrabold pt-2">
+<span class="text-on-surface">Total Due</span>
+<span class="text-primary">12,500 CFA</span>
+</div>
+</div>
+<!-- Action Button -->
+<button class="w-full bg-primary text-on-primary py-5 rounded-full font-headline font-bold text-lg shadow-lg hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+<span class="material-symbols-outlined">lock</span>
+                Complete Purchase
+            </button>
+<p class="text-center text-[0.7rem] text-on-surface-variant mt-4 px-4">
+                By completing this purchase, you agree to SawaLove's Terms of Service and Privacy Policy. Subscriptions renew automatically unless cancelled in settings.
+            </p>
+</section>
+</main>
+<!-- Trust Badges Section -->
+<div class="bg-surface-container-highest/30 py-8 px-6 mb-24">
+<div class="max-w-2xl mx-auto flex justify-around items-center opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+<div class="flex flex-col items-center gap-1">
+<span class="material-symbols-outlined text-2xl">verified_user</span>
+<span class="text-[0.6rem] font-bold uppercase tracking-widest">Secure Pay</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<span class="material-symbols-outlined text-2xl">diversity_1</span>
+<span class="text-[0.6rem] font-bold uppercase tracking-widest">Local Support</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<span class="material-symbols-outlined text-2xl">encrypted</span>
+<span class="text-[0.6rem] font-bold uppercase tracking-widest">End-to-End</span>
+</div>
+</div>
+</div>
+</body></html>

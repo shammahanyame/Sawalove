@@ -1,0 +1,6 @@
+# Copy this file to android/key.properties and fill it with your Play Store
+# upload key values before running `flutter build appbundle --release`.
+storePassword=change-me
+keyPassword=change-me
+keyAlias=upload
+storeFile=../upload-keystore.jks

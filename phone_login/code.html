@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SawaLove - Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#ffd1e1",
+                        "on-secondary": "#fceeff",
+                        "on-secondary-fixed": "#510085",
+                        "primary-fixed": "#ff6ea9",
+                        "secondary-dim": "#7613bb",
+                        "on-surface-variant": "#7e4d61",
+                        "secondary-fixed-dim": "#deb3ff",
+                        "secondary": "#8329c8",
+                        "surface-dim": "#ffc4da",
+                        "tertiary-fixed-dim": "#39bce2",
+                        "on-primary-container": "#4b0027",
+                        "primary": "#b30065",
+                        "on-tertiary-fixed": "#002732",
+                        "on-tertiary-container": "#003e4e",
+                        "secondary-fixed": "#e7c5ff",
+                        "on-error": "#ffefee",
+                        "on-primary-fixed": "#000000",
+                        "primary-container": "#ff6ea9",
+                        "error-container": "#fb5151",
+                        "surface-container-high": "#ffd8e5",
+                        "on-error-container": "#570008",
+                        "background": "#fff4f6",
+                        "on-tertiary": "#e2f6ff",
+                        "on-secondary-container": "#6c00b0",
+                        "surface-bright": "#fff4f6",
+                        "inverse-primary": "#ff479c",
+                        "on-tertiary-fixed-variant": "#00485a",
+                        "tertiary": "#00647c",
+                        "error": "#b31b25",
+                        "outline": "#9c677d",
+                        "secondary-container": "#e7c5ff",
+                        "on-background": "#4a2134",
+                        "on-surface": "#4a2134",
+                        "surface-tint": "#b30065",
+                        "outline-variant": "#d89cb4",
+                        "on-secondary-fixed-variant": "#7716bc",
+                        "inverse-surface": "#220213",
+                        "surface": "#fff4f6",
+                        "primary-dim": "#9d0058",
+                        "surface-container-low": "#ffecf1",
+                        "surface-variant": "#ffd1e1",
+                        "tertiary-container": "#4dc9f1",
+                        "surface-container": "#ffe0ea",
+                        "inverse-on-surface": "#c68da3",
+                        "tertiary-dim": "#00576c",
+                        "on-primary": "#ffeff2",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-fixed-dim": "#ff4e9e",
+                        "on-primary-fixed-variant": "#5c0031",
+                        "error-dim": "#9f0519",
+                        "tertiary-fixed": "#4dc9f1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Be Vietnam Pro"],
+                        "label": ["Be Vietnam Pro"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: #fff4f6;
+        }
+        h1, h2, h3 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .bento-bg {
+            background-image: radial-gradient(circle at 2px 2px, #ffd1e1 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col items-center overflow-x-hidden">
+<!-- Top Navigation Bar (Language Toggle) -->
+<header class="w-full flex justify-between items-center px-6 h-20 z-50">
+<div class="bg-surface-container-low rounded-full p-1 flex items-center shadow-sm">
+<button class="px-4 py-1.5 rounded-full text-sm font-semibold bg-primary text-white transition-all">EN</button>
+<button class="px-4 py-1.5 rounded-full text-sm font-semibold text-on-surface-variant hover:bg-surface-container-highest transition-all">FR</button>
+</div>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low rounded-full transition-all">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</header>
+<main class="flex-1 w-full max-w-md px-6 pb-12 flex flex-col items-center justify-center relative">
+<!-- Background Decoration -->
+<div class="absolute -top-12 -right-12 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10"></div>
+<div class="absolute bottom-24 -left-12 w-48 h-48 bg-secondary/5 rounded-full blur-3xl -z-10"></div>
+<!-- Logo Section -->
+<div class="mb-12 text-center">
+<div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary to-primary-container rounded-lg mb-6 shadow-[0_12px_32px_rgba(179,0,101,0.2)]">
+<span class="material-symbols-outlined text-white text-4xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<h1 class="text-4xl font-extrabold tracking-tight text-primary italic">SawaLove</h1>
+<p class="mt-2 text-on-surface-variant font-medium">Radiant connections, modern souls.</p>
+</div>
+<!-- Login Container -->
+<div class="w-full bg-surface-container-lowest rounded-lg p-8 shadow-[0_20px_48px_rgba(74,33,52,0.06)] space-y-8">
+<div class="space-y-2">
+<h2 class="text-2xl font-bold text-on-surface">Welcome back</h2>
+<p class="text-sm text-on-surface-variant">Enter your phone number to continue your journey.</p>
+</div>
+<!-- Input Group -->
+<div class="space-y-4">
+<div class="flex items-center space-x-3">
+<!-- Country Selector -->
+<div class="flex items-center bg-surface-container-low px-4 py-4 rounded-md border border-transparent focus-within:border-primary transition-all">
+<img alt="Cameroon Flag" class="w-6 h-4 rounded-sm object-cover mr-2" data-alt="National flag of Cameroon with green red and yellow stripes and a gold star" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDh9kcGZNLg3ge46wqY5DSTSgilom08TDNVVhNJ9cvs04VSUDcSZvjYfSwsmxgIF6rev9v1ScoqvgBlhui8JNsjiDMh2uRSg5q5cC2Fptx0j51kPvjNXq8_UGmHupWY4K5QSutm3goWR2PaPU8YilOUEqqHGt9WMuFwtbnKx7mek_Oh_828WGZMkSpKVRtrPJrGdJ4uckquf-oCmi9w3Z85f7St30dUQK1JqdXJ-3ZmZVAyfbQJiJRMDNaFy69OFFH42J3dLQ0__xw"/>
+<span class="font-bold text-on-surface">+237</span>
+<span class="material-symbols-outlined text-sm ml-1 text-on-surface-variant">keyboard_arrow_down</span>
+</div>
+<!-- Number Input -->
+<div class="flex-1 relative">
+<input class="w-full bg-surface-container-low border-transparent focus:border-primary focus:ring-0 rounded-md py-4 px-4 font-bold text-on-surface placeholder:text-on-surface-variant/40 transition-all" placeholder="6xx xxx xxx" type="tel"/>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary font-bold py-4 rounded-full shadow-[0_8px_20px_rgba(179,0,101,0.25)] hover:scale-[1.02] active:scale-95 transition-all duration-200">
+                    Continue
+                </button>
+</div>
+<!-- Divider -->
+<div class="relative py-2">
+<div class="absolute inset-0 flex items-center"><div class="w-full border-t border-outline-variant/20"></div></div>
+<div class="relative flex justify-center text-xs uppercase tracking-widest font-bold text-on-surface-variant/40 bg-surface-container-lowest px-4">OR</div>
+</div>
+<!-- Social Logins -->
+<div class="grid grid-cols-2 gap-4">
+<button class="flex items-center justify-center space-x-2 py-3.5 rounded-full border border-outline-variant/30 hover:bg-surface-container-low transition-all active:scale-95">
+<img alt="Google" class="w-5 h-5" data-alt="Official Google multi-colored G logo icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-QiN1E54-joPqwROtlzvgsP8zi6snxYQGrmtDlS9lRXrshmJJvasH4fEJoqseNV_PbCklp4uzyvkjpE5UU8XRA2NKX-McWqnoIOqllgNBgUY_VzpgHT3Ry4U867PgDXObeiAMw0fOH8T0rxa30rBB2GrQ4s8j9XNMZqsDZBi8OQhj57JKShRbIrSxypUlepKQQYsGDSC5GI_vST6CRui_k-Yt_ZzCAt4XURI8xH2BLsEUsxuHW2ERN-OVMgANC0VwOlFOA6l-Y6c"/>
+<span class="text-sm font-bold text-on-surface">Google</span>
+</button>
+<button class="flex items-center justify-center space-x-2 py-3.5 rounded-full border border-outline-variant/30 hover:bg-surface-container-low transition-all active:scale-95">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">ios</span>
+<span class="text-sm font-bold text-on-surface">Apple</span>
+</button>
+</div>
+</div>
+<!-- Trust Building Visual -->
+<div class="mt-12 w-full bg-surface-container-low rounded-lg p-6 flex items-center space-x-4">
+<div class="relative flex -space-x-2">
+<div class="w-10 h-10 rounded-full border-2 border-surface-container-lowest overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait of a smiling young African woman with natural hair in soft outdoor sunlight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCC_KnD19DXCcUOl_nYmf8lLjj703xSbbaZq-ajWd7YHCIUhzV5H6IK7tjfoVrDvxijwzOGpcJUxkhvp0qLKbbgDz_QzYE54COBgZp1m_hFzAxlTwhDXWtP9v_X35Pts2tLNq3ruavAr6x0ryiLKLW7-PQ96CB4nwzmo2bXx9CTcEt0ersS-9xv7CjzJWiwKoR38hCuLi_lATfP7AfcpfFrvf6SNAEJTMJDr-gkh26F802xFSbcOq0slBsoUfYiIcGWVUh66KhtBJ8"/>
+</div>
+<div class="w-10 h-10 rounded-full border-2 border-surface-container-lowest overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Portrait of a handsome African man in a bright linen shirt smiling warmly" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHXsFWp3aZtW7l-gQ3BrLMQtC69oih9xkSfNMhLoxc6g-yFOT0ovTGyLZ-zlHu-kd3mhJursR9oa5l8xfJD8H3x0Q9cy_F26iUw0vwtpsw5LQMKEXHAs7XkSYNrVzcSX5eNJXje5-wfKN5VQwR6_NvwKXG32TacGSnvZqy_wVCAKgWZIbTmvyP1MdjdFsRR7s60YPeEZ4yHiJfPCwTBoRbUGzkI91dKlw1_svNtYA4Myt69BAlMW4ILhaTfYtgrH1cL3pFYCMXWhQ"/>
+</div>
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-[10px] font-bold text-on-primary-container border-2 border-surface-container-lowest">
+                    +10k
+                </div>
+</div>
+<div>
+<p class="text-xs font-bold text-on-surface">Trusted by thousands in Cameroon</p>
+<div class="flex items-center text-[10px] text-tertiary font-semibold uppercase tracking-wider">
+<span class="material-symbols-outlined text-xs mr-1" style="font-variation-settings: 'FILL' 1;">verified</span>
+                    Secure &amp; Private
+                </div>
+</div>
+</div>
+</main>
+<!-- Friendly Footer -->
+<footer class="w-full py-8 px-8 text-center space-y-3">
+<p class="text-xs text-on-surface-variant/60 leading-relaxed max-w-xs mx-auto">
+            By continuing, you agree to our <a class="text-primary font-bold hover:underline" href="#">Terms of Service</a> and <a class="text-primary font-bold hover:underline" href="#">Privacy Policy</a>.
+        </p>
+<p class="text-[10px] font-bold text-on-surface-variant/40 tracking-widest uppercase">
+            © 2024 SawaLove African Modern
+        </p>
+</footer>
+<!-- TopAppBar for consistent branding if needed by shell logic, though suppressed by Task-Focused rule in standard flow -->
+<!-- We focus on the task-specific login shell here -->
+</body></html>

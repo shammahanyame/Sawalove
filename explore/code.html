@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&amp;family=Be+Vietnam+Pro:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#ff4e9e",
+                    "tertiary-container": "#4dc9f1",
+                    "primary-dim": "#9d0058",
+                    "secondary-fixed-dim": "#deb3ff",
+                    "secondary-fixed": "#e7c5ff",
+                    "secondary-container": "#e7c5ff",
+                    "on-background": "#4a2134",
+                    "tertiary-fixed": "#4dc9f1",
+                    "on-primary": "#ffeff2",
+                    "inverse-primary": "#ff479c",
+                    "tertiary": "#00647c",
+                    "tertiary-dim": "#00576c",
+                    "inverse-surface": "#220213",
+                    "error": "#b31b25",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-variant": "#ffd1e1",
+                    "surface-bright": "#fff4f6",
+                    "outline": "#9c677d",
+                    "on-secondary-container": "#6c00b0",
+                    "on-tertiary-container": "#003e4e",
+                    "surface": "#fff4f6",
+                    "surface-container": "#ffe0ea",
+                    "inverse-on-surface": "#c68da3",
+                    "outline-variant": "#d89cb4",
+                    "surface-tint": "#b30065",
+                    "error-container": "#fb5151",
+                    "on-tertiary-fixed-variant": "#00485a",
+                    "error-dim": "#9f0519",
+                    "surface-container-low": "#ffecf1",
+                    "on-tertiary-fixed": "#002732",
+                    "on-secondary-fixed-variant": "#7716bc",
+                    "on-secondary": "#fceeff",
+                    "tertiary-fixed-dim": "#39bce2",
+                    "on-surface": "#4a2134",
+                    "surface-container-highest": "#ffd1e1",
+                    "on-surface-variant": "#7e4d61",
+                    "primary-fixed": "#ff6ea9",
+                    "on-tertiary": "#e2f6ff",
+                    "background": "#fff4f6",
+                    "surface-dim": "#ffc4da",
+                    "surface-container-high": "#ffd8e5",
+                    "on-error": "#ffefee",
+                    "primary-container": "#ff6ea9",
+                    "on-primary-fixed": "#000000",
+                    "secondary": "#8329c8",
+                    "primary": "#b30065",
+                    "on-secondary-fixed": "#510085",
+                    "on-primary-container": "#4b0027",
+                    "on-primary-fixed-variant": "#5c0031",
+                    "on-error-container": "#570008",
+                    "secondary-dim": "#7613bb"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Be Vietnam Pro"],
+                    "label": ["Be Vietnam Pro"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bento-card-hover:hover {
+            transform: translateY(-4px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container/30">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#fff4f6]/80 dark:bg-pink-950/80 backdrop-blur-md flex justify-between items-center px-6 py-4 w-full">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/20">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="portrait of a beautiful young African woman with short hair smiling warmly against a soft pink background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaY9E_8oYs0blmZsWUpR_mloSTBu9syHHiF38uWKHGBFYZXSeFAM7UGL6yY1spNeayyW9GZmkSKx8pNuR2I3ZrfyDd6KWizRx9IWjo5XdEvRuyeUC6IFcP2BGMxuVvzGC82GT8UpMHMsw7raFgX9OFQ-YgDRNLQshRn3fVFLwXoP3hqiS7VU5qvFU21OIzQZITRcFsxWqMKiONQb7T00U-pervKByhlObEGBT7Cu3r66sKaleEdCiwzI6cG0PqqvwI19et5Qp_D24"/>
+</div>
+<h1 class="text-xl font-black text-[#b30065] dark:text-pink-300 font-headline tracking-tight">SawaLove</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-[#b30065] dark:text-pink-400 font-bold hover:opacity-80 transition-opacity">FR</button>
+<span class="material-symbols-outlined text-primary cursor-pointer">notifications</span>
+</div>
+</header>
+<main class="pt-24 pb-32 px-6 max-w-2xl mx-auto">
+<!-- Search Bar -->
+<section class="mb-8">
+<div class="bg-surface-container-low rounded-lg p-4 flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant">travel_explore</span>
+<input class="bg-transparent border-none focus:ring-0 text-on-surface w-full font-body placeholder:text-on-surface-variant/60" placeholder="Explore connections..." type="text"/>
+</div>
+</section>
+<!-- Featured Section: Double Date -->
+<section class="mb-10">
+<h2 class="text-lg font-headline font-bold text-on-surface mb-4 px-1">Social Moments</h2>
+<div class="relative overflow-hidden rounded-lg bg-gradient-to-br from-primary to-primary-container p-6 text-on-primary shadow-xl">
+<div class="relative z-10">
+<span class="bg-white/20 text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full backdrop-blur-sm">Featured Mode</span>
+<h3 class="text-2xl font-headline font-extrabold mt-3 mb-2">Double Date</h3>
+<p class="text-sm opacity-90 mb-6 max-w-[240px]">Group up with your best friend and match with other duos for a fun, low-pressure evening.</p>
+<button class="bg-surface-container-lowest text-primary font-bold px-6 py-3 rounded-full hover:scale-95 transition-transform duration-150">
+                        Find a Pair
+                    </button>
+</div>
+<!-- Abstract Decorative Elements -->
+<div class="absolute -right-4 -bottom-4 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
+<div class="absolute right-0 top-0 w-32 h-64 opacity-20 pointer-events-none">
+<img class="w-full h-full object-cover" data-alt="four young friends laughing and enjoying drinks together in a modern stylish rooftop lounge" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZ2NW5kNMXIFu61rLqwZDu2s5th6KkebPVWik-CKopdLndOw2eg3Mb75sXn-RwSSZQYqzfIuGTbUyCjkiaWyvd1Kl2x2ATQKwMHX9uHVC7q6niMf5HXiexJ1PNQqQqsff-SX-kZpIM5lzrFvl9H6ceRNKk47aPpcCK92DwFOJs6hENUbDVawrOvEDVYKMXvVr-AdWYHNaWTDql21mZky-tdLhGgfIXl6WiB3jjHnF4tEJLrtP4uspIYJw03fY3F1nhJ_dxvduy-ag"/>
+</div>
+</div>
+</section>
+<!-- Interest Modes: Bento Grid -->
+<section class="mb-10">
+<div class="flex justify-between items-end mb-4 px-1">
+<h2 class="text-lg font-headline font-bold text-on-surface">Interest Modes</h2>
+<span class="text-xs font-bold text-primary cursor-pointer hover:underline">See All</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<!-- Music Lovers -->
+<div class="bento-card-hover bg-surface-container-low rounded-lg p-5 flex flex-col justify-between aspect-square">
+<div class="w-12 h-12 rounded-2xl bg-[#ff6ea9]/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl" data-weight="fill" style="font-variation-settings: 'FILL' 1;">music_note</span>
+</div>
+<div>
+<h4 class="font-headline font-bold text-on-surface">Music Lovers</h4>
+<p class="text-xs text-on-surface-variant mt-1">1.2k active now</p>
+</div>
+</div>
+<!-- Travelers -->
+<div class="bento-card-hover bg-surface-container rounded-lg p-5 flex flex-col justify-between aspect-square">
+<div class="w-12 h-12 rounded-2xl bg-tertiary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary text-3xl" data-weight="fill" style="font-variation-settings: 'FILL' 1;">travel_explore</span>
+</div>
+<div>
+<h4 class="font-headline font-bold text-on-surface">Travelers</h4>
+<p class="text-xs text-on-surface-variant mt-1">New adventures</p>
+</div>
+</div>
+<!-- Foodies -->
+<div class="bento-card-hover bg-surface-container-highest rounded-lg p-5 flex flex-col justify-between aspect-square">
+<div class="w-12 h-12 rounded-2xl bg-secondary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary text-3xl" data-weight="fill" style="font-variation-settings: 'FILL' 1;">restaurant</span>
+</div>
+<div>
+<h4 class="font-headline font-bold text-on-surface">Foodies</h4>
+<p class="text-xs text-on-surface-variant mt-1">Dinner dates</p>
+</div>
+</div>
+<!-- Serious Only -->
+<div class="bento-card-hover bg-primary-container/10 rounded-lg p-5 flex flex-col justify-between aspect-square border-2 border-primary/10">
+<div class="w-12 h-12 rounded-2xl bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-3xl" data-weight="fill" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<div>
+<h4 class="font-headline font-bold text-on-surface">Serious Only</h4>
+<p class="text-xs text-on-surface-variant mt-1">Long term focus</p>
+</div>
+</div>
+</div>
+</section>
+<!-- New Near You Section (Asymmetric Gallery) -->
+<section class="mb-10">
+<h2 class="text-lg font-headline font-bold text-on-surface mb-4 px-1">New Near You</h2>
+<div class="grid grid-cols-3 gap-3">
+<div class="col-span-2 row-span-2 relative h-64 rounded-lg overflow-hidden group">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="overhead shot of a confident African man wearing colorful contemporary fashion, sitting in a bright modern cafe" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDl2yRyY4Y5xwJ00cQspVcGaan5MWSKO-lkRL9KY-t9dze1knDwflQTswrlfcdZCx1329ziMAJLcTZRjHEdVFiBHQ7oaNEEkdfSbjZn8TRSR_BMAcwS2nbHVT0AdiCr-2H0wrhmg3qCNysRkw7FnT2lOCu9bfNMyQkGsWdERUS9AGE8322CNrIKNUA9MbedBf2AbG-QjUL0Rkitzn7h4vWGeMbs3Dx5C7ENfV-PYu-tWAQX0PfrdZUlTWB57xilcushy8QfUqgyjOg"/>
+<div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent">
+<p class="text-white font-bold font-headline">Kofi, 28</p>
+<p class="text-white/80 text-[10px]">Accra • 2km away</p>
+</div>
+</div>
+<div class="relative h-[124px] rounded-lg overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="close up profile of a stylish African woman with artistic jewelry and glowing skin" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDu8YOfSqacP-PQOj6utNddPXof4_FNmeV6IKK8ZXYkT_AeSZVfU5HSux5MX-Q4UpQRJsh7UHkZ9YFL3zgD9bCNLUBIhKkLYE_i-mvj8RqBd-lCZ_gwY2nS_anniX_zsjVIxB4M5FgZvE4JHQv19yiEf2ZRoHy_Nlf8YEqLRpKFCWTJhJuIR7nzZfxPQzhHNKk-SEOtmTG5C0HkiAOtxIfhS_g55B7gZksbKFQAbwxN7hHWw7c0CpwipNY-D7rdDgudh3Mym4N-CBA"/>
+</div>
+<div class="relative h-[124px] rounded-lg overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="portrait of a young African woman laughing outdoors in soft golden sunlight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuraBPKKzA1CRJdviBBQE1bFgCvyx1QCjJtDO4KiDCiBcrwxOS7ItTHb-bJv9nUDR56oxv7Qiv9eeDvY4Tkp3PtJs9sEoczzdCjGVZfjSp-mnyxUPi3lCZXw9CtSnFOc8_yAOouDW4bFvwo094UHJtHjpUIs1e2l54D7fOj7uhjQrAvrv1bG3Wx1PJ3WZac3SVxAwEJKJe_xsDDBWsBXPeB-YUBRkzvXmKVpVX5MMfaGcGtXPZ3dl521vd34Wt7KqmVcinqPtARBQ"/>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] rounded-[3rem] bg-[#fff4f6]/80 dark:bg-pink-900/80 backdrop-blur-xl z-50 flex justify-around items-center p-2 shadow-[0_12px_32px_rgba(74,33,52,0.08)]">
+<!-- Home -->
+<a class="flex flex-col items-center justify-center text-[#4a2134] dark:text-pink-200 p-3 hover:bg-pink-100/50 dark:hover:bg-pink-800/50 rounded-full transition-transform duration-200 active:scale-90" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-medium font-['Be_Vietnam_Pro']">Home</span>
+</a>
+<!-- Explore (Active) -->
+<a class="flex flex-col items-center justify-center bg-[#b30065] text-white rounded-full p-3 transition-transform duration-200 active:scale-90" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">travel_explore</span>
+<span class="text-[10px] font-medium font-['Be_Vietnam_Pro']">Explore</span>
+</a>
+<!-- Likes -->
+<a class="flex flex-col items-center justify-center text-[#4a2134] dark:text-pink-200 p-3 hover:bg-pink-100/50 dark:hover:bg-pink-800/50 rounded-full transition-transform duration-200 active:scale-90" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<span class="text-[10px] font-medium font-['Be_Vietnam_Pro']">Likes</span>
+</a>
+<!-- Messages -->
+<a class="flex flex-col items-center justify-center text-[#4a2134] dark:text-pink-200 p-3 hover:bg-pink-100/50 dark:hover:bg-pink-800/50 rounded-full transition-transform duration-200 active:scale-90" href="#">
+<span class="material-symbols-outlined">chat</span>
+<span class="text-[10px] font-medium font-['Be_Vietnam_Pro']">Messages</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center text-[#4a2134] dark:text-pink-200 p-3 hover:bg-pink-100/50 dark:hover:bg-pink-800/50 rounded-full transition-transform duration-200 active:scale-90" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium font-['Be_Vietnam_Pro']">Profile</span>
+</a>
+</nav>
+</body></html>

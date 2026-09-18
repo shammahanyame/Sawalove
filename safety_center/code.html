@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,700;0,800;1,800&amp;family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-dim": "#ffc4da",
+                    "secondary-dim": "#7613bb",
+                    "surface-bright": "#fff4f6",
+                    "on-tertiary-fixed-variant": "#00485a",
+                    "tertiary-dim": "#00576c",
+                    "on-tertiary-container": "#003e4e",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-fixed-variant": "#7716bc",
+                    "outline-variant": "#d89cb4",
+                    "tertiary-fixed": "#4dc9f1",
+                    "tertiary-container": "#4dc9f1",
+                    "on-secondary-fixed": "#510085",
+                    "inverse-surface": "#220213",
+                    "on-tertiary": "#e2f6ff",
+                    "on-primary-fixed-variant": "#5c0031",
+                    "surface": "#fff4f6",
+                    "on-error-container": "#570008",
+                    "tertiary-fixed-dim": "#39bce2",
+                    "on-secondary-container": "#6c00b0",
+                    "on-primary-fixed": "#000000",
+                    "primary-fixed": "#ff6ea9",
+                    "on-background": "#4a2134",
+                    "secondary-fixed": "#e7c5ff",
+                    "surface-container-low": "#ffecf1",
+                    "background": "#fff4f6",
+                    "surface-tint": "#b30065",
+                    "inverse-on-surface": "#c68da3",
+                    "inverse-primary": "#ff479c",
+                    "surface-container-high": "#ffd8e5",
+                    "error": "#b31b25",
+                    "secondary-container": "#e7c5ff",
+                    "on-primary-container": "#4b0027",
+                    "primary-fixed-dim": "#ff4e9e",
+                    "primary-container": "#ff6ea9",
+                    "on-error": "#ffefee",
+                    "on-secondary": "#fceeff",
+                    "primary": "#b30065",
+                    "surface-container-highest": "#ffd1e1",
+                    "on-surface-variant": "#7e4d61",
+                    "secondary": "#8329c8",
+                    "on-tertiary-fixed": "#002732",
+                    "surface-variant": "#ffd1e1",
+                    "secondary-fixed-dim": "#deb3ff",
+                    "error-container": "#fb5151",
+                    "primary-dim": "#9d0058",
+                    "on-surface": "#4a2134",
+                    "outline": "#9c677d",
+                    "error-dim": "#9f0519",
+                    "tertiary": "#00647c",
+                    "on-primary": "#ffeff2",
+                    "surface-container": "#ffe0ea"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Be Vietnam Pro"],
+                    "label": ["Be Vietnam Pro"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: #fff4f6;
+            color: #4a2134;
+        }
+        .glass-nav {
+            background: rgba(255, 244, 246, 0.8);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- TopAppBar -->
+<header class="fixed top-0 z-50 w-full glass-nav flex justify-between items-center px-6 py-4">
+<div class="flex items-center gap-4">
+<button class="text-[#b30065] hover:opacity-80 transition-opacity active:scale-95 duration-200">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-['Plus_Jakarta_Sans'] font-black text-2xl text-[#b30065] italic tracking-tight">SawaLove</h1>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-container">
+<img alt="User Profile Photo" class="w-full h-full object-cover" data-alt="portrait of a young African woman with a radiant smile and braided hair in soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtLg65Yndr_lyURsw18VLEFLcG6e7bhjXpEXo0Y3jNbCdnGuxzNODerpdEHJwMCCLCuR6Ny3wJQ-9eaftERPJEiiOpAV4a0tHyia4IswqafAn5-Aj81ho8clp7GfQLoE8lIn8tymwApQ3mqvzyrj0_sXEgcAOtRuLn7yKCsC7gG7sE_Yxqwf12msMb9hi7JrYivUSvxp_0yqUPdPZwAy52vtot4iNDcq1vBMCv0ISAPxArRLk0AuLYSzx9ATnn-DE_igStaIIFnnY"/>
+</div>
+</header>
+<main class="pt-24 pb-32 px-6 max-w-4xl mx-auto space-y-12">
+<!-- Hero Section -->
+<section class="text-center space-y-4">
+<div class="inline-flex items-center justify-center p-4 bg-tertiary-container/20 text-tertiary rounded-full mb-2">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">gpp_good</span>
+</div>
+<h2 class="font-headline font-extrabold text-4xl text-on-background tracking-tight">Safety Center</h2>
+<p class="font-body text-on-surface-variant max-w-md mx-auto">Your well-being is our priority. Explore our tools and guidelines to ensure a secure and respectful experience.</p>
+</section>
+<!-- Security Tools: Bento Grid Style -->
+<section class="space-y-6">
+<h3 class="font-headline font-bold text-xl px-2">Security Tools</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<!-- Photo Verification -->
+<div class="md:col-span-2 bg-surface-container-lowest p-8 rounded-lg flex flex-col justify-between relative overflow-hidden group">
+<div class="relative z-10">
+<span class="material-symbols-outlined text-primary mb-4 text-3xl">verified_user</span>
+<h4 class="font-headline font-bold text-2xl mb-2">Photo Verification</h4>
+<p class="text-on-surface-variant mb-6 max-w-sm">Increase trust and transparency. Get your profile badge by verifying your identity with a quick selfie.</p>
+<button class="bg-primary text-on-primary px-8 py-3 rounded-full font-bold transition-transform active:scale-95">Verify Now</button>
+</div>
+<div class="absolute right-[-20px] bottom-[-20px] opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[160px]">face</span>
+</div>
+</div>
+<!-- Incognito Mode -->
+<div class="bg-secondary-container p-8 rounded-lg flex flex-col items-center text-center justify-center space-y-4">
+<span class="material-symbols-outlined text-secondary text-4xl">visibility_off</span>
+<h4 class="font-headline font-bold text-xl text-on-secondary-container">Incognito Mode</h4>
+<p class="text-on-secondary-container/80 text-sm">Only people you've liked will see your profile.</p>
+<div class="w-12 h-6 bg-secondary/20 rounded-full relative cursor-pointer flex items-center px-1">
+<div class="w-4 h-4 bg-white rounded-full"></div>
+</div>
+</div>
+<!-- Blocked Contacts -->
+<div class="bg-surface-container-low p-8 rounded-lg flex items-center justify-between col-span-1 md:col-span-3">
+<div class="flex items-center gap-6">
+<div class="w-16 h-16 bg-white rounded-full flex items-center justify-center text-error">
+<span class="material-symbols-outlined text-3xl">block</span>
+</div>
+<div>
+<h4 class="font-headline font-bold text-xl">Blocked Contacts</h4>
+<p class="text-on-surface-variant text-sm">Manage users you've previously restricted from reaching you.</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</div>
+</div>
+</section>
+<!-- Safety Guidelines: Horizontal Scroll/Cards -->
+<section class="space-y-6">
+<h3 class="font-headline font-bold text-xl px-2">Safety Guidelines</h3>
+<div class="flex gap-6 overflow-x-auto pb-6 scrollbar-hide -mx-6 px-6">
+<!-- Card 1 -->
+<div class="min-w-[280px] bg-surface-container-high p-6 rounded-lg space-y-4">
+<div class="w-12 h-12 bg-white/50 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary">meeting_room</span>
+</div>
+<h5 class="font-bold text-lg">Meeting in Public</h5>
+<p class="text-sm text-on-surface-variant leading-relaxed">Always arrange your first few meetings in busy, well-lit public spaces like cafes or restaurants.</p>
+</div>
+<!-- Card 2 -->
+<div class="min-w-[280px] bg-surface-container-high p-6 rounded-lg space-y-4">
+<div class="w-12 h-12 bg-white/50 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">share_location</span>
+</div>
+<h5 class="font-bold text-lg">Share Your Plans</h5>
+<p class="text-sm text-on-surface-variant leading-relaxed">Let a trusted friend or family member know where you're going and who you are meeting.</p>
+</div>
+<!-- Card 3 -->
+<div class="min-w-[280px] bg-surface-container-high p-6 rounded-lg space-y-4">
+<div class="w-12 h-12 bg-white/50 rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">payments</span>
+</div>
+<h5 class="font-bold text-lg">Financial Safety</h5>
+<p class="text-sm text-on-surface-variant leading-relaxed">Never send money or share financial details with someone you met online, no matter the story.</p>
+</div>
+</div>
+</section>
+<!-- Help & Support: Subtle Stack -->
+<section class="space-y-6">
+<h3 class="font-headline font-bold text-xl px-2">Help &amp; Support</h3>
+<div class="bg-surface-container-low rounded-lg overflow-hidden">
+<button class="w-full flex items-center justify-between p-6 hover:bg-white/40 transition-colors">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-error">report</span>
+<span class="font-semibold">Report a Problem</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">arrow_forward</span>
+</button>
+<div class="h-[1px] bg-on-surface/5 mx-6"></div>
+<button class="w-full flex items-center justify-between p-6 hover:bg-white/40 transition-colors">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-tertiary">contact_support</span>
+<span class="font-semibold">Contact Safety Team</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">arrow_forward</span>
+</button>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md rounded-xl glass-nav z-50 flex justify-around items-center h-20 px-4 shadow-[0_12px_32px_rgba(74,33,52,0.12)]">
+<a class="flex flex-col items-center justify-center text-[#4a2134]/50 p-2 hover:text-[#b30065] transition-colors" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-['Be_Vietnam_Pro'] text-[10px] font-semibold uppercase tracking-widest mt-1">Discover</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#4a2134]/50 p-2 hover:text-[#b30065] transition-colors" href="#">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="font-['Be_Vietnam_Pro'] text-[10px] font-semibold uppercase tracking-widest mt-1">Messages</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-[#b30065] text-white rounded-full p-3 scale-110 -translate-y-2 transition-all shadow-lg shadow-[#b30065]/40" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">gpp_good</span>
+<span class="font-['Be_Vietnam_Pro'] text-[8px] font-bold uppercase tracking-widest mt-0.5">Safety</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#4a2134]/50 p-2 hover:text-[#b30065] transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-['Be_Vietnam_Pro'] text-[10px] font-semibold uppercase tracking-widest mt-1">Profile</span>
+</a>
+</nav>
+</body></html>

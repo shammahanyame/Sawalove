@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SawaLove | Likes &amp; Matches</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#ff4e9e",
+                        "on-error-container": "#570008",
+                        "primary": "#b30065",
+                        "surface-tint": "#b30065",
+                        "secondary-dim": "#7613bb",
+                        "on-primary-fixed": "#000000",
+                        "secondary-container": "#e7c5ff",
+                        "primary-container": "#ff6ea9",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#4dc9f1",
+                        "surface-container-low": "#ffecf1",
+                        "on-secondary": "#fceeff",
+                        "on-tertiary": "#e2f6ff",
+                        "tertiary": "#00647c",
+                        "on-primary": "#ffeff2",
+                        "inverse-on-surface": "#c68da3",
+                        "secondary-fixed": "#e7c5ff",
+                        "on-surface-variant": "#7e4d61",
+                        "on-primary-fixed-variant": "#5c0031",
+                        "tertiary-dim": "#00576c",
+                        "inverse-primary": "#ff479c",
+                        "surface-container-highest": "#ffd1e1",
+                        "outline": "#9c677d",
+                        "surface-container-high": "#ffd8e5",
+                        "outline-variant": "#d89cb4",
+                        "on-tertiary-fixed-variant": "#00485a",
+                        "on-tertiary-container": "#003e4e",
+                        "on-surface": "#4a2134",
+                        "surface-dim": "#ffc4da",
+                        "on-tertiary-fixed": "#002732",
+                        "on-primary-container": "#4b0027",
+                        "secondary-fixed-dim": "#deb3ff",
+                        "on-secondary-fixed-variant": "#7716bc",
+                        "on-secondary-container": "#6c00b0",
+                        "tertiary-container": "#4dc9f1",
+                        "error": "#b31b25",
+                        "tertiary-fixed-dim": "#39bce2",
+                        "on-background": "#4a2134",
+                        "error-container": "#fb5151",
+                        "surface": "#fff4f6",
+                        "primary-fixed": "#ff6ea9",
+                        "surface-container": "#ffe0ea",
+                        "secondary": "#8329c8",
+                        "background": "#fff4f6",
+                        "inverse-surface": "#220213",
+                        "error-dim": "#9f0519",
+                        "on-error": "#ffefee",
+                        "primary-dim": "#9d0058",
+                        "surface-variant": "#ffd1e1",
+                        "surface-bright": "#fff4f6",
+                        "on-secondary-fixed": "#510085"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Be Vietnam Pro"],
+                        "label": ["Be Vietnam Pro"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface antialiased min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#fff4f6]/80 backdrop-blur-xl shadow-[0_4px_20px_rgba(74,33,52,0.05)]">
+<div class="flex justify-between items-center w-full px-6 py-3">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-full overflow-hidden border-2 border-primary-container">
+<img alt="User profile photo" class="h-full w-full object-cover" data-alt="Close up portrait of a young African man with a friendly smile, studio lighting with soft pink background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjURtUTAMKqA-le3LMnIw9Miklru_qsOVSrMlSHjQOPJwK_SKBczq_MdWB-4KjrKXT0OYRLmcsgSNh60tOcwOVlDdNUVTYSAVlyJpDpTAS-Vx94UUQCdbcgjcBzlD91WOdFtO58oe-PYY8YxmVpg0N0ZpiGTwSvC9SfFqVOoOo0fVxjDiRNkVOidZfjY-hDFqo_wSFd9dVi0ktERPGrgSrmNEh3hPHDXPaRLQ1E5cpVtQniquVaCIu4SwowIoRRkec7f7hy8GabEI"/>
+</div>
+<span class="text-2xl font-extrabold text-[#b30065] font-headline tracking-tight">SawaLove</span>
+</div>
+<button class="px-4 py-1.5 rounded-full bg-surface-container-high text-primary font-bold text-sm hover:bg-[#ffecf1] transition-all active:scale-95 duration-200">
+                FR/EN
+            </button>
+</div>
+</header>
+<main class="pt-20 px-6 max-w-2xl mx-auto">
+<!-- Likes You Section -->
+<section class="mt-4">
+<div class="flex justify-between items-end mb-4">
+<h2 class="text-xl font-headline font-extrabold tracking-tight text-on-surface">Likes You</h2>
+<span class="text-primary font-bold text-sm">See all</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<!-- Profile Card: Kofi -->
+<div class="relative group aspect-[3/4] rounded-lg overflow-hidden bg-surface-container-lowest">
+<img class="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Portrait of a stylish African man named Kofi wearing a neutral linen shirt, smiling warmly against a vibrant botanical background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdkT6C71J2HfjmUUP4PEaQZ5BJIleM_77wuFUYdF5l2DCVulAXnVByzj7GKWOXdwbI-11xhLWFx2stGofjKZBH_4iaHJCYVWzhr1CF3Eu3l7y27ErsHhDTi2E0ZvU5-nxURd3gS83B_vseORn5V1aHW_WToRBe6h14uLUQrfBsq6QO1G7QgwWJTztGdhKap-GDNR_ZJFNWh8HEGJ0BhhcDIk05LiVFk4djFpF0nGaKbecpDMwcS6sEr-EnEoVJUIDkmPMsdStxrVE"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4">
+<div class="flex items-center justify-between">
+<div>
+<p class="text-white font-headline font-bold text-lg leading-none">Kofi, 28</p>
+<p class="text-white/80 text-xs font-medium">Accra, GH</p>
+</div>
+<div class="h-10 w-10 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/30">
+<span class="material-symbols-outlined text-white text-xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Premium Locked Card -->
+<div class="relative aspect-[3/4] rounded-lg overflow-hidden bg-surface-container-lowest">
+<div class="absolute inset-0 blur-xl scale-110">
+<img class="h-full w-full object-cover" data-alt="Blurred abstract shapes of people in warm sunset tones, suggesting hidden profile photos" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPhTbWr3RJPHSscWcLQvKPRtX9pspuWyiy-cjogZMg1UhHjnqwcn6EAmqUwRAd6A8bNkQHSQoEiumXo-nzPf29iCuipdcDkPUALKoOi6fyw6_IIBSmb2sh-5UEOUIpYPRFEfFGdDDV68O-q8ZPqrapnQgI4L5jrYGVIHjd-AZYdhYxvb62D4_BLkz-4UJ_nQ1EuDkPKcrgfTgVBW28ZqV5ZQ3rVddefo23Z6MUKs5HXo2_Ju27znSfjCw3CR9-4j5c86ol3x6tTDU"/>
+</div>
+<div class="absolute inset-0 bg-primary/10 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
+<div class="h-12 w-12 bg-white/20 rounded-full flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-primary text-3xl">lock</span>
+</div>
+<h3 class="text-on-primary-container font-headline font-extrabold text-xl leading-tight mb-4">12 more likes</h3>
+<button class="w-full py-3 bg-primary text-on-primary font-bold rounded-full shadow-lg shadow-primary/20 active:scale-95 transition-transform">
+                            GO GOLD
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- New Matches Section -->
+<section class="mt-10">
+<h2 class="text-xl font-headline font-extrabold tracking-tight text-on-surface mb-4">New Matches</h2>
+<div class="flex gap-5 overflow-x-auto hide-scrollbar pb-2">
+<!-- Match 1 -->
+<div class="flex flex-col items-center gap-2 flex-shrink-0">
+<div class="h-20 w-20 rounded-full p-1 border-2 border-primary">
+<img class="h-full w-full object-cover rounded-full" data-alt="Close up of a radiant woman with braided hair, high-fashion aesthetic, soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD65oneUXDp-vzSBWdt6Prl68CCvLuzrhBn1cK8cQAhETr4SDEZ2OdzWqRUBKh-YfNvslYwmdwyh0YWE3EmgFfIZas_7sISQIvFHI0n80gdJ_b3EyUcNDpN5gkCAhJabS0MUi4UgL2GH2SvbiaJ7n_V0d1_yZBCjo5KZqPGQieIr_aTtJaW6oEADfqL5VPP25shK6ir-ljdtAusQSKQVh6-uFVEuJiHOzk01AK1uX5NLiHPwkKpCWhUCs8xOFaZvvxvD1yTIhanq8I"/>
+</div>
+<span class="text-xs font-bold text-on-surface-variant">Amara</span>
+</div>
+<!-- Match 2 -->
+<div class="flex flex-col items-center gap-2 flex-shrink-0">
+<div class="h-20 w-20 rounded-full p-1 border-2 border-primary">
+<img class="h-full w-full object-cover rounded-full" data-alt="Stylish woman in colorful contemporary African print clothing, smiling broadly" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9HPRA4RvJjhF6A8a2YB-JybZXXTUDd_M0AM3cTQ-FpB2Q7HMc3WxgVgseEQxhm2KseQt-ARgZR8t3X2rw1sAHDwXXdGmzs9rWPq28llnoqwE6kFSTed0amkge8J-6isGE8Qz-c9MEJVUpuHANzPAfVMSyBr4xJvais42u_x3PB9z2QLbf_fPz2wHw6klvVWniFxt_h4Oltn0Tev3ciRpFTwEacyFp1wMvizBtOgDAmHlBEXDEDfZh-ieeE8Rc0OMoYL4jngAU0Ok"/>
+</div>
+<span class="text-xs font-bold text-on-surface-variant">Zainab</span>
+</div>
+<!-- Match 3 -->
+<div class="flex flex-col items-center gap-2 flex-shrink-0">
+<div class="h-20 w-20 rounded-full p-1 border-2 border-primary">
+<img class="h-full w-full object-cover rounded-full" data-alt="Portrait of a young man with a confident expression, soft outdoor lighting in a city park" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0vba6W4I3M2Rg7ZhVCorQdWlO3P5d1UDd61Gq57iG850A7prIjmAQm9q3xVKxqCY8eTqDaBB3oiY6zboedOgFb4vZrTBCU3dE550Ho-de7mIevzvu6nbdIHKSKwvyotqgOE3h94OPc7TUVpYRH1AnyoL7w-Tmbas_qIo6occKmsseFb7NVpOoRZ7THdtzNlAUKpGRAUQO-C0Y9DCcuWTeR3mmE5wTd64dSsvA55WD19HhbCoAGn3v-9NS0HMnYP_Ixh-hYczy8X4"/>
+</div>
+<span class="text-xs font-bold text-on-surface-variant">Malik</span>
+</div>
+<!-- Match 4 -->
+<div class="flex flex-col items-center gap-2 flex-shrink-0">
+<div class="h-20 w-20 rounded-full p-1 border-2 border-primary">
+<img class="h-full w-full object-cover rounded-full" data-alt="Candid shot of a laughing woman with natural curls, warm sun-drenched lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACmJkYKG7G7XqPA70IctCGgi6FR3cDHHKtYcMFfFkQDsBNJmQzWrjsoki-RPE6N-0VRDmmr-IrcTd0UwNRdcA2Q_MzNikVkJJK5m9s6qd_E6zN6x6y4c5CZRXfn9vAzl8xeZvKFuLqYH9sexIGrKcBEV93MtWWtBB3wEg8wH84QjqH_tWHudigH_NlYCvO1OBCnl6zQ97UqQXo7GsnOS740HLOZ1cPXZ5ksS7ppFkqfVbZtL-07vaTBoqes02KdnONDC5ZL62zDRM"/>
+</div>
+<span class="text-xs font-bold text-on-surface-variant">Nneka</span>
+</div>
+<!-- Match 5 -->
+<div class="flex flex-col items-center gap-2 flex-shrink-0">
+<div class="h-20 w-20 rounded-full p-1 border-2 border-primary">
+<img class="h-full w-full object-cover rounded-full" data-alt="Portrait of a handsome man with a short beard, wearing a traditional modern dashiki" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXpvR6Psx5ahc-O6zSdPHhOYe73J-Mdt3oLSeIIcilq2TucR_W0nN9DwMhNjSZQ3PFa4c7PG6h_oH6-BCLmIozRF-7immPsdLTaSHCJtWt_IMNPzLF55P77qcqzWUXX_DcmK-Iuu8NaRRJokYMn5KIIKOsKIF9maZC0lZr_cqjylNyUZcvXcNJrZGx-oYYDagweHp2y2et7tH-h5UeKLGySZU7dcqKPSUSUkmzfSpDNKZkr8bHlvahzrnnDy0EbYTMIg0mPrh0UyA"/>
+</div>
+<span class="text-xs font-bold text-on-surface-variant">Kwame</span>
+</div>
+</div>
+</section>
+<!-- Messages Section -->
+<section class="mt-10">
+<h2 class="text-xl font-headline font-extrabold tracking-tight text-on-surface mb-4">Messages</h2>
+<div class="space-y-1">
+<!-- Chat 1: Typing state -->
+<div class="flex items-center gap-4 p-4 rounded-lg bg-surface-container-low hover:bg-surface-container-high transition-colors cursor-pointer">
+<div class="relative h-14 w-14 flex-shrink-0">
+<img class="h-full w-full object-cover rounded-full" data-alt="Profile photo of Amara" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-HlZE-_mldT3vv2nqnrL2a0LEI6EPxECZMnxYtjGMUmutMXStsTdonnhLFzsggMT3oZo4GIicQcxgcBNcK7MaPunXzpX_FMXueNrTTFrf30HxroIZ6ZH3OJYhCUOsf1h2014g82bY_gQ_4MSqrW3YjDPNTtj3Mq3O8TTlhNCFOl0mLCdlm9_Ajc8vacx-IQJ_sq8_lwss6YXpAkydLPAtVsQshLsrHr41yrKQIfDgY88BrwLfLXf1bKkhmsmdorbCcVFkM-uZmqs"/>
+<div class="absolute bottom-0 right-0 h-4 w-4 bg-green-500 border-2 border-surface-container-low rounded-full"></div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline">
+<h4 class="font-bold text-on-surface truncate">Amara</h4>
+<span class="text-[10px] font-bold text-primary uppercase tracking-wider">Just now</span>
+</div>
+<p class="text-sm font-bold text-primary italic truncate">Typing...</p>
+</div>
+</div>
+<!-- Chat 2 -->
+<div class="flex items-center gap-4 p-4 rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="h-14 w-14 flex-shrink-0">
+<img class="h-full w-full object-cover rounded-full" data-alt="Profile photo of Malik" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVNn14gpYjkkCC4CBejZrXylbSmy7ck8RRxXaqbTeD-ISQqyhBtMnEzvb8bOucT_JrO_fiTxOt2e7EpsM9-KeNOjU4Mi55vR1i7cWNPcoUQG6-Yfw84O2jYIi_YrQs0bmHzOpa3GwMLPxpZTTLnrrsSczN9a2yW9d-fGHvg4v8uMmPArigFRoMBzkjOi2Z6kJXdViaHFay6TC53RYU_7g3zeMU3IAMxaWv3pOni4znSyIux6TRScEm48ZKQ6a3r71yK1kcOmW8gDE"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline">
+<h4 class="font-bold text-on-surface truncate">Malik</h4>
+<span class="text-[10px] font-semibold text-on-surface-variant opacity-60">12:45 PM</span>
+</div>
+<p class="text-sm text-on-surface-variant truncate">That sounds like a great plan for the weekend!</p>
+</div>
+</div>
+<!-- Chat 3 -->
+<div class="flex items-center gap-4 p-4 rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="h-14 w-14 flex-shrink-0">
+<img class="h-full w-full object-cover rounded-full" data-alt="Profile photo of Zainab" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOi9e8rz5hJozLU7d5IdMUew6ARR4AW3-UGT0YIJwBMo0y8d-sH5VdRTv4q4bZC32jAcxChIaQuxi-ByfRYsQ5IOHQgqG7AdA0xRVQ-KeRavLqB8Kp5Fj3SpNWtoRcJhe-Jbm9hkZp495lIj3BRC27gqbADucUrma4HVoyCWw6YYv3j3iFvmmbuGJnAJL7B3mq5LUFDL0w7N64DBHIUUx7xxzxAA5i6el9p9WfW0GvCRTjTvkbayo3hKO3e7u0H1nqdCyFmZOCDYA"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline">
+<h4 class="font-bold text-on-surface truncate">Zainab</h4>
+<span class="text-[10px] font-semibold text-on-surface-variant opacity-60">Yesterday</span>
+</div>
+<p class="text-sm text-on-surface-variant truncate">Have you been to that new gallery in Douala yet?</p>
+</div>
+</div>
+<!-- Chat 4 -->
+<div class="flex items-center gap-4 p-4 rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer opacity-80">
+<div class="h-14 w-14 flex-shrink-0">
+<img class="h-full w-full object-cover rounded-full" data-alt="Profile photo of Nneka" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQDZ8e65G0IumSyaxhw3rlHrKlTHoujEbWsAAvwaTU39leB518RXQq3ZYJRDapvcXFXMwiMNrj_KNbtnAcX8RFP5JTtBjZwzoXJ1psTuJDKBCOoC9KHWlxBx3VhJXG_hbdvXMRlHpIP5LPsFeUU7tw4zFKSbkhwZ2gwcsPJj2124CQjqileZqaO6hE-reJ4jsP-2HTu9bGTDCPruECXANLuY5jP81Fpk6PyvC9NbZTMaLFwHAUknx31mOWeQWK8TmvXbrgyi1Uj3w"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline">
+<h4 class="font-bold text-on-surface truncate">Nneka</h4>
+<span class="text-[10px] font-semibold text-on-surface-variant opacity-60">Mon</span>
+</div>
+<p class="text-sm text-on-surface-variant truncate">Talk soon!</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-end px-4 pb-4 pt-2 bg-[#fff4f6]/90 backdrop-blur-2xl rounded-t-[3rem] shadow-[0_-12px_32px_rgba(74,33,52,0.08)]">
+<!-- Home -->
+<a class="flex flex-col items-center justify-center text-[#4a2134] opacity-50 hover:opacity-100 transition-opacity active:scale-90 duration-300" href="#">
+<span class="material-symbols-outlined text-2xl">home</span>
+<span class="font-label text-[10px] font-semibold uppercase tracking-widest mt-1">Home</span>
+</a>
+<!-- Explore -->
+<a class="flex flex-col items-center justify-center text-[#4a2134] opacity-50 hover:opacity-100 transition-opacity active:scale-90 duration-300" href="#">
+<span class="material-symbols-outlined text-2xl">explore</span>
+<span class="font-label text-[10px] font-semibold uppercase tracking-widest mt-1">Explore</span>
+</a>
+<!-- Likes (Active) -->
+<a class="flex flex-col items-center justify-center bg-[#b30065] text-white rounded-full h-14 w-14 -translate-y-2 shadow-lg shadow-[#b30065]/30 active:scale-95 duration-300 transition-all" href="#">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span class="font-label text-[8px] font-bold uppercase tracking-widest leading-none mt-0.5">Likes</span>
+</a>
+<!-- Messages -->
+<a class="flex flex-col items-center justify-center text-[#4a2134] opacity-50 hover:opacity-100 transition-opacity active:scale-90 duration-300" href="#">
+<span class="material-symbols-outlined text-2xl">chat_bubble</span>
+<span class="font-label text-[10px] font-semibold uppercase tracking-widest mt-1">Messages</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center text-[#4a2134] opacity-50 hover:opacity-100 transition-opacity active:scale-90 duration-300" href="#">
+<span class="material-symbols-outlined text-2xl">person</span>
+<span class="font-label text-[10px] font-semibold uppercase tracking-widest mt-1">Profile</span>
+</a>
+</nav>
+</body></html>

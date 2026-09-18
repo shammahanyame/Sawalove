@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Be+Vietnam+Pro:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#ff4e9e",
+                    "tertiary-container": "#4dc9f1",
+                    "primary-dim": "#9d0058",
+                    "secondary-fixed-dim": "#deb3ff",
+                    "secondary-fixed": "#e7c5ff",
+                    "secondary-container": "#e7c5ff",
+                    "on-background": "#4a2134",
+                    "tertiary-fixed": "#4dc9f1",
+                    "on-primary": "#ffeff2",
+                    "inverse-primary": "#ff479c",
+                    "tertiary": "#00647c",
+                    "tertiary-dim": "#00576c",
+                    "inverse-surface": "#220213",
+                    "error": "#b31b25",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-variant": "#ffd1e1",
+                    "surface-bright": "#fff4f6",
+                    "outline": "#9c677d",
+                    "on-secondary-container": "#6c00b0",
+                    "on-tertiary-container": "#003e4e",
+                    "surface": "#fff4f6",
+                    "surface-container": "#ffe0ea",
+                    "inverse-on-surface": "#c68da3",
+                    "outline-variant": "#d89cb4",
+                    "surface-tint": "#b30065",
+                    "error-container": "#fb5151",
+                    "on-tertiary-fixed-variant": "#00485a",
+                    "error-dim": "#9f0519",
+                    "surface-container-low": "#ffecf1",
+                    "on-tertiary-fixed": "#002732",
+                    "on-secondary-fixed-variant": "#7716bc",
+                    "on-secondary": "#fceeff",
+                    "tertiary-fixed-dim": "#39bce2",
+                    "on-surface": "#4a2134",
+                    "surface-container-highest": "#ffd1e1",
+                    "on-surface-variant": "#7e4d61",
+                    "primary-fixed": "#ff6ea9",
+                    "on-tertiary": "#e2f6ff",
+                    "background": "#fff4f6",
+                    "surface-dim": "#ffc4da",
+                    "surface-container-high": "#ffd8e5",
+                    "on-error": "#ffefee",
+                    "primary-container": "#ff6ea9",
+                    "on-primary-fixed": "#000000",
+                    "secondary": "#8329c8",
+                    "primary": "#b30065",
+                    "on-secondary-fixed": "#510085",
+                    "on-primary-container": "#4b0027",
+                    "on-primary-fixed-variant": "#5c0031",
+                    "on-error-container": "#570008",
+                    "secondary-dim": "#7613bb"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Be Vietnam Pro"],
+                    "label": ["Be Vietnam Pro"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .chat-gradient {
+            background: linear-gradient(135deg, #b30065 0%, #ff6ea9 100%);
+        }
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: #fff4f6;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="text-on-surface">
+<!-- Top AppBar (Predicted Component Mapping) -->
+<header class="fixed top-0 w-full z-50 bg-[#fff4f6]/80 dark:bg-pink-950/80 backdrop-blur-md flex justify-between items-center px-6 py-4 w-full">
+<div class="flex items-center gap-3">
+<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-pink-100/50 transition-all active:scale-95">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<div class="relative">
+<img alt="Amara" class="w-10 h-10 rounded-full object-cover" data-alt="portrait of a radiant West African woman with braided hair smiling softly in warm golden hour light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1RdSUwFC5bUchgUbQLCISZZElLeVvR0ZAD8OA24zHi4xN083tICwkZdlKyo4D4_preo-873xXQ58tP0BZmLHLuI-RlZi9DtvKn1r5bWz50wTCTuqS4ihbEwqP7hxH2C4SPMB_4tF4eI5I_rakeYisIWbfPXpvJgRMQ5SA7mfPe56-QfmVm1KXYba90iH9ySmnqBmPoGuMtsSN4lvcNxASMnM0tEMZARTSA6HocGMOhkubHA3Rco3qZxd3GnekfMXoMU9aRHjGLWQ"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-surface rounded-full"></div>
+</div>
+<div>
+<h1 class="text-on-surface font-headline font-bold leading-tight">Amara</h1>
+<p class="text-[10px] text-primary font-medium tracking-wide">Online</p>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-primary hover:bg-pink-100/50 transition-all active:scale-95">
+<span class="material-symbols-outlined">videocam</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full text-primary hover:bg-pink-100/50 transition-all active:scale-95">
+<span class="material-symbols-outlined">info</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-20 pb-24 px-4 min-h-screen flex flex-col">
+<!-- Safety Tip Banner -->
+<div class="mb-6 mx-auto w-full max-w-2xl">
+<div class="bg-tertiary-container/10 border border-tertiary/10 rounded-lg p-4 flex items-start gap-3">
+<span class="material-symbols-outlined text-tertiary">verified_user</span>
+<div class="flex-1">
+<p class="text-sm font-semibold text-on-tertiary-container">Safety First</p>
+<p class="text-xs text-on-tertiary-container opacity-80">Never share your bank details or home address. Meet in public spaces for the first time.</p>
+</div>
+<button class="text-tertiary">
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+</div>
+</div>
+<!-- Chat History -->
+<div class="flex-1 flex flex-col gap-6 max-w-2xl mx-auto w-full">
+<!-- Date Separator -->
+<div class="flex justify-center my-4">
+<span class="bg-surface-container-low px-4 py-1 rounded-full text-[10px] font-bold text-on-surface-variant tracking-widest">TODAY</span>
+</div>
+<!-- Incoming Message -->
+<div class="flex items-end gap-2 max-w-[85%]">
+<div class="bg-surface-container-highest text-on-surface px-5 py-3 rounded-t-lg rounded-br-lg rounded-bl-sm">
+<p class="text-sm">Bonjour! I really loved your photos from the Limbe beach. When was that? 🌊</p>
+<p class="text-[10px] text-on-surface-variant text-right mt-1 opacity-60">10:42 AM</p>
+</div>
+</div>
+<!-- Outgoing Message -->
+<div class="flex flex-col items-end gap-1 self-end max-w-[85%]">
+<div class="chat-gradient text-on-primary px-5 py-3 rounded-t-lg rounded-bl-lg rounded-br-sm shadow-sm">
+<p class="text-sm">Merci! That was just last weekend. The sunset was absolutely magical.</p>
+<div class="flex items-center justify-end gap-1 mt-1">
+<p class="text-[10px] opacity-80">10:45 AM</p>
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">done_all</span>
+</div>
+</div>
+</div>
+<!-- Outgoing Message (Follow-up) -->
+<div class="flex flex-col items-end gap-1 self-end max-w-[85%]">
+<div class="chat-gradient text-on-primary px-5 py-3 rounded-t-lg rounded-bl-lg rounded-br-sm shadow-sm">
+<p class="text-sm">We should definitely grab a coffee at that new spot in Bonapriso soon!</p>
+<div class="flex items-center justify-end gap-1 mt-1">
+<p class="text-[10px] opacity-80">10:45 AM</p>
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">done_all</span>
+</div>
+</div>
+</div>
+<!-- Image Message (Asymmetric UI pattern) -->
+<div class="flex items-end gap-2 max-w-[70%]">
+<div class="bg-surface-container-highest p-1.5 rounded-lg">
+<img alt="Cafe photo" class="rounded-md object-cover w-full aspect-[4/3]" data-alt="aesthetic overhead shot of two latte art coffees and a croissant on a marble table in a bright modern cafe" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmu6L1esAjiKY3FStpyWOT5wDCTOyKKtV0BKnZdK0IwrxpL0rP32cKGMQfdGOSA7GNiggnYTGPT8K3FYqyzKQXcTJjQrqi0OBgUd2dpceglungO5BmeQPZVRUFONW1JNL0VabB6ZoYnww7PpgPVFf41o1sJ5jrJcpiDJPAUlXxRheYf-aCRypRXj3pakngaBH_8rFyW-EcTllhdxFVXjajfw607f0Jnj9kkZpQvDvdtAjmbGfXLr6wmXGNf-z2OUB3efdhRb2AG50"/>
+<div class="px-2 py-2">
+<p class="text-sm">Are you talking about this one? I was there yesterday!</p>
+<p class="text-[10px] text-on-surface-variant text-right mt-1 opacity-60">10:48 AM</p>
+</div>
+</div>
+</div>
+<!-- Typing Indicator -->
+<div class="flex items-center gap-2 mb-4">
+<div class="flex gap-1 bg-surface-container-low px-4 py-2.5 rounded-full">
+<div class="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce"></div>
+<div class="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+<div class="w-1.5 h-1.5 bg-primary/80 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+</div>
+<span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Amara is typing</span>
+</div>
+</div>
+</main>
+<!-- Bottom Input Bar (Re-imagined for focus journey) -->
+<div class="fixed bottom-0 w-full bg-surface/90 backdrop-blur-xl px-4 py-4 pb-8 z-50">
+<div class="max-w-2xl mx-auto flex items-center gap-2">
+<button class="w-11 h-11 flex items-center justify-center rounded-full bg-surface-container-high text-primary hover:bg-pink-100 transition-colors">
+<span class="material-symbols-outlined">add</span>
+</button>
+<div class="flex-1 flex items-center bg-surface-container-lowest rounded-full px-4 py-2 border border-outline-variant/20 shadow-sm focus-within:border-primary transition-all">
+<button class="text-on-surface-variant mr-2">
+<span class="material-symbols-outlined">mood</span>
+</button>
+<input class="flex-1 bg-transparent border-none focus:ring-0 text-sm text-on-surface placeholder:text-on-surface-variant/50" placeholder="Type your message..." type="text"/>
+<button class="text-on-surface-variant ml-2">
+<span class="material-symbols-outlined">photo_camera</span>
+</button>
+</div>
+<button class="w-11 h-11 chat-gradient text-on-primary flex items-center justify-center rounded-full shadow-lg active:scale-90 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">mic</span>
+</button>
+</div>
+</div>
+</body></html>

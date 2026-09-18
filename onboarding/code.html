@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#ff4e9e",
+                    "tertiary-container": "#4dc9f1",
+                    "primary-dim": "#9d0058",
+                    "secondary-fixed-dim": "#deb3ff",
+                    "secondary-fixed": "#e7c5ff",
+                    "secondary-container": "#e7c5ff",
+                    "on-background": "#4a2134",
+                    "tertiary-fixed": "#4dc9f1",
+                    "on-primary": "#ffeff2",
+                    "inverse-primary": "#ff479c",
+                    "tertiary": "#00647c",
+                    "tertiary-dim": "#00576c",
+                    "inverse-surface": "#220213",
+                    "error": "#b31b25",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-variant": "#ffd1e1",
+                    "surface-bright": "#fff4f6",
+                    "outline": "#9c677d",
+                    "on-secondary-container": "#6c00b0",
+                    "on-tertiary-container": "#003e4e",
+                    "surface": "#fff4f6",
+                    "surface-container": "#ffe0ea",
+                    "inverse-on-surface": "#c68da3",
+                    "outline-variant": "#d89cb4",
+                    "surface-tint": "#b30065",
+                    "error-container": "#fb5151",
+                    "on-tertiary-fixed-variant": "#00485a",
+                    "error-dim": "#9f0519",
+                    "surface-container-low": "#ffecf1",
+                    "on-tertiary-fixed": "#002732",
+                    "on-secondary-fixed-variant": "#7716bc",
+                    "on-secondary": "#fceeff",
+                    "tertiary-fixed-dim": "#39bce2",
+                    "on-surface": "#4a2134",
+                    "surface-container-highest": "#ffd1e1",
+                    "on-surface-variant": "#7e4d61",
+                    "primary-fixed": "#ff6ea9",
+                    "on-tertiary": "#e2f6ff",
+                    "background": "#fff4f6",
+                    "surface-dim": "#ffc4da",
+                    "surface-container-high": "#ffd8e5",
+                    "on-error": "#ffefee",
+                    "primary-container": "#ff6ea9",
+                    "on-primary-fixed": "#000000",
+                    "secondary": "#8329c8",
+                    "primary": "#b30065",
+                    "on-secondary-fixed": "#510085",
+                    "on-primary-container": "#4b0027",
+                    "on-primary-fixed-variant": "#5c0031",
+                    "on-error-container": "#570008",
+                    "secondary-dim": "#7613bb"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Be Vietnam Pro"],
+                    "label": ["Be Vietnam Pro"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 244, 246, 0.85);
+            backdrop-filter: blur(12px);
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #b30065 0%, #ff6ea9 100%);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface antialiased overflow-hidden">
+<!-- Main Onboarding Canvas -->
+<main class="relative h-screen w-full flex flex-col items-center justify-center">
+<!-- Background Imagery (Asymmetric Stacked Layout) -->
+<div class="absolute inset-0 overflow-hidden pointer-events-none">
+<div class="absolute hero-gradient inset-0 opacity-100"></div>
+<!-- Decorative Profile Cards for Visual Context -->
+<div class="absolute top-[10%] -left-10 w-64 h-80 rounded-lg overflow-hidden rotate-12 transition-transform duration-1000">
+<img alt="" class="w-full h-full object-cover opacity-60" data-alt="candid portrait of a radiant smiling Cameroonian woman in vibrant traditional kaba dress in a sunlit Douala garden" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxEdByLaVggtpbMf6edGjc2J2MpP3Rku-ClVWPGJFjcguU8tF_NT10WavL5fgowPh9z8SZRdw6mccTmr76iJNxfwlBgCEd-EtgJqFnZOp_16TcSm1Dph7RcnO80XvPf7zxO1byglnL_wP2SZjOk4nsjaP0oHFdGaOeqe2TtybWp_MGorLITaFcQk-mJwtWcsENn-t_-_tAmWfxQ7ANJRXbtfCcFqIsB-rarNxjmC8dFjXuxSGLwAO5I3i57lIWdGIrg1re_rtXzCU"/>
+</div>
+<div class="absolute bottom-[5%] -right-16 w-72 h-96 rounded-lg overflow-hidden -rotate-6 transition-transform duration-1000">
+<img alt="" class="w-full h-full object-cover opacity-50" data-alt="handsome young Cameroonian man laughing warmly wearing a stylish modern linen shirt against a soft sunset background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6vRjXTi1naV24-UEVJiywxYXI-7H2JmJAoOgtWhAWt-v4SvVa56s6DGVH1nBEW6Jd_BsjmLENMY1Pdt8E1QM7ty1Sbo-OA_FezcY3gRQED8B-VuHwaOIwb1Udbh2tv6ldjaCuIpJdZ3nF21boJCsXdEJWyUUf_1D-LrERUKHF0qjYDnx9_XqKaI2wBeXzpEgP_P4AL5QTRJIVwHwgKnW5kcInvZfBtL_xi9j04m5XdZsqPdqdHEgw7CJyAllxglWeipGh_tgjSDQ"/>
+</div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] opacity-20">
+<div class="w-full h-full border-[60px] border-white/10 rounded-full scale-125"></div>
+</div>
+</div>
+<!-- Top Navigation (Shell suppressed for Focus Journey, but using TopAppBar elements) -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-6 py-6">
+<!-- Brand Anchor -->
+<div class="text-xl font-black text-white tracking-tight font-headline">
+                SawaLove
+            </div>
+<!-- Bilingual Toggle -->
+<button class="flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md rounded-full text-white text-sm font-semibold transition-all active:scale-95">
+<span class="material-symbols-outlined text-sm">language</span>
+<span>FR</span>
+</button>
+</nav>
+<!-- Centered Interaction Card -->
+<div class="relative z-10 w-full max-w-[400px] px-6">
+<div class="glass-panel p-8 rounded-lg shadow-[0_12px_32px_rgba(74,33,52,0.12)] flex flex-col items-center">
+<!-- Welcome Content -->
+<div class="text-center mb-10">
+<h1 class="font-headline text-3xl font-extrabold text-on-surface mb-3 tracking-tight leading-tight">
+                        Find your connection in Cameroon
+                    </h1>
+<p class="text-on-surface-variant text-sm px-4">
+                        Join the most vibrant community for authentic Cameroonian dating and friendships.
+                    </p>
+</div>
+<!-- Action Buttons Cluster -->
+<div class="w-full flex flex-col gap-4">
+<!-- Primary Action -->
+<button class="w-full h-14 bg-primary text-on-primary rounded-full font-bold flex items-center justify-center gap-3 transition-transform active:scale-95 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">call</span>
+                        Continue with Phone Number
+                    </button>
+<!-- Divider -->
+<div class="flex items-center gap-4 w-full py-2">
+<div class="h-[1px] flex-1 bg-outline-variant/30"></div>
+<span class="text-[10px] font-bold text-outline-variant uppercase tracking-widest">or</span>
+<div class="h-[1px] flex-1 bg-outline-variant/30"></div>
+</div>
+<!-- Social Options -->
+<button class="w-full h-14 bg-surface-container-lowest text-on-surface rounded-full font-semibold flex items-center justify-center gap-3 transition-all hover:bg-white active:scale-95 border border-outline-variant/10">
+<svg class="w-5 h-5" viewbox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+</svg>
+                        Continue with Google
+                    </button>
+<button class="w-full h-14 bg-surface-container-lowest text-on-surface rounded-full font-semibold flex items-center justify-center gap-3 transition-all hover:bg-white active:scale-95 border border-outline-variant/10">
+<svg class="w-5 h-5 fill-current" viewbox="0 0 24 24">
+<path d="M17.05 20.28c-.96.95-2.2 1.78-3.71 1.78-1.5 0-2.33-.87-3.67-.87-1.34 0-2.31.84-3.66.84-1.44 0-2.82-1.01-3.89-2.52-2.18-3.07-2.52-7.65-.46-10.42.94-1.26 2.23-2.06 3.65-2.06 1.15 0 2.03.62 2.94.62.88 0 1.93-.7 3.34-.7 1.44 0 2.68.75 3.46 1.88-2.91 1.6-2.45 5.56.5 6.78-.66 1.58-1.54 3.12-2.5 4.07zM12.03 5.4c-.02-2.13 1.71-3.95 3.73-4.05.21 2.18-1.92 4.14-3.73 4.05z"></path>
+</svg>
+                        Continue with Apple
+                    </button>
+</div>
+<!-- Legal/Terms -->
+<div class="mt-8 text-center px-2">
+<p class="text-[10px] text-on-surface-variant/70 leading-relaxed font-medium">
+                        By signing up, you agree to our 
+                        <a class="text-primary hover:underline font-bold" href="#">Terms of Service</a> 
+                        and 
+                        <a class="text-primary hover:underline font-bold" href="#">Privacy Policy</a>.
+                    </p>
+</div>
+</div>
+<!-- Secondary Help Action -->
+<div class="mt-8 text-center">
+<button class="text-white/80 hover:text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2 mx-auto">
+                    Trouble signing in?
+                    <span class="material-symbols-outlined text-base">help_outline</span>
+</button>
+</div>
+</div>
+<!-- Footnote / Version -->
+<footer class="fixed bottom-8 w-full text-center">
+<span class="text-white/40 text-[10px] tracking-widest uppercase font-bold">Made with Love in Cameroon</span>
+</footer>
+</main>
+<!-- Visual Texture Overlays -->
+<div class="fixed inset-0 pointer-events-none mix-blend-overlay opacity-30">
+<div class="w-full h-full bg-[radial-gradient(circle_at_center,#ffffff_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+</div>
+</body></html>

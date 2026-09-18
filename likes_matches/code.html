@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#ff4e9e",
+                    "tertiary-container": "#4dc9f1",
+                    "primary-dim": "#9d0058",
+                    "secondary-fixed-dim": "#deb3ff",
+                    "secondary-fixed": "#e7c5ff",
+                    "secondary-container": "#e7c5ff",
+                    "on-background": "#4a2134",
+                    "tertiary-fixed": "#4dc9f1",
+                    "on-primary": "#ffeff2",
+                    "inverse-primary": "#ff479c",
+                    "tertiary": "#00647c",
+                    "tertiary-dim": "#00576c",
+                    "inverse-surface": "#220213",
+                    "error": "#b31b25",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-variant": "#ffd1e1",
+                    "surface-bright": "#fff4f6",
+                    "outline": "#9c677d",
+                    "on-secondary-container": "#6c00b0",
+                    "on-tertiary-container": "#003e4e",
+                    "surface": "#fff4f6",
+                    "surface-container": "#ffe0ea",
+                    "inverse-on-surface": "#c68da3",
+                    "outline-variant": "#d89cb4",
+                    "surface-tint": "#b30065",
+                    "error-container": "#fb5151",
+                    "on-tertiary-fixed-variant": "#00485a",
+                    "error-dim": "#9f0519",
+                    "surface-container-low": "#ffecf1",
+                    "on-tertiary-fixed": "#002732",
+                    "on-secondary-fixed-variant": "#7716bc",
+                    "on-secondary": "#fceeff",
+                    "tertiary-fixed-dim": "#39bce2",
+                    "on-surface": "#4a2134",
+                    "surface-container-highest": "#ffd1e1",
+                    "on-surface-variant": "#7e4d61",
+                    "primary-fixed": "#ff6ea9",
+                    "on-tertiary": "#e2f6ff",
+                    "background": "#fff4f6",
+                    "surface-dim": "#ffc4da",
+                    "surface-container-high": "#ffd8e5",
+                    "on-error": "#ffefee",
+                    "primary-container": "#ff6ea9",
+                    "on-primary-fixed": "#000000",
+                    "secondary": "#8329c8",
+                    "primary": "#b30065",
+                    "on-secondary-fixed": "#510085",
+                    "on-primary-container": "#4b0027",
+                    "on-primary-fixed-variant": "#5c0031",
+                    "on-error-container": "#570008",
+                    "secondary-dim": "#7613bb"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Be Vietnam Pro"],
+                    "label": ["Be Vietnam Pro"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .premium-blur {
+            backdrop-filter: blur(8px);
+            background: linear-gradient(135deg, rgba(179, 0, 101, 0.1), rgba(255, 110, 169, 0.2));
+        }
+        .gold-shimmer {
+            background: linear-gradient(45deg, #d4af37 0%, #f9e29c 50%, #d4af37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body min-h-screen pb-32">
+<!-- TopAppBar Execution -->
+<header class="fixed top-0 w-full z-50 bg-[#fff4f6]/80 backdrop-blur-md flex justify-between items-center px-6 py-4 w-full">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden">
+<img alt="Profile" class="w-full h-full object-cover" data-alt="Close-up portrait of a confident young African woman with a stylish short hairstyle and radiant skin against a soft pink background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwgP6F_D36sfJTYpKw7x0S_2KxpuPIYKQsQEv8bPq4EvksiIQ1RJ0hAswQReiYUHIF_l0o2XNiRKCy2A9xvcFLccednXDb1FgN1KyuODVLvmzY3pzVxqLZFUiRcWdB7rKriUwY5jYRXxfCOVXptp0i-KcnQBbSUxXFZpOTXc5sYgZa1oSo-AE-W8f6n-bbut81pTcGNm6DC5zJI8MrHRVF670D64XUpLEW80SGrxreaf-u6Eie_U_RsR2ZQSa7NzyIujvfrfFljqs"/>
+</div>
+<h1 class="text-xl font-black text-[#b30065] font-['Plus_Jakarta_Sans'] tracking-tight">SawaLove</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-[#b30065] font-bold transition-opacity hover:opacity-80 active:scale-95 duration-150">
+            FR
+        </button>
+</header>
+<main class="pt-24 px-6 space-y-8">
+<!-- Section: Likes You (Bento Grid Style) -->
+<section>
+<div class="flex justify-between items-end mb-4">
+<div>
+<h2 class="text-2xl font-bold font-headline tracking-tight text-on-surface">Likes You</h2>
+<p class="text-on-surface-variant text-sm">See who's interested in you</p>
+</div>
+<button class="text-primary font-semibold text-sm">See All</button>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<!-- Revealed Like -->
+<div class="relative aspect-[3/4] rounded-lg overflow-hidden group">
+<img alt="Candidate" class="w-full h-full object-cover" data-alt="Portrait of a handsome African man in a linen shirt smiling warmly in soft afternoon sunlight at an outdoor cafe" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDI4PIE6hrFDOtBPRx1nyvGIuEqke9o3WaWYpFr7-VeYiGwp-8JNpG9r1nKwzjX9t_hjJifNqqhsMOm2GJs7T10N6aZlSuYmzJrTlXCZdDeZIYW_dgkcLEuzAvmOdz_x1T9a7gAhFvVoYCTdfUpxh5_IBE7ekxvw5kZ7iCBVBhE-A-gYk27U3XKVbd9fnvB0cO0nlbIrO1AzFzfNl75dR_TgpJF6ew8ArhbHl-MnqFsTuwcZFeC00VaX-ZIgcfrfHROmUlA2Qouiig"/>
+<div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#4a2134]/80 to-transparent">
+<span class="text-white font-bold">Kofi, 28</span>
+</div>
+<div class="absolute top-3 right-3 bg-primary text-white p-2 rounded-full shadow-lg">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+</div>
+<!-- Premium Locked Like -->
+<div class="relative aspect-[3/4] rounded-lg overflow-hidden premium-blur group border-2 border-primary-container/30">
+<img alt="Blurred profile" class="w-full h-full object-cover blur-xl opacity-60" data-alt="Artistically blurred silhouette of a person standing against a sunset background with warm orange and pink hues" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyTOai5mHuG_DyDIF-4CVSL1vjHHPdLrfiISZUySgLVgWPytprpjeYa5SV25GuxP0YZbDnAnC3tur71zE4JqT_6OVjUGtXA6mU_fpWNGOW6v1dJ3XqxyoXGDH5LgH8WLatyI7jFB6OBD86-_crmkk2fPPuBjcAtXII35NC7OY8x8w_TePoNLrxsqEiAjQ7jghUFNlWRoBrMmFBvdWGb0FfNWEyrPatrkPc93uNjnOMw2SMufWZZ17-2-_1npIGIb-vQ0tj2Xvm4xc"/>
+<div class="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+<span class="material-symbols-outlined text-primary text-4xl mb-2">lock</span>
+<p class="text-on-surface font-bold text-sm mb-1">12 more likes</p>
+<button class="bg-primary text-white text-xs px-4 py-2 rounded-full font-bold shadow-lg transform active:scale-95 transition-transform">GO GOLD</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Section: New Matches (Horizontal Scroll) -->
+<section>
+<div class="mb-4">
+<h2 class="text-2xl font-bold font-headline tracking-tight text-on-surface">New Matches</h2>
+<p class="text-on-surface-variant text-sm">Start a conversation with your latest sparks</p>
+</div>
+<div class="flex gap-4 overflow-x-auto pb-4 -mx-6 px-6 no-scrollbar">
+<!-- Match Item 1 -->
+<div class="flex-shrink-0 w-20 flex flex-col items-center gap-2">
+<div class="relative w-20 h-20 rounded-full p-[3px] bg-gradient-to-tr from-primary to-secondary">
+<div class="w-full h-full rounded-full border-4 border-surface overflow-hidden">
+<img alt="New Match" class="w-full h-full object-cover" data-alt="Youthful woman with intricate braids and vibrant jewelry smiling at the camera in a modern minimalist studio setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqKCo0hbV6iv1eyeLz9VESylOHGxkyjsmfZYid-jkgQCgYoK_1TSacV5Xoe63Pn-vu9ZX4Mi98XWPnnYjQXRiUTzhERjqo4i6W5lJrdViO-D7RiskYJDJlv4zrRpt6WbjszThxEgukREQpu3HNZNAzMdRPxG0QmLQRANLWtFMtm4oAYunOaaBTVqD1XaAXyUFOtaj4a747bqECBIGMVryybexW-69pr76mZcij4JMBq9C6MM3fwCjR35SBgfOSVIWs4-twFZEN3Ds"/>
+</div>
+</div>
+<span class="text-xs font-bold text-on-surface">Amara</span>
+</div>
+<!-- Match Item 2 -->
+<div class="flex-shrink-0 w-20 flex flex-col items-center gap-2">
+<div class="relative w-20 h-20 rounded-full p-[3px] bg-gradient-to-tr from-primary to-secondary">
+<div class="w-full h-full rounded-full border-4 border-surface overflow-hidden">
+<img alt="New Match" class="w-full h-full object-cover" data-alt="Professional African man in a sharp navy suit leaning against a modern glass building in downtown Lagos" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDJb8HHZcNF4cF8FKVwRfKP8H_OgSKDFEqlOv9NJjCA_DvGp8EuGJZgAirshl7Hlb2ECrvvbFI1Ba61OK8Xk3VTp1BF6KFvSOzyCWheEMu3dlPTqvYFfo7nxuazj1f4RVe7DZNwFuWfCD4qjupZ9T1mnO3aof11t7qpme5ZlEzp1LlJP7_Pob6pHz8yOVZiAVLYxUf3vYDoqf83sd9ywCGp2IaM66jc6UNzvcJ22WVzT6fqcKsCLsVQPzANIJPiOFgDmxyZPqdXek"/>
+</div>
+</div>
+<span class="text-xs font-bold text-on-surface">Olu</span>
+</div>
+<!-- Match Item 3 -->
+<div class="flex-shrink-0 w-20 flex flex-col items-center gap-2">
+<div class="relative w-20 h-20 rounded-full p-[3px] bg-gradient-to-tr from-primary to-secondary">
+<div class="w-full h-full rounded-full border-4 border-surface overflow-hidden">
+<img alt="New Match" class="w-full h-full object-cover" data-alt="Portrait of a woman with curly hair and a joyful expression wearing a colorful patterned scarf" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkBKGoDFVMgRXk2_26hrqyYHDx6689ZnusJezmmcGz08UzSaYaXiysKaAXsnGUpDkXW_tfDzSz6B60UzcMkPmUpWmqGbGKpB4qiR_YC8vlgx_0baba4_EksKpIuYoQEiE0QQtYAb_HLvneJwtrTZ9lyUObsm2-dQgVIaG1BnVgzzGBLjZm5NKfy-e68L4Jf5kETsqd5LtyxGEbaWHE4K-dRDeTSNCa1wToUNih0stOMFwp1cDCqpbWleDFXqfBH2HAFf0E30rAvMY"/>
+</div>
+</div>
+<span class="text-xs font-bold text-on-surface">Zainab</span>
+</div>
+<!-- Match Item 4 -->
+<div class="flex-shrink-0 w-20 flex flex-col items-center gap-2">
+<div class="relative w-20 h-20 rounded-full p-[3px] bg-gradient-to-tr from-primary to-secondary">
+<div class="w-full h-full rounded-full border-4 border-surface overflow-hidden">
+<img alt="New Match" class="w-full h-full object-cover" data-alt="Close up of a man with intense eyes and a gentle smile against a textured earthy background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKSUCsfEijX-JKQnkvnLcaC6f-c9D-xrG9hI6YkALBbwd_HOTGTzjZz68-yA3xY1Vuexos03bXRw64LPo_696vXSlRT41uTy_M5qTcfoJtIA4yE6skRCXMsdfDO92gC6JU8DWrfA54neVj6eFjMLU7G6P9zayTX436lQEzPn9EqF8eOaFRiLUFoJD3l1unDFMVKF91PBgkDqb49k50Wc4QZc7BgYMCfnYLovHUn3hTBdvvuuIo7oPD3Asc9r2mIgHfEI6qN4cbj0o"/>
+</div>
+</div>
+<span class="text-xs font-bold text-on-surface">Malik</span>
+</div>
+</div>
+</section>
+<!-- Section: All Matches (Vertical List) -->
+<section class="space-y-4">
+<h2 class="text-2xl font-bold font-headline tracking-tight text-on-surface">Messages</h2>
+<div class="space-y-2">
+<!-- Chat Thread 1 -->
+<div class="flex items-center gap-4 p-4 rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="relative">
+<div class="w-14 h-14 rounded-full overflow-hidden">
+<img alt="Chat Profile" class="w-full h-full object-cover" data-alt="Profile photo of a man with spectacles and a thoughtful expression, wearing a stylish turtleneck sweater" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgKqWBAlNUwGS6rsmH6BuwHhJeBcvSIIvpGCtIVbfkNREVpS__TRdd8KCyq9gmvmWKQQ9yBnH5pacPd2rNwPnxTPz-dJo6PQZRYaxBKjTOq4Zj5S5GQfzFQJSfJ_SIUsQH8_bfc_pKqvL-P6VMPOVMd1QKvWJmLSXG4uJk-HaKbsmjo6isGVdqqZWaeIIV2ZnyxofnBcey-LMLWnqZezy591wU3jXFXffeLtBXmgQ5Ay_-aptQtwDghUBu9E93srFA4ubEHeZJrUs"/>
+</div>
+<div class="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-surface rounded-full"></div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h3 class="font-bold text-on-surface truncate">Kwame</h3>
+<span class="text-[10px] text-on-surface-variant">2m ago</span>
+</div>
+<p class="text-sm text-primary font-semibold truncate">Typing...</p>
+</div>
+</div>
+<!-- Chat Thread 2 -->
+<div class="flex items-center gap-4 p-4 rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer">
+<div class="w-14 h-14 rounded-full overflow-hidden">
+<img alt="Chat Profile" class="w-full h-full object-cover" data-alt="Portrait of a fashionable woman with voluminous natural hair and gold earrings, looking away from camera with a soft smile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAe_n5rT8vzCde4dVznQ-X6lfHJi3F9rKC8D0z9ASnvZMMTnrdfvOdOaEUgrFlyUaF0gh5tr8s70pkoDuurgrgdIH5Vb2YA56pgpm6vvndj91aULwVHuNdXAta__dYk33sOJSK_zKzjsib62-9k7sXQXUbSm2XtNwmncujvP1MQZI244cAbWc0tIncbQQF7_6lr9ghAMeKMbLpxMwopZgXyO7Pu_0_eJGkrz8kkX7OQFM1PbMe1in9rj0nCevX42BDFVB9IxACxfGs"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h3 class="font-bold text-on-surface truncate">Fatima</h3>
+<span class="text-[10px] text-on-surface-variant">1h ago</span>
+</div>
+<p class="text-sm text-on-surface-variant truncate">That sounds like a great plan for Sunday! Can't wait.</p>
+</div>
+</div>
+<!-- Chat Thread 3 -->
+<div class="flex items-center gap-4 p-4 rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors cursor-pointer">
+<div class="w-14 h-14 rounded-full overflow-hidden">
+<img alt="Chat Profile" class="w-full h-full object-cover" data-alt="Candid shot of a smiling man with short hair at an outdoor festival with bokeh lights in the background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvy0dCV5HoC6GFTZ67qPyb1I6bcpPMR-CdEd1_SOpjy0huWcKD_OObi4MZLi3MedLYwuRxmxxgGDGv1WDlsZQQigN7ErNXFHJcdAmErKBegBehrO_cxYzOEeIT7i9F5S44k0xdoEHulep984xuj_6hx7SJ5B_AgTE7x08anSYcxYC2geBaldzRBHQN4G9an4zQb9Ogp3dadv8mysNFy452cb0s391nM_DYVk49QizuBDrYFLjqC0mGonU2_16dJgxa_aHvKjhVBDc"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h3 class="font-bold text-on-surface truncate">Emeka</h3>
+<span class="text-[10px] text-on-surface-variant">Yesterday</span>
+</div>
+<p class="text-sm text-on-surface-variant truncate">You: Hey, how was your weekend in Douala?</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar Execution -->
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] rounded-[3rem] bg-[#fff4f6]/80 dark:bg-pink-900/80 backdrop-blur-xl shadow-[0_12px_32px_rgba(74,33,52,0.08)] z-50">
+<div class="flex justify-around items-center p-2">
+<!-- Home -->
+<a class="flex flex-col items-center justify-center text-[#4a2134] p-3 transition-transform duration-200 hover:bg-pink-100/50 rounded-full active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="text-[10px] font-medium font-['Be_Vietnam_Pro'] mt-1">Home</span>
+</a>
+<!-- Explore -->
+<a class="flex flex-col items-center justify-center text-[#4a2134] p-3 transition-transform duration-200 hover:bg-pink-100/50 rounded-full active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="travel_explore">travel_explore</span>
+<span class="text-[10px] font-medium font-['Be_Vietnam_Pro'] mt-1">Explore</span>
+</a>
+<!-- Likes (ACTIVE) -->
+<a class="flex flex-col items-center justify-center bg-[#b30065] text-white rounded-full p-3 transition-transform duration-200 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span class="text-[10px] font-medium font-['Be_Vietnam_Pro'] mt-1">Likes</span>
+</a>
+<!-- Messages -->
+<a class="flex flex-col items-center justify-center text-[#4a2134] p-3 transition-transform duration-200 hover:bg-pink-100/50 rounded-full active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+<span class="text-[10px] font-medium font-['Be_Vietnam_Pro'] mt-1">Messages</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center text-[#4a2134] p-3 transition-transform duration-200 hover:bg-pink-100/50 rounded-full active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="text-[10px] font-medium font-['Be_Vietnam_Pro'] mt-1">Profile</span>
+</a>
+</div>
+</nav>
+</body></html>

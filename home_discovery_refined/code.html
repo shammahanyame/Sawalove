@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&amp;family=Be+Vietnam+Pro:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#ff4e9e",
+                    "tertiary-container": "#4dc9f1",
+                    "primary-dim": "#9d0058",
+                    "secondary-fixed-dim": "#deb3ff",
+                    "secondary-fixed": "#e7c5ff",
+                    "secondary-container": "#e7c5ff",
+                    "on-background": "#4a2134",
+                    "tertiary-fixed": "#4dc9f1",
+                    "on-primary": "#ffeff2",
+                    "inverse-primary": "#ff479c",
+                    "tertiary": "#00647c",
+                    "tertiary-dim": "#00576c",
+                    "inverse-surface": "#220213",
+                    "error": "#b31b25",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-variant": "#ffd1e1",
+                    "surface-bright": "#fff4f6",
+                    "outline": "#9c677d",
+                    "on-secondary-container": "#6c00b0",
+                    "on-tertiary-container": "#003e4e",
+                    "surface": "#fff4f6",
+                    "surface-container": "#ffe0ea",
+                    "inverse-on-surface": "#c68da3",
+                    "outline-variant": "#d89cb4",
+                    "surface-tint": "#b30065",
+                    "error-container": "#fb5151",
+                    "on-tertiary-fixed-variant": "#00485a",
+                    "error-dim": "#9f0519",
+                    "surface-container-low": "#ffecf1",
+                    "on-tertiary-fixed": "#002732",
+                    "on-secondary-fixed-variant": "#7716bc",
+                    "on-secondary": "#fceeff",
+                    "tertiary-fixed-dim": "#39bce2",
+                    "on-surface": "#4a2134",
+                    "surface-container-highest": "#ffd1e1",
+                    "on-surface-variant": "#7e4d61",
+                    "primary-fixed": "#ff6ea9",
+                    "on-tertiary": "#e2f6ff",
+                    "background": "#fff4f6",
+                    "surface-dim": "#ffc4da",
+                    "surface-container-high": "#ffd8e5",
+                    "on-error": "#ffefee",
+                    "primary-container": "#ff6ea9",
+                    "on-primary-fixed": "#000000",
+                    "secondary": "#8329c8",
+                    "primary": "#b30065",
+                    "on-secondary-fixed": "#510085",
+                    "on-primary-container": "#4b0027",
+                    "on-primary-fixed-variant": "#5c0031",
+                    "on-error-container": "#570008",
+                    "secondary-dim": "#7613bb"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1.25rem",
+                    "lg": "2.5rem",
+                    "xl": "3.5rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Be Vietnam Pro"],
+                    "label": ["Be Vietnam Pro"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 244, 246, 0.8);
+            backdrop-filter: blur(12px);
+        }
+        body {
+            background-color: #fff4f6;
+            color: #4a2134;
+            font-family: 'Be Vietnam Pro', sans-serif;
+        }
+        .premium-shadow {
+            box-shadow: 0 20px 40px -10px rgba(74, 33, 52, 0.15);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#fff4f6]/90 dark:bg-pink-950/90 backdrop-blur-md flex justify-between items-center px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden border-2 border-primary-fixed ring-2 ring-primary/5">
+<img alt="User avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAMyvcGpIfkB6yeskn0VQ9PFvRRpsP7k8RM2sXlv6iutuoRxZUhH-vwd4-j1atQWNc3Wi4yFMSI_3wpQnIQkU4YfzFJfR6OKEojzT9dckAClH4rTxEvZGSczCPYII9UVysKvUvVzkvd9hDgocW8wWsUQHdyp_daYun7NL2hEJ31r76_POiTHvPpJYXWNXIYzB9czEWZ0PbidqVSgZBP2Y3hdX_FZJLSyq7cie18aH4L5zyu6tm3jvX9sNi3rhJy53xPfhZzca94OuY"/>
+</div>
+<h1 class="text-xl font-black text-[#b30065] dark:text-pink-300 font-headline tracking-tighter">SawaLove</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-[#b30065] font-bold text-sm tracking-wide hover:opacity-80 transition-opacity">FR</button>
+<span class="material-symbols-outlined text-[#4a2134] text-[24px]" data-icon="notifications">notifications</span>
+</div>
+</header>
+<main class="pt-24 px-5 max-w-md mx-auto relative h-[calc(100vh-140px)] flex flex-col">
+<!-- Discovery Canvas -->
+<div class="relative flex-1 w-full perspective-1000 group">
+<!-- Secondary Card Stack (Visual Depth) -->
+<div class="absolute inset-x-2 top-3 bottom-1 bg-surface-container/60 rounded-lg transform scale-[0.97] -translate-y-2"></div>
+<!-- Primary Profile Card -->
+<div class="absolute inset-0 bg-surface-container-lowest rounded-lg overflow-hidden premium-shadow flex flex-col transition-transform duration-500 ease-out">
+<!-- Image Container -->
+<div class="relative flex-1 h-full">
+<img class="w-full h-full object-cover" data-alt="Beautiful African woman in vibrant modern attire" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTaBGd791iG3kykvCvJGX1dEgk2cTb1IId-xgwgxxJyzh0eh-Z4uNdCxvHiAS3L1ypGwDztBnSo-yG_TyOyyNqoLcggH8jaDO_3EXksM5FlHy7_-O7RO91y1bwqNrn4Ul_404Lg1JcCmRwbCr5w-F3aaGGCh0yDXldyuZI3Bbjl2CATqruKlR1WY7K7QCebknKTMRNFkuo3O70th74sL8LiptgUzVVFjtdXTJDTGWBhMkRZZUNQaWgI8TlZHVC3AK41x4Os9Wcu_Q"/>
+<!-- Multiple Gradient Layers for Depth and Legibility -->
+<div class="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent h-1/3"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+<!-- Top Verified Badge -->
+<div class="absolute top-5 left-5">
+<div class="bg-primary/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1.5 border border-white/20">
+<span class="material-symbols-outlined text-white text-[14px]" data-icon="verified" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="text-white text-[10px] font-bold uppercase tracking-widest">Verified</span>
+</div>
+</div>
+<!-- Profile Info Bottom Content -->
+<div class="absolute bottom-0 w-full p-6 pb-8 text-white flex flex-col gap-4">
+<div>
+<div class="flex items-center gap-2">
+<h2 class="text-3xl font-extrabold font-headline leading-tight">Amaka, 24</h2>
+</div>
+<div class="flex items-center gap-1 opacity-90 text-sm mt-0.5">
+<span class="material-symbols-outlined text-sm" data-icon="location_on">location_on</span>
+<span class="font-medium">Yaoundé, Cameroon</span>
+</div>
+</div>
+<!-- Badges Row -->
+<div class="flex flex-wrap gap-2">
+<div class="bg-white/15 backdrop-blur-xl px-3.5 py-1.5 rounded-full border border-white/20 flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px]" data-icon="castle">castle</span>
+<span class="text-xs font-semibold">Village: Batoufam</span>
+</div>
+<div class="bg-white/15 backdrop-blur-xl px-3.5 py-1.5 rounded-full border border-white/20 flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px]" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span class="text-xs font-semibold">Serious Relationship</span>
+</div>
+</div>
+<p class="text-[15px] leading-relaxed opacity-90 font-medium italic">
+"Looking for someone who appreciates culture, art, and long walks in the Mfoundi valley."
+</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Discovery Action Buttons -->
+<div class="py-6 flex justify-between items-center px-4 max-w-[360px] mx-auto w-full">
+<!-- Rewind -->
+<button class="w-12 h-12 rounded-full bg-surface-container-low flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition-all active:scale-90">
+<span class="material-symbols-outlined text-[24px]" data-icon="history">history</span>
+</button>
+<!-- Nope -->
+<button class="w-16 h-16 rounded-full bg-white flex items-center justify-center text-error shadow-xl hover:bg-error/5 transition-all active:scale-90 group">
+<span class="material-symbols-outlined text-[32px] font-bold" data-icon="close">close</span>
+</button>
+<!-- Super Like -->
+<button class="w-14 h-14 rounded-full bg-secondary flex items-center justify-center text-white shadow-xl hover:brightness-110 transition-all active:scale-90">
+<span class="material-symbols-outlined text-[28px]" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+</button>
+<!-- Like -->
+<button class="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white shadow-xl hover:brightness-110 transition-all active:scale-90">
+<span class="material-symbols-outlined text-[32px]" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+<!-- Boost -->
+<button class="w-12 h-12 rounded-full bg-surface-container-low flex items-center justify-center text-tertiary-dim hover:bg-surface-container-high transition-all active:scale-90">
+<span class="material-symbols-outlined text-[24px]" data-icon="bolt" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-md rounded-full bg-[#fff4f6]/90 dark:bg-pink-900/90 backdrop-blur-2xl shadow-2xl flex justify-around items-center p-2.5 z-50 border border-white/20">
+<a class="flex flex-col items-center justify-center bg-primary text-white rounded-full py-2 px-4 transition-all" href="#">
+<span class="material-symbols-outlined text-[22px]" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-[9px] font-bold uppercase tracking-tighter mt-0.5">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#4a2134] dark:text-pink-200 p-2.5 hover:bg-pink-100/50 rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]" data-icon="travel_explore">travel_explore</span>
+<span class="text-[9px] font-bold uppercase tracking-tighter mt-0.5">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#4a2134] dark:text-pink-200 p-2.5 hover:bg-pink-100/50 rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]" data-icon="favorite">favorite</span>
+<span class="text-[9px] font-bold uppercase tracking-tighter mt-0.5">Likes</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#4a2134] dark:text-pink-200 p-2.5 hover:bg-pink-100/50 rounded-full transition-colors relative" href="#">
+<span class="material-symbols-outlined text-[22px]" data-icon="chat">chat</span>
+<span class="text-[9px] font-bold uppercase tracking-tighter mt-0.5">Chats</span>
+<div class="absolute top-2.5 right-2.5 w-2 h-2 bg-primary-fixed-dim rounded-full ring-2 ring-[#fff4f6]"></div>
+</a>
+<a class="flex flex-col items-center justify-center text-[#4a2134] dark:text-pink-200 p-2.5 hover:bg-pink-100/50 rounded-full transition-colors" href="#">
+<span class="material-symbols-outlined text-[22px]" data-icon="person">person</span>
+<span class="text-[9px] font-bold uppercase tracking-tighter mt-0.5">Me</span>
+</a>
+</nav>
+</body></html>
