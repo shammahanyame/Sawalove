@@ -21,9 +21,22 @@ RUN sed -ri -e 's!CustomLog \S+!CustomLog /proc/self/fd/1 combined!g; s!ErrorLog
 COPY public/ /var/www/html/public/
 COPY src/ /var/www/html/src/
 
-# Uploaded photos need a writable location. Mounted volume recommended in
-# production (UPLOAD_PUBLIC_PATH relative to public/).
+# Uploaded photos need a writable location.
+# SECURITY: the app writes a .htaccess into this dir at runtime, but the base
+# image sets AllowOverride None, which would silently ignore it. The same
+# rules are therefore baked into the vhost here so they are ALWAYS honored:
+# uploads may only ever be served as static files, never executed.
 RUN mkdir -p /var/www/html/public/uploads/profile-photos \
+    && printf '%s\n' \
+        '# Uploaded images must never execute as code.' \
+        '<FilesMatch "\.(php|phtml|php3|php4|php5|php7|phps|phar|pl|py|cgi|sh|asp|aspx|jsp)$">' \
+        'Require all denied' \
+        '</FilesMatch>' \
+        'php_flag engine off' \
+        'Options -Indexes -ExecCGI' \
+        > /etc/apache2/conf-available/sawalove-uploads.conf \
+    && a2enconf sawalove-uploads \
+    && a2enmod headers \
     && chown -R www-data:www-data /var/www/html/public/uploads
 
 ENV APACHE_RUN_USER=www-data

@@ -1,18 +1,40 @@
 # DigitalOcean App Platform spec for the SawaLove PHP API.
-# Deploy with:  doctl apps create --spec backend/php/.do/app.yaml
-# or connect the repo in the App Platform dashboard and pick this spec.
 #
-# NOTE: never commit real secrets here — set APP_KEY, DB_PASSWORD etc. via
-# `doctl apps update <id> --spec` with env types corrected to SECRET, or in
-# the dashboard. The managed MySQL database block provisions a cluster and
-# injects DATABASE_URL into the service environment.
+# Deploy (after pushing this repo to GitHub):
+#   doctl apps create --spec backend/php/.do/app.yaml
+# or in the dashboard: App Platform -> Create App -> pick the repo, then
+# import this file via Settings (or configure the same values by hand).
+#
+# The `databases` block provisions a managed MySQL 8 cluster and exposes
+# DATABASE_URL / USERNAME / PASSWORD / HOSTNAME / PORT / DATABASE bindings,
+# which the service composes into the PDO DSN the API expects (mysql:host=...).
+#
+# SECURITY: APP_KEY and SMS_HTTP_* below are placeholders. Replace them with
+# real secrets in the dashboard (Settings -> sawalove-api -> Environment
+# Variables) BEFORE going live — APP_KEY signs rate-limit IP hashes and
+# sessions. Never commit real secrets to this file.
+#
+# NOTE: uploaded photos live on the container filesystem, which is ephemeral
+# on App Platform (persistent volumes are only available to workers/jobs).
+# Users would re-upload photos after each deploy. See DEPLOY.md for the
+# follow-up (object storage / worker volume).
 
 name: sawalove-api
 region: lon
 
+alerts:
+  - rule: DEPLOYMENT_FAILED
+  - rule: DOMAIN_FAILED
+
+databases:
+  - name: sawalove-db
+    engine: MYSQL
+    version: "8"
+    size: db-s-1vcpu-1gb
+    num_nodes: 1
+
 services:
   - name: sawalove-api
-    type: web
     http_port: 8080
     dockerfile_path: backend/php/Dockerfile
     source_dir: /
@@ -20,7 +42,7 @@ services:
     instance_size_slug: basic-xxs
     health_check:
       http_path: /health
-      initial_delay_seconds: 15
+      initial_delay_seconds: 30
       period_seconds: 30
       timeout_seconds: 5
       success_threshold: 1
@@ -30,31 +52,31 @@ services:
         value: production
         scope: RUN_AND_BUILD_TIME
       - key: APP_URL
-        value: ${APP_DOMAIN}
+        value: ${APP_URL}
         scope: RUN_AND_BUILD_TIME
       - key: APP_KEY
         type: SECRET
-        value: SET_ME_VIA_DASHBOARD
+        value: REPLACE_VIA_DASHBOARD_BEFORE_LAUNCH
         scope: RUN_AND_BUILD_TIME
       - key: DB_DSN
-        value: ${sawalove-db.DATABASE_URL}
-        scope: RUN_AND_BUILD_TIME
+        value: mysql:host=${sawalove-db.HOSTNAME};port=${sawalove-db.PORT};dbname=${sawalove-db.DATABASE};charset=utf8mb4
+        scope: RUN_TIME
+      - key: DB_HOST
+        value: ${sawalove-db.HOSTNAME}
+        scope: RUN_TIME
+      - key: DB_PORT
+        value: ${sawalove-db.PORT}
+        scope: RUN_TIME
+      - key: DB_NAME
+        value: ${sawalove-db.DATABASE}
+        scope: RUN_TIME
       - key: DB_USER
         value: ${sawalove-db.USERNAME}
-        scope: RUN_AND_BUILD_TIME
+        scope: RUN_TIME
       - key: DB_PASSWORD
         type: SECRET
         value: ${sawalove-db.PASSWORD}
-        scope: RUN_AND_BUILD_TIME
-      - key: DB_HOST
-        value: ${sawalove-db.HOSTNAME}
-        scope: RUN_AND_BUILD_TIME
-      - key: DB_PORT
-        value: ${sawalove-db.PORT}
-        scope: RUN_AND_BUILD_TIME
-      - key: DB_NAME
-        value: ${sawalove-db.DATABASE}
-        scope: RUN_AND_BUILD_TIME
+        scope: RUN_TIME
       - key: API_PHONE_AUTH_ENABLED
         value: "true"
       - key: API_EMAIL_AUTH_ENABLED
@@ -67,23 +89,13 @@ services:
         value: "false"
       - key: SMS_HTTP_URL
         type: SECRET
-        value: SET_ME_VIA_DASHBOARD
+        value: REPLACE_VIA_DASHBOARD_BEFORE_LAUNCH
       - key: SMS_HTTP_AUTH_HEADER
         type: SECRET
-        value: SET_ME_VIA_DASHBOARD
+        value: REPLACE_VIA_DASHBOARD_BEFORE_LAUNCH
       - key: AUTH_RATE_LIMIT_WINDOW
         value: "300"
       - key: AUTH_RATE_LIMIT_MAX
         value: "20"
       - key: MAX_UPLOAD_BYTES
         value: "5242880"
-
-# Optional managed MySQL. Uncomment to let App Platform provision it and wire
-# DATABASE_URL/USERNAME/PASSWORD/HOSTNAME/PORT/DATABASE into the service.
-#
-# databases:
-#   - name: sawalove-db
-#     engine: MYSQL
-#     version: "8"
-#     size: db-s-1vcpu-1gb
-#     num_nodes: 1
