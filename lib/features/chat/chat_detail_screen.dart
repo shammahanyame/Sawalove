@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'gif_sticker_picker.dart';
 import 'providers/chat_messages_provider.dart';
 import 'widgets/voice_note_bubble.dart';
@@ -22,7 +23,36 @@ class ChatDetailScreen extends ConsumerWidget {
         actions: [
           IconButton(icon: const Icon(Icons.videocam), onPressed: () {}),
           IconButton(icon: const Icon(Icons.call), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
+          IconButton(
+            icon: const Icon(Icons.more_vert),
+            onPressed: () => showModalBottomSheet<void>(
+              context: context,
+              showDragHandle: true,
+              builder: (sheetContext) => SafeArea(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const ListTile(
+                      leading: Icon(Icons.person_outline),
+                      title: Text('View profile'),
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.flag_outlined),
+                      title: const Text('Report user'),
+                      onTap: () {
+                        Navigator.pop(sheetContext);
+                        context.push('/safety/report/$matchId');
+                      },
+                    ),
+                    const ListTile(
+                      leading: Icon(Icons.block),
+                      title: Text('Unmatch'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
       body: Column(

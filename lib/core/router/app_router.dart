@@ -104,6 +104,7 @@ import '../../features/safety/report_user_screen.dart';
 import '../../features/safety/emergency_sos_screen.dart';
 import '../../features/safety/id_verification_screen.dart';
 import '../../features/safety/moderation_appeal_screen.dart';
+import '../../features/safety/moderation_queue_screen.dart';
 
 // Location
 import '../../features/location/nearby_map_screen.dart';
@@ -435,6 +436,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
           path: '/safety/moderation-appeal',
           builder: (c, s) => const ModerationAppealScreen()),
+      GoRoute(
+          path: '/moderation',
+          builder: (c, s) => const ModerationQueueScreen()),
 
       // ── Location ────────────────────────────────────────────────────────
       GoRoute(

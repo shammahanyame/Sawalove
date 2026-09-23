@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../shared/services/backend_service.dart';
 
-class ReportUserScreen extends StatefulWidget {
+class ReportUserScreen extends ConsumerStatefulWidget {
   final String? profileUid;
   final String? initialReason;
   final String? photoUrl;
@@ -14,11 +16,40 @@ class ReportUserScreen extends StatefulWidget {
   });
 
   @override
-  State<ReportUserScreen> createState() => _ReportUserScreenState();
+  ConsumerState<ReportUserScreen> createState() => _ReportUserScreenState();
 }
 
-class _ReportUserScreenState extends State<ReportUserScreen> {
+class _ReportUserScreenState extends ConsumerState<ReportUserScreen> {
   String? _selectedReason;
+  bool _submitting = false;
+
+  /// UI labels → the server's report reason enum. 'Underage' has no dedicated
+  /// server category, so it files as 'other' with the concern spelled out in
+  /// details — moderation triage reads the note.
+  static const Map<String, String> _reasonApiKeys = {
+    'Inappropriate content': 'inappropriate_photos',
+    'Spam or fake profile': 'fake_profile',
+    'Harassment': 'harassment',
+    'Underage': 'other',
+    'Other': 'other',
+  };
+
+  String? _apiReason(String? label) {
+    if (label == null) return null;
+    final key = _reasonApiKeys[label];
+    if (key == null) return null;
+    if (label == 'Underage') return 'other';
+    return key;
+  }
+
+  String? _detailsFor(String label) {
+    final parts = <String>[
+      if (label == 'Underage') 'Underage concern.',
+      if (widget.photoUrl != null && widget.photoUrl!.isNotEmpty)
+        'Reported from a photo.',
+    ];
+    return parts.isEmpty ? null : parts.join(' ');
+  }
 
   @override
   void initState() {
@@ -93,14 +124,20 @@ class _ReportUserScreenState extends State<ReportUserScreen> {
                 ],
               ),
             ),
-            SizedBox(
+              SizedBox(
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed: _selectedReason == null
+                onPressed: _selectedReason == null || _submitting
                     ? null
-                    : () => _submitReport(context),
-                child: const Text('Submit Report'),
+                    : _submitReport,
+                child: _submitting
+                    ? const SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Submit Report'),
               ),
             ),
           ],
@@ -113,11 +150,57 @@ class _ReportUserScreenState extends State<ReportUserScreen> {
     setState(() => _selectedReason = reason);
   }
 
-  void _submitReport(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Report submitted')),
-    );
-    context.pop();
+  Future<void> _submitReport() async {
+    final label = _selectedReason;
+    if (label == null || _submitting) return;
+    final apiReason = _apiReason(label);
+    if (apiReason == null) return;
+
+    // Preview/demo contexts render this screen with no target uid; there is
+    // nothing real to file, so keep the legacy confirmation behavior.
+    final uid = widget.profileUid?.trim() ?? '';
+    if (uid.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Report submitted')),
+      );
+      context.pop();
+      return;
+    }
+
+    setState(() => _submitting = true);
+    try {
+      await ref
+          .read(backendServiceProvider)
+          .submitReport(
+            reportedUserId: uid,
+            reason: apiReason,
+            details: _detailsFor(label),
+          );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Report submitted. Our moderation team will review it.'),
+        ),
+      );
+      context.pop();
+    } on BackendAuthException catch (e) {
+      if (!mounted) return;
+      setState(() => _submitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(authErrorMessage(e))),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _submitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Could not submit right now. Check your connection and try again.',
+          ),
+        ),
+      );
+    }
   }
 }
 

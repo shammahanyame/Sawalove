@@ -1,7 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../core/theme/theme.dart';
+import '../../shared/services/backend_service.dart';
 
-class SelfProfileScreen extends StatelessWidget {
+/// Profile settings hub. Shows the moderator queue entry only when the
+/// signed-in account's private payload reports a moderator+ role; the server
+/// remains the enforcement point either way.
+class SelfProfileScreen extends ConsumerStatefulWidget {
   const SelfProfileScreen({super.key});
+
+  @override
+  ConsumerState<SelfProfileScreen> createState() => _SelfProfileScreenState();
+}
+
+class _SelfProfileScreenState extends ConsumerState<SelfProfileScreen> {
+  String? _role;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRole();
+  }
+
+  Future<void> _loadRole() async {
+    final backend = ref.read(backendServiceProvider);
+    if (!backend.isConfigured || !backend.isSignedIn) return;
+    try {
+      final profile = await backend.getUserProfile(backend.currentUserId!);
+      if (!mounted) return;
+      setState(() => _role = profile?['role']?.toString());
+    } catch (_) {
+      // Role chip is a convenience; ignore fetch failures.
+    }
+  }
+
+  bool get _isModerator => _role == 'moderator' || _role == 'admin';
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +93,14 @@ class SelfProfileScreen extends StatelessWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () {},
           ),
+          if (_isModerator)
+            ListTile(
+              leading: const Icon(Icons.gavel, color: SawaLoveTheme.primary),
+              title: const Text('Moderation queue'),
+              subtitle: const Text('Review reported accounts'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/moderation'),
+            ),
           const SizedBox(height: 24),
           // Premium Upsell
           Container(

@@ -84,7 +84,32 @@ class PeerProfileScreen extends StatelessWidget {
               ),
             ),
             actions: [
-              IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
+              IconButton(
+                icon: const Icon(Icons.more_vert),
+                onPressed: () => showModalBottomSheet<void>(
+                  context: context,
+                  showDragHandle: true,
+                  builder: (sheetContext) => SafeArea(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          leading: const Icon(Icons.flag_outlined),
+                          title: const Text('Report user'),
+                          onTap: () {
+                            Navigator.pop(sheetContext);
+                            context.push('/safety/report/$uid');
+                          },
+                        ),
+                        const ListTile(
+                          leading: Icon(Icons.block),
+                          title: Text('Block user'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
           SliverToBoxAdapter(

@@ -1376,6 +1376,9 @@ function user_to_api(array $user, bool $includePrivate = false): array
         'photo' => nullable_string($user['photo'] ?? null),
         'email' => $includePrivate ? nullable_string($user['email'] ?? null) : null,
         'phone' => $includePrivate ? nullable_string($user['phone'] ?? null) : null,
+        // Role is only ever revealed to the account itself; public discovery
+        // and profile responses never expose who moderates the platform.
+        'role' => $includePrivate ? user_role($user) : null,
         'visible' => bool_from_db($user['visible'] ?? false),
         'status' => (string)($user['status'] ?? 'active'),
         'isPremium' => bool_from_db($user['is_premium'] ?? false),

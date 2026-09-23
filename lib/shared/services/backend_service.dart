@@ -503,6 +503,88 @@ class BackendService {
     }
   }
 
+  /// REPORTING — files a report against another user. Reasons must match
+  /// the server's enum (harassment, fake_profile, inappropriate_photos,
+  /// scam, other). Throws BackendAuthException on API error so callers can
+  /// surface the message; returns the created report id.
+  Future<String> submitReport({
+    required String reportedUserId,
+    required String reason,
+    String? details,
+  }) async {
+    final decoded = await _sendJson(
+      'POST',
+      '/reports',
+      body: {
+        'reportedUserId': reportedUserId,
+        'reason': reason,
+        if (details != null && details.trim().isNotEmpty) 'details': details.trim(),
+      },
+      requiresAuth: true,
+    );
+    final report = decoded['report'];
+    if (report is Map) {
+      final id = report['id']?.toString();
+      if (id != null && id.isNotEmpty) return id;
+    }
+    return '';
+  }
+
+  /// MODERATION QUEUE — moderator+ only (server enforces; a 403 here means
+  /// the signed-in account is not a moderator). Returns [] when empty.
+  Future<List<Map<String, dynamic>>> fetchModerationReports({
+    String status = 'pending',
+  }) async {
+    final decoded = await _sendJson(
+      'GET',
+      '/moderation/reports',
+      query: {'status': status},
+      requiresAuth: true,
+    );
+    final raw = decoded['reports'];
+    if (raw is! List) return [];
+    return [
+      for (final item in raw)
+        if (item is Map) Map<String, dynamic>.from(item),
+    ];
+  }
+
+  /// Resolves a report. [outcome] is 'uphold' or 'dismiss'; upholding pauses
+  /// the reported account pending human review (server-side behavior).
+  Future<void> resolveReport({
+    required String reportId,
+    required String outcome,
+    String? note,
+  }) async {
+    await _sendJson(
+      'POST',
+      '/moderation/reports/$reportId/resolve',
+      body: {
+        'outcome': outcome,
+        if (note != null && note.trim().isNotEmpty) 'note': note.trim(),
+      },
+      requiresAuth: true,
+    );
+  }
+
+  /// Pauses, bans, or reinstates a user (moderator+). The server revokes the
+  /// target's sessions immediately.
+  Future<void> setUserStatus({
+    required String userId,
+    required String action, // 'pause' | 'ban' | 'reinstate'
+    String? note,
+  }) async {
+    await _sendJson(
+      'POST',
+      '/moderation/users/$userId/status',
+      body: {
+        'action': action,
+        if (note != null && note.trim().isNotEmpty) 'note': note.trim(),
+      },
+      requiresAuth: true,
+    );
+  }
+
   Future<Map<String, dynamic>> _sendJson(
     String method,
     String path, {
