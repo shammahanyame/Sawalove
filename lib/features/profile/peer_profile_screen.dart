@@ -101,7 +101,7 @@ class PeerProfileScreen extends StatelessWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.green.withValues(alpha: 0.2),
+                          color: SawaLoveTheme.success.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: const Row(
@@ -109,13 +109,13 @@ class PeerProfileScreen extends StatelessWidget {
                           children: [
                             Icon(
                               Icons.verified,
-                              color: Colors.green,
+                              color: SawaLoveTheme.success,
                               size: 16,
                             ),
                             SizedBox(width: 4),
                             Text(
                               'Verified',
-                              style: TextStyle(color: Colors.green),
+                              style: TextStyle(color: SawaLoveTheme.success),
                             ),
                           ],
                         ),
@@ -196,7 +196,7 @@ class PeerProfileScreen extends StatelessWidget {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: canMessage
                                 ? SawaLoveTheme.primary
-                                : Colors.grey,
+                                : SawaLoveTheme.onSurfaceVariant,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(vertical: 16),
                           ),

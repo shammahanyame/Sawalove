@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:reorderable_grid/reorderable_grid.dart';
 import '../../core/theme/theme.dart';
+import '../../shared/widgets/pressable_scale.dart';
 import '../../shared/models/photo_slot.dart';
 import '../../shared/providers/photo_upload_provider.dart';
 import 'widgets/photo_grid_cell.dart';
@@ -450,7 +451,7 @@ class _SourceButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Expanded(
-      child: GestureDetector(
+      child: PressableScale(
         onTap: onTap,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 20),

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:sawalove/core/theme/theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../shared/providers/app_settings_provider.dart';
@@ -97,7 +98,7 @@ class _LanguageSelectionScreenState
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
+                            color: SawaLoveTheme.surfaceContainerLow,
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: const Row(
@@ -115,13 +116,13 @@ class _LanguageSelectionScreenState
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Container(width: 12, height: 12, decoration: BoxDecoration(color: Colors.grey.shade300, shape: BoxShape.circle)),
+                            Container(width: 12, height: 12, decoration: const BoxDecoration(color: SawaLoveTheme.outlineVariant, shape: BoxShape.circle)),
                             const SizedBox(width: 8),
                             Container(width: 20, height: 12, decoration: const BoxDecoration(color: Color(0xFFB30065), borderRadius: BorderRadius.horizontal(left: Radius.circular(6), right: Radius.circular(6)))),
                             const SizedBox(width: 8),
-                            Container(width: 12, height: 12, decoration: BoxDecoration(color: Colors.grey.shade300, shape: BoxShape.circle)),
+                            Container(width: 12, height: 12, decoration: const BoxDecoration(color: SawaLoveTheme.outlineVariant, shape: BoxShape.circle)),
                             const SizedBox(width: 8),
-                            Container(width: 12, height: 12, decoration: BoxDecoration(color: Colors.grey.shade300, shape: BoxShape.circle)),
+                            Container(width: 12, height: 12, decoration: const BoxDecoration(color: SawaLoveTheme.outlineVariant, shape: BoxShape.circle)),
                           ],
                         ),
                       const SizedBox(height: 48),
@@ -159,12 +160,12 @@ class _LanguageSelectionScreenState
                           children: [
                             Row(
                               children: [
-                                Expanded(child: Container(height: 1, color: Colors.grey.shade300)),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                                  child: Text('Detect from location', style: TextStyle(color: Colors.grey.shade600, fontSize: 12)),
+                                Expanded(child: Container(height: 1, color: SawaLoveTheme.outlineVariant)),
+                                const Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 16),
+                                  child: Text('Detect from location', style: TextStyle(color: SawaLoveTheme.onSurfaceVariant, fontSize: 12)),
                                 ),
-                                Expanded(child: Container(height: 1, color: Colors.grey.shade300)),
+                                Expanded(child: Container(height: 1, color: SawaLoveTheme.outlineVariant)),
                               ],
                             ),
                             const SizedBox(height: 16),
@@ -254,7 +255,7 @@ class _LanguageCard extends StatelessWidget {
                 height: 24,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.grey.shade400),
+                  border: Border.all(color: SawaLoveTheme.outlineVariant),
                 ),
                 child: isSelected
                   ? const Icon(Icons.radio_button_checked, size: 20, color: Color(0xFFB30065))

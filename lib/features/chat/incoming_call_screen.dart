@@ -244,7 +244,7 @@ class _DeclinedCallScreenState extends State<DeclinedCallScreen> {
               const Icon(
                 Icons.person_remove,
                 size: 80,
-                color: Colors.redAccent,
+                color: SawaLoveTheme.errorColor,
               ),
               const SizedBox(height: 24),
               Text(
@@ -368,7 +368,7 @@ class _BusyUnavailableScreenState extends State<BusyUnavailableScreen> {
 const Icon(
                 Icons.call_missed,
                 size: 80,
-                color: Colors.blueAccent,
+                color: SawaLoveTheme.tertiary,
               ),
               const SizedBox(height: 24),
               Text(
@@ -400,7 +400,7 @@ const Icon(
                   'Leave voice message · Message vocal',
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
+                  backgroundColor: SawaLoveTheme.tertiary,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(
                     horizontal: 24,

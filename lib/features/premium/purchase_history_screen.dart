@@ -58,7 +58,7 @@ class PurchaseHistoryScreen extends StatelessWidget {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: isActive ? Colors.green : Colors.orange,
+                                    color: isActive ? SawaLoveTheme.success : SawaLoveTheme.warning,
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Text(
@@ -71,7 +71,7 @@ class PurchaseHistoryScreen extends StatelessWidget {
                             const SizedBox(height: 8),
                             Row(
                               children: [
-                                Icon(Icons.receipt_long, size: 16, color: Colors.grey.shade600),
+                                const Icon(Icons.receipt_long, size: 16, color: SawaLoveTheme.onSurfaceVariant),
                                 const SizedBox(width: 8),
                                 Text('Receipt #${1000 + index}'),
                               ],
@@ -79,17 +79,17 @@ class PurchaseHistoryScreen extends StatelessWidget {
                             const SizedBox(height: 4),
                             Row(
                               children: [
-                                Icon(Icons.attach_money, size: 16, color: Colors.grey.shade600),
+                                const Icon(Icons.attach_money, size: 16, color: SawaLoveTheme.onSurfaceVariant),
                                 const SizedBox(width: 8),
                                 Text(purchase['amount']!),
                               ],
                             ),
                             const SizedBox(height: 4),
-                            Row(
+                            const Row(
                               children: [
-                                Icon(Icons.payment, size: 16, color: Colors.grey.shade600),
-                                const SizedBox(width: 8),
-                                const Text('MTN MoMo'),
+                                Icon(Icons.payment, size: 16, color: SawaLoveTheme.onSurfaceVariant),
+                                SizedBox(width: 8),
+                                Text('MTN MoMo'),
                               ],
                             ),
                             const SizedBox(height: 12),

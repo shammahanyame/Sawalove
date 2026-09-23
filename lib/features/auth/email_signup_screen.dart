@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sawalove/core/theme/theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sawalove/core/utils/password_strength.dart';
 import 'package:go_router/go_router.dart';
@@ -58,7 +59,7 @@ class _EmailSignupScreenState extends ConsumerState<EmailSignupScreen> {
                           Row(
                             children: [
                               Icon(Icons.check_circle,
-                                  color: Colors.green, size: 24),
+                                  color: SawaLoveTheme.success, size: 24),
                               SizedBox(width: 12),
                               Expanded(child: Text('Works from any country')),
                             ],
@@ -67,7 +68,7 @@ class _EmailSignupScreenState extends ConsumerState<EmailSignupScreen> {
                           Row(
                             children: [
                               Icon(Icons.warning_amber,
-                                  color: Colors.orange, size: 24),
+                                  color: SawaLoveTheme.warning, size: 24),
                               SizedBox(width: 12),
                               Expanded(
                                 child: Text(

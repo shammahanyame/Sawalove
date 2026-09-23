@@ -21,7 +21,7 @@ class FaceCheckBadge extends StatelessWidget {
         );
       case FaceCheckType.checking:
         return _buildPill(
-          color: Colors.amber.shade700,
+          color: SawaLoveTheme.warning,
           icon: Icons.access_time,
           label: 'Checking…',
         );

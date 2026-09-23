@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sawalove/core/theme/theme.dart';
 import 'package:go_router/go_router.dart';
 
 
@@ -50,7 +51,7 @@ class ReferFriendsScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.star, color: Colors.amber),
+                        Icon(Icons.star, color: SawaLoveTheme.warning),
                         SizedBox(width: 12),
                         Text('Your referrals', style: TextStyle(fontWeight: FontWeight.bold)),
                       ],
@@ -60,7 +61,7 @@ class ReferFriendsScreen extends StatelessWidget {
                       leading: CircleAvatar(child: Text('J')),
                       title: Text('Jean M.'),
                       subtitle: Text('Signed up - 3 days earned'),
-                      trailing: Icon(Icons.check_circle, color: Colors.green),
+                      trailing: Icon(Icons.check_circle, color: SawaLoveTheme.success),
                     ),
                     ListTile(
                       leading: CircleAvatar(child: Text('P')),

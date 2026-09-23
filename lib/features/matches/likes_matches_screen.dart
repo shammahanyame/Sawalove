@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sawalove/shared/widgets/pressable_scale.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class LikesMatchesScreen extends ConsumerWidget {
@@ -70,7 +71,7 @@ class LikesMatchesScreen extends ConsumerWidget {
                   mainAxisSpacing: 12,
                 ),
                 itemCount: 8, // Mock data
-                itemBuilder: (context, index) => GestureDetector(
+                itemBuilder: (context, index) => PressableScale(
                   onTap: () => Navigator.pushNamed(context, '/chat/$index'),
                   child: Container(
                     decoration: BoxDecoration(

@@ -736,7 +736,7 @@ class _PhotoImage extends StatelessWidget {
     return CachedNetworkImage(
       imageUrl: url,
       fit: fit,
-      placeholder: (context, url) => Container(color: Colors.grey.shade900),
+      placeholder: (context, url) => Container(color: SawaLoveTheme.darkSurfaceContainer),
       errorWidget: (context, url, error) => const _MissingPhotoPlaceholder(),
     );
   }
@@ -748,10 +748,10 @@ class _MissingPhotoPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.grey.shade800,
+      color: SawaLoveTheme.darkSurfaceContainerHigh,
       alignment: Alignment.center,
       child:
-          const Icon(Icons.image_not_supported, color: Colors.grey, size: 64),
+          const Icon(Icons.image_not_supported, color: SawaLoveTheme.onSurfaceVariant, size: 64),
     );
   }
 }

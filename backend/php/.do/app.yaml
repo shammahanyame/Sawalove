@@ -99,3 +99,19 @@ services:
         value: "20"
       - key: MAX_UPLOAD_BYTES
         value: "5242880"
+      # AI gateway: the model API key is a server-side secret — replace it in
+      # the dashboard (Settings -> Environment Variables) before enabling AI
+      # features. The frontend never sees any AI credential.
+      - key: AI_PROVIDER_API_KEY
+        type: SECRET
+        value: REPLACE_VIA_DASHBOARD_BEFORE_ENABLING_AI
+      - key: AI_PROVIDER_BASE_URL
+        value: https://api.openai.com/v1
+      - key: AI_PROVIDER_MODEL
+        value: gpt-4o-mini
+      - key: AI_DAILY_SPEND_LIMIT_CENTS_USD
+        value: "500"
+      - key: AI_USER_DAILY_REQUEST_LIMIT
+        value: "20"
+      - key: AI_COST_USD_PER_1M_TOKENS
+        value: "500"

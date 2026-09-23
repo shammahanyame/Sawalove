@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sawalove/core/theme/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class OfflineScreen extends StatelessWidget {
@@ -10,7 +11,7 @@ class OfflineScreen extends StatelessWidget {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.blue, Colors.indigo],
+            colors: [SawaLoveTheme.tertiary, Color(0xFF004B5E)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -37,24 +38,24 @@ class OfflineScreen extends StatelessWidget {
                           Container(
                             width: 4,
                             height: 20,
-                            color: Colors.grey,
+                            color: SawaLoveTheme.onSurfaceVariant,
                           ),
                           const SizedBox(height: 8),
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Container(width: 4, height: 40, color: Colors.grey),
+                              Container(width: 4, height: 40, color: SawaLoveTheme.onSurfaceVariant),
                               const SizedBox(width: 4),
-                              Container(width: 4, height: 30, color: Colors.grey),
+                              Container(width: 4, height: 30, color: SawaLoveTheme.onSurfaceVariant),
                               const SizedBox(width: 4),
-                              Container(width: 4, height: 20, color: Colors.grey[300]),
+                              Container(width: 4, height: 20, color: SawaLoveTheme.outlineVariant),
                               const SizedBox(width: 4),
-                              Container(width: 4, height: 10, color: Colors.grey[200]),
+                              Container(width: 4, height: 10, color: SawaLoveTheme.outlineVariant),
                             ],
                           ),
                         ],
                       ),
-                      const Icon(Icons.cloud_off, size: 48, color: Colors.blue),
+                      const Icon(Icons.cloud_off, size: 48, color: SawaLoveTheme.tertiary),
                     ],
                   ),
                 ),
@@ -81,7 +82,7 @@ class OfflineScreen extends StatelessWidget {
                     padding: EdgeInsets.all(24),
                     child: Column(
                       children: [
-                        Icon(Icons.phone_android, size: 48, color: Colors.blue),
+                        Icon(Icons.phone_android, size: 48, color: SawaLoveTheme.tertiary),
                         SizedBox(height: 16),
                         Text(
                           'Tips while offline:',
@@ -92,7 +93,7 @@ class OfflineScreen extends StatelessWidget {
                         Text('• Edit profile'),
                         Text('• Review matches'),
                         SizedBox(height: 8),
-                        Text('New likes/matches when back online', style: TextStyle(color: Colors.green)),
+                        Text('New likes/matches when back online', style: TextStyle(color: SawaLoveTheme.success)),
                       ],
                     ),
                   ),
@@ -105,7 +106,7 @@ class OfflineScreen extends StatelessWidget {
                     label: const Text('Retry Connection'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
-                      foregroundColor: Colors.blue,
+                      foregroundColor: SawaLoveTheme.tertiary,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                     ),
@@ -114,7 +115,7 @@ class OfflineScreen extends StatelessWidget {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Connection restored!'),
-                          backgroundColor: Colors.green,
+                          backgroundColor: SawaLoveTheme.success,
                         ),
                       );
                       context.pop();

@@ -52,7 +52,7 @@ class _ContactSupportScreenState extends State<ContactSupportScreen>
         bottom: TabBar(
           controller: _tabController,
           labelColor: SawaLoveTheme.primary,
-          unselectedLabelColor: Colors.grey,
+          unselectedLabelColor: SawaLoveTheme.onSurfaceVariant,
           indicatorColor: SawaLoveTheme.primary,
           tabs: const [
             Tab(icon: Icon(Icons.contact_mail), text: 'Tickets'),
@@ -88,15 +88,15 @@ class _ContactSupportScreenState extends State<ContactSupportScreen>
                     child: ListTile(
                       leading: CircleAvatar(
                         backgroundColor: ticket['status'] == 'Open'
-                            ? Colors.orange.withValues(alpha: 0.2)
-                            : Colors.green.withValues(alpha: 0.2),
+                            ? SawaLoveTheme.warning.withValues(alpha: 0.2)
+                            : SawaLoveTheme.success.withValues(alpha: 0.2),
                         child: Icon(
                           ticket['status'] == 'Open'
                               ? Icons.pending
                               : Icons.check_circle,
                           color: ticket['status'] == 'Open'
-                              ? Colors.orange
-                              : Colors.green,
+                            ? SawaLoveTheme.warning
+                            : SawaLoveTheme.success,
                         ),
                       ),
                       title: Text(ticket['subject']!,
@@ -109,8 +109,8 @@ class _ContactSupportScreenState extends State<ContactSupportScreen>
                               color: Colors.white, fontSize: 12),
                         ),
                         backgroundColor: ticket['status'] == 'Open'
-                            ? Colors.orange
-                            : Colors.green,
+                            ? SawaLoveTheme.warning
+                            : SawaLoveTheme.success,
                         padding: EdgeInsets.zero,
                       ),
                     ),
@@ -201,15 +201,15 @@ class _ContactSupportScreenState extends State<ContactSupportScreen>
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: _isPremium
-                  ? Colors.green.withValues(alpha: 0.1)
-                  : Colors.orange.withValues(alpha: 0.1),
+                  ? SawaLoveTheme.success.withValues(alpha: 0.1)
+                  : SawaLoveTheme.warning.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
               children: [
                 Icon(
                   _isPremium ? Icons.chat : Icons.lock,
-                  color: _isPremium ? Colors.green : Colors.orange,
+                  color: _isPremium ? SawaLoveTheme.success : SawaLoveTheme.warning,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -240,8 +240,8 @@ class _ContactSupportScreenState extends State<ContactSupportScreen>
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.email_outlined,
-                            size: 80, color: Colors.grey.shade400),
+                        const Icon(Icons.email_outlined,
+                            size: 80, color: SawaLoveTheme.outlineVariant),
                         const SizedBox(height: 24),
                         Text(
                           'Email Support',
@@ -257,9 +257,9 @@ class _ContactSupportScreenState extends State<ContactSupportScreen>
                               fontSize: 18, color: SawaLoveTheme.primary),
                         ),
                         const SizedBox(height: 8),
-                        Text(
+                        const Text(
                           'Response within 24 hours',
-                          style: TextStyle(color: Colors.grey.shade600),
+                          style: TextStyle(color: SawaLoveTheme.onSurfaceVariant),
                         ),
                       ],
                     ),
@@ -301,7 +301,7 @@ class _ContactSupportScreenState extends State<ContactSupportScreen>
         constraints: BoxConstraints(
             maxWidth: MediaQuery.of(context).size.width * 0.7),
         decoration: BoxDecoration(
-          color: isUser ? SawaLoveTheme.primary : Colors.grey.shade200,
+          color: isUser ? SawaLoveTheme.primary : SawaLoveTheme.surfaceContainerHigh,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(

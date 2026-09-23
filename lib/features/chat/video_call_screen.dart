@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sawalove/core/theme/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class VideoCallScreen extends StatefulWidget {
@@ -27,7 +28,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.call_end, color: Colors.red, size: 32),
+                    icon: const Icon(Icons.call_end, color: SawaLoveTheme.errorColor, size: 32),
                     onPressed: () => context.pop(),
                   ),
                   const Column(
@@ -50,7 +51,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                 children: [
                   // Main video (local)
                   Container(
-                    color: Colors.blueGrey.shade900,
+                    color: SawaLoveTheme.darkSurfaceContainerHigh,
                     child: const Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -114,7 +115,7 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
                       width: 72,
                       height: 72,
                       decoration: const BoxDecoration(
-                        color: Colors.red,
+                        color: SawaLoveTheme.errorColor,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.call_end, color: Colors.white, size: 32),

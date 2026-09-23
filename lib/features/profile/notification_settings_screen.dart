@@ -100,7 +100,7 @@ class _NotificationSettingsScreenState
               ),
               SwitchListTile(
                 title: const Row(children: [
-                  Icon(Icons.thumb_up, color: Colors.blue),
+                  Icon(Icons.thumb_up, color: SawaLoveTheme.tertiary),
                   SizedBox(width: 12),
                   Text('New Likes'),
                 ]),
@@ -109,7 +109,7 @@ class _NotificationSettingsScreenState
               ),
               SwitchListTile(
                 title: const Row(children: [
-                  Icon(Icons.star, color: Colors.amber),
+                  Icon(Icons.star, color: SawaLoveTheme.warning),
                   SizedBox(width: 12),
                   Text('Super Likes'),
                 ]),
@@ -127,7 +127,7 @@ class _NotificationSettingsScreenState
               ),
               SwitchListTile(
                 title: const Row(children: [
-                  Icon(Icons.campaign, color: Colors.grey),
+                  Icon(Icons.campaign, color: SawaLoveTheme.onSurfaceVariant),
                   SizedBox(width: 12),
                   Text('Promotions'),
                 ]),

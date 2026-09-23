@@ -135,25 +135,25 @@ class _IdVerificationScreenState extends State<IdVerificationScreen> {
                       Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Colors.green.shade50,
+                          color: SawaLoveTheme.successContainer,
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        child: Row(
+                        child: const Row(
                           children: [
-                            const Icon(Icons.verified,
-                                color: Colors.green, size: 32),
-                            const SizedBox(width: 16),
+                            Icon(Icons.verified,
+                                color: SawaLoveTheme.success, size: 32),
+                            SizedBox(width: 16),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('Verified!',
+                                  Text('Verified!',
                                       style: TextStyle(
                                           fontWeight: FontWeight.w700,
                                           fontSize: 18)),
                                   Text('Gold badge activated',
                                       style: TextStyle(
-                                          color: Colors.green.shade700)),
+                                          color: SawaLoveTheme.success)),
                                 ],
                               ),
                             ),

@@ -14,13 +14,13 @@ class SafetyFlaggedCard extends ConsumerWidget {
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.orange.withValues(alpha: 0.1),
+        color: SawaLoveTheme.warning.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+        border: Border.all(color: SawaLoveTheme.warning.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
-          const Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 32),
+          const Icon(Icons.warning_amber_rounded, color: SawaLoveTheme.warning, size: 32),
           const SizedBox(height: 8),
           Text(
             'Safety notice · Avertissement sécurité',

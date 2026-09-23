@@ -136,7 +136,7 @@ class _ForgotPinScreenState extends State<ForgotPinScreen>
         child: Container(
           height: 68,
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
+            border: Border.all(color: SawaLoveTheme.outlineVariant),
             borderRadius: BorderRadius.circular(16),
             color: Colors.white,
           ),
@@ -164,7 +164,7 @@ class _ForgotPinScreenState extends State<ForgotPinScreen>
       width: 12,
       height: 12,
       decoration: const BoxDecoration(
-        color: Colors.grey,
+        color: SawaLoveTheme.onSurfaceVariant,
         shape: BoxShape.circle,
       ),
     );
@@ -189,14 +189,14 @@ class _ForgotPinScreenState extends State<ForgotPinScreen>
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.red.withValues(alpha: 0.1),
+              color: SawaLoveTheme.errorColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Row(
               children: [
-                Icon(Icons.error, color: Colors.red),
+                Icon(Icons.error, color: SawaLoveTheme.errorColor),
                 SizedBox(width: 8),
-                Text('PINs do not match', style: TextStyle(color: Colors.red)),
+                Text('PINs do not match', style: TextStyle(color: SawaLoveTheme.errorColor)),
               ],
             ),
           ),
@@ -249,13 +249,13 @@ class _ForgotPinScreenState extends State<ForgotPinScreen>
       children: [
         LinearProgressIndicator(
           value: _newPinDigits.where((d) => d != -1).length / 6,
-          backgroundColor: Colors.grey[300],
+          backgroundColor: SawaLoveTheme.outlineVariant,
           valueColor: AlwaysStoppedAnimation<Color>(
             strength == PinStrength.strong
-                ? Colors.green
+                ? SawaLoveTheme.success
                 : strength == PinStrength.fair
-                    ? Colors.orange
-                    : Colors.red,
+                    ? SawaLoveTheme.warning
+                    : SawaLoveTheme.errorColor,
           ),
         ),
         const SizedBox(height: 8),
@@ -306,7 +306,7 @@ class _ForgotPinScreenState extends State<ForgotPinScreen>
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
         ),
-        child: const Icon(Icons.backspace, color: Colors.grey),
+        child: const Icon(Icons.backspace, color: SawaLoveTheme.onSurfaceVariant),
       ),
     );
   }
@@ -378,13 +378,13 @@ class _ForgotPinScreenState extends State<ForgotPinScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: isActive ? SawaLoveTheme.primary : Colors.grey[200],
+        color: isActive ? SawaLoveTheme.primary : SawaLoveTheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
         label,
         style: TextStyle(
-          color: isActive ? Colors.white : Colors.grey[600],
+          color: isActive ? SawaLoveTheme.onPrimary : SawaLoveTheme.onSurfaceVariant,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -395,7 +395,7 @@ class _ForgotPinScreenState extends State<ForgotPinScreen>
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(Icons.phone_iphone, size: 80, color: Colors.grey),
+        const Icon(Icons.phone_iphone, size: 80, color: SawaLoveTheme.onSurfaceVariant),
         const SizedBox(height: 32),
         Text('Confirm your number',
             style: Theme.of(context).textTheme.headlineMedium),
@@ -405,12 +405,12 @@ class _ForgotPinScreenState extends State<ForgotPinScreen>
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.orange.withValues(alpha: 0.1),
+            color: SawaLoveTheme.warning.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: const Row(
             children: [
-              Icon(Icons.warning_amber_rounded, color: Colors.orange),
+              Icon(Icons.warning_amber_rounded, color: SawaLoveTheme.warning),
               SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -458,7 +458,7 @@ class _ForgotPinScreenState extends State<ForgotPinScreen>
                 onTap: _sendOtp,
                 child: const Text('Resend code',
                     style: TextStyle(
-                        color: Colors.blue, fontWeight: FontWeight.w600)),
+                        color: SawaLoveTheme.tertiary, fontWeight: FontWeight.w600)),
               ),
             ],
           ],
@@ -482,7 +482,7 @@ class _ForgotPinScreenState extends State<ForgotPinScreen>
         Container(
           padding: const EdgeInsets.all(32),
           decoration: const BoxDecoration(
-            color: Colors.green,
+            color: SawaLoveTheme.success,
             shape: BoxShape.circle,
           ),
           child: const Icon(Icons.check, size: 64, color: Colors.white),

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:sawalove/core/theme/theme.dart';
 import 'package:go_router/go_router.dart';
 
 /// Busy/Unavailable screen - shown when recipient is on another call or has DND enabled
@@ -118,12 +119,12 @@ class _BusyUnavailableScreenState extends State<BusyUnavailableScreen> {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: Colors.blue.withValues(alpha: 0.2),
+                    color: SawaLoveTheme.tertiary.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.do_not_disturb_on,
-                    color: Colors.blueAccent,
+                    color: SawaLoveTheme.tertiary,
                     size: 40,
                   ),
                 ),
@@ -158,7 +159,7 @@ class _BusyUnavailableScreenState extends State<BusyUnavailableScreen> {
                     onPressed: _isRecording ? _stopRecording : _startRecording,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _isRecording 
-                        ? Colors.red 
+                        ? SawaLoveTheme.errorColor 
                         : const Color(0xFF3B82F6),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -183,7 +184,7 @@ class _BusyUnavailableScreenState extends State<BusyUnavailableScreen> {
                   LinearProgressIndicator(
                     value: _recordingSeconds / 60,
                     backgroundColor: Colors.white.withValues(alpha: 0.2),
-                    valueColor: const AlwaysStoppedAnimation(Colors.red),
+                    valueColor: const AlwaysStoppedAnimation(SawaLoveTheme.errorColor),
                   ),
                   const SizedBox(height: 8),
                   Text(

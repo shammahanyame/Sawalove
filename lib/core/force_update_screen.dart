@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sawalove/core/theme/theme.dart';
 
 class ForceUpdateScreen extends StatelessWidget {
   const ForceUpdateScreen({super.key});
@@ -62,7 +63,7 @@ class ForceUpdateScreen extends StatelessWidget {
                       children: [
                         Row(
                           children: [
-                            Icon(Icons.new_releases, color: Colors.orange),
+                            Icon(Icons.new_releases, color: SawaLoveTheme.warning),
                             SizedBox(width: 12),
                             Text('What\'s new:', style: TextStyle(fontWeight: FontWeight.w600)),
                           ],

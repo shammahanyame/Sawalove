@@ -547,7 +547,7 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
     if (isOpenToAll) {
       barColor = const Color(0xFF1D9E75);
     } else if (count < 100) {
-      barColor = Colors.amber.shade700;
+      barColor = SawaLoveTheme.warning;
     } else {
       barColor = SawaLoveTheme.primary;
     }
@@ -562,14 +562,14 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
           color: isOpenToAll
               ? const Color(0xFFE8F8EF)
               : count < 100
-                  ? Colors.amber.shade50
+                  ? SawaLoveTheme.warningContainer
                   : SawaLoveTheme.surfaceContainerLow,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isOpenToAll
                 ? const Color(0xFF1D9E75)
                 : count < 100
-                    ? Colors.amber.shade300
+                    ? SawaLoveTheme.warning
                     : SawaLoveTheme.surfaceContainerHighest,
           ),
         ),
@@ -615,7 +615,7 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
                 color: isOpenToAll
                     ? const Color(0xFF1D9E75)
                     : count < 100
-                        ? Colors.amber.shade800
+                        ? SawaLoveTheme.warning
                         : SawaLoveTheme.onSurfaceVariant,
               ),
             ),
@@ -625,20 +625,20 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.amber.shade100,
+                  color: SawaLoveTheme.warningContainer,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.lightbulb,
-                        size: 18, color: Colors.amber.shade800),
+                    const Icon(Icons.lightbulb,
+                        size: 18, color: SawaLoveTheme.warning),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         suggestion,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 12,
-                          color: Colors.amber.shade900,
+                          color: SawaLoveTheme.warning,
                         ),
                       ),
                     ),

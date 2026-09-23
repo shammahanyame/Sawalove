@@ -16,6 +16,10 @@ create table if not exists users (
   photo varchar(512) null,
   visible tinyint(1) not null default 0,
   status enum('active', 'paused', 'deletion_requested', 'banned') not null default 'active',
+  -- ROLE-BASED ACCESS CONTROL: 'user' is the default. 'moderator' and 'admin'
+  -- are granted ONLY by a direct DB change (ops runbook) — no API endpoint
+  -- can create, read, or modify roles.
+  role enum('user', 'moderator', 'admin') not null default 'user',
   is_premium tinyint(1) not null default 0,
   lat decimal(10, 7) not null default 0,
   lng decimal(10, 7) not null default 0,
@@ -102,8 +106,61 @@ create table if not exists auth_rate_limits (
   key auth_rate_limits_window_idx (window_start)
 ) engine=InnoDB default charset=utf8mb4 collate=utf8mb4_unicode_ci;
 
+-- AI SPEND LEDGER: one row per completed model call. The API sums this table
+-- (per day, globally and per user) BEFORE making any model request, so the
+-- configured daily caps are hard limits, not suggestions. Cost is stored in
+-- whole US cents (estimated, rounded up).
+create table if not exists ai_usage (
+  id bigint unsigned auto_increment primary key,
+  user_id char(36) not null,
+  endpoint varchar(64) not null,
+  model varchar(64) not null,
+  cost_usd_cents int unsigned not null default 0,
+  day date not null,
+  created_at datetime not null default current_timestamp,
+  key ai_usage_day_idx (day),
+  key ai_usage_user_day_idx (user_id, day),
+  constraint ai_usage_user_id_fk foreign key (user_id) references users(id) on delete cascade
+) engine=InnoDB default charset=utf8mb4 collate=utf8mb4_unicode_ci;
+
+create table if not exists reports (
+  id char(36) primary key,
+  reporter_id char(36) not null,
+  reported_user_id char(36) not null,
+  reason enum('harassment', 'fake_profile', 'inappropriate_photos', 'scam', 'other') not null,
+  details text null,
+  status enum('pending', 'upheld', 'dismissed') not null default 'pending',
+  resolved_by char(36) null,
+  resolution_note text null,
+  created_at datetime not null default current_timestamp,
+  updated_at datetime not null default current_timestamp on update current_timestamp,
+  key reports_status_idx (status, created_at),
+  key reports_reporter_idx (reporter_id),
+  key reports_reported_idx (reported_user_id),
+  constraint reports_reporter_fk foreign key (reporter_id) references users(id) on delete cascade,
+  constraint reports_reported_fk foreign key (reported_user_id) references users(id) on delete cascade,
+  -- A moderator's account may be deleted; keep the resolver reference but
+  -- null it out rather than deleting the audit trail.
+  constraint reports_resolved_by_fk foreign key (resolved_by) references users(id) on delete set null
+) engine=InnoDB default charset=utf8mb4 collate=utf8mb4_unicode_ci;
+
+create table if not exists moderation_actions (
+  id bigint unsigned auto_increment primary key,
+  moderator_id char(36) not null,
+  report_id char(36) null,
+  target_user_id char(36) not null,
+  action enum('warn', 'pause', 'ban', 'reinstate', 'dismiss') not null,
+  note text null,
+  created_at datetime not null default current_timestamp,
+  key moderation_actions_target_idx (target_user_id, created_at),
+  key moderation_actions_moderator_idx (moderator_id, created_at),
+  constraint moderation_actions_moderator_fk foreign key (moderator_id) references users(id) on delete cascade,
+  constraint moderation_actions_report_fk foreign key (report_id) references reports(id) on delete set null,
+  constraint moderation_actions_target_fk foreign key (target_user_id) references users(id) on delete cascade
+) engine=InnoDB default charset=utf8mb4 collate=utf8mb4_unicode_ci;
+
 -- Housekeeping: purge stale rows so these tables do not grow forever.
--- Kept as three single-statement events so the file imports with the plain
+-- Kept as single-statement events so the file imports with the plain
 -- mysql CLI (no DELIMITER juggling required).
 create event if not exists sawalove_housekeeping_rate_limits
 on schedule every 1 hour
@@ -119,3 +176,8 @@ create event if not exists sawalove_housekeeping_sessions
 on schedule every 1 hour
 do
   delete from sessions where expires_at < utc_timestamp() - interval 7 day;
+
+create event if not exists sawalove_housekeeping_ai_usage
+on schedule every 1 day
+do
+  delete from ai_usage where day < utc_date() - interval 90 day;

@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/theme.dart';
+import '../../shared/providers/app_settings_provider.dart';
 
-class DarkModeDisplayScreen extends StatefulWidget {
+class DarkModeDisplayScreen extends ConsumerStatefulWidget {
   const DarkModeDisplayScreen({super.key});
 
   @override
-  State<DarkModeDisplayScreen> createState() => _DarkModeDisplayScreenState();
+  ConsumerState<DarkModeDisplayScreen> createState() => _DarkModeDisplayScreenState();
 }
 
-class _DarkModeDisplayScreenState extends State<DarkModeDisplayScreen> {
-  ThemeMode _themeMode = ThemeMode.system;
+class _DarkModeDisplayScreenState extends ConsumerState<DarkModeDisplayScreen> {
+  late ThemeMode _themeMode = ref.read(appSettingsProvider).themeMode;
   double _textScale = 1.0;
 
   @override
@@ -43,6 +45,8 @@ class _DarkModeDisplayScreenState extends State<DarkModeDisplayScreen> {
                     onChanged: (value) {
                       if (value != null) {
                         setState(() => _themeMode = value);
+                        // Persist immediately so the change is not lost.
+                        ref.read(appSettingsProvider.notifier).setThemeMode(value);
                       }
                     },
                     child: Column(
@@ -187,7 +191,7 @@ class _DarkModeDisplayScreenState extends State<DarkModeDisplayScreen> {
               const Spacer(),
               ElevatedButton(
                 onPressed: () {
-                  // Save theme/text scale
+                  ref.read(appSettingsProvider.notifier).setThemeMode(_themeMode);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Display settings updated')),
                   );

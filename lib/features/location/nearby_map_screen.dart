@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:sawalove/core/theme/theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -155,7 +156,7 @@ class _NearbyMapScreenState extends ConsumerState<NearbyMapScreen> {
                 width: 40,
                 height: 40,
                 decoration: const BoxDecoration(
-                  color: Colors.blue,
+                  color: SawaLoveTheme.tertiary,
                   shape: BoxShape.circle,
                 ),
                 child: TweenAnimationBuilder<double>(
@@ -167,7 +168,7 @@ class _NearbyMapScreenState extends ConsumerState<NearbyMapScreen> {
                       width: 20,
                       height: 20,
                       decoration: const BoxDecoration(
-                        color: Colors.blue,
+                        color: SawaLoveTheme.tertiary,
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -193,7 +194,7 @@ class _NearbyMapScreenState extends ConsumerState<NearbyMapScreen> {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
+                      color: SawaLoveTheme.outlineVariant,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),

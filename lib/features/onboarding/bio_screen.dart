@@ -1,17 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/theme.dart';
+import '../../../shared/services/backend_service.dart';
 
-class BioScreen extends StatefulWidget {
+class BioScreen extends ConsumerStatefulWidget {
   const BioScreen({super.key});
 
   @override
-  State<BioScreen> createState() => _BioScreenState();
+  ConsumerState<BioScreen> createState() => _BioScreenState();
 }
 
-class _BioScreenState extends State<BioScreen> {
+class _BioScreenState extends ConsumerState<BioScreen> {
   final TextEditingController _bioController = TextEditingController();
   String _selectedHint = '';
+
+  /// Live AI-generated bio drafts from the server-side capped gateway. Empty
+  /// until fetched; on any failure (offline, not signed in, budget exhausted)
+  /// the static [hints] below still render, so onboarding never blocks.
+  List<Map<String, String>> _aiHints = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAiHints();
+  }
+
+  Future<void> _loadAiHints() async {
+    final items = await ref
+        .read(backendServiceProvider)
+        .fetchAiBioSuggestions(about: _bioController.text);
+    if (!mounted || items == null) return;
+    setState(() {
+      _aiHints = [
+        for (final text in items) {'title': 'AI suggestion', 'bio': text},
+      ];
+    });
+  }
 
   final List<Map<String, String>> hints = [
     {
@@ -97,9 +122,11 @@ class _BioScreenState extends State<BioScreen> {
                 height: 120,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: hints.length,
+                  itemCount: _aiHints.length + hints.length,
                   itemBuilder: (context, index) {
-                    final hint = hints[index];
+                    final hint = index < _aiHints.length
+                        ? _aiHints[index]
+                        : hints[index - _aiHints.length];
                     final isSelected = _selectedHint == hint['title'];
                     return Container(
                       margin: const EdgeInsets.only(right: 12),
@@ -137,6 +164,13 @@ class _BioScreenState extends State<BioScreen> {
                                       ),
                                     ),
                                   ),
+                                  if (index < _aiHints.length)
+                                    IconButton(
+                                      visualDensity: VisualDensity.compact,
+                                      onPressed: _loadAiHints,
+                                      tooltip: 'More suggestions',
+                                      icon: const Icon(Icons.refresh, size: 16, color: SawaLoveTheme.onSurfaceVariant),
+                                    ),
                                 ],
                               ),
                               const SizedBox(height: 8),

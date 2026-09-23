@@ -74,7 +74,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Min', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                    const Text('Min', style: TextStyle(fontSize: 12, color: SawaLoveTheme.onSurfaceVariant)),
                     Slider(
                       value: _heightMin,
                       min: 140,
@@ -90,7 +90,7 @@ class _FiltersScreenState extends State<FiltersScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Max', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                    const Text('Max', style: TextStyle(fontSize: 12, color: SawaLoveTheme.onSurfaceVariant)),
                     Slider(
                       value: _heightMax,
                       min: 140,

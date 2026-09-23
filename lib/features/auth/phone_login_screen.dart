@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:sawalove/core/theme/theme.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -257,7 +258,7 @@ class _PhoneLoginScreenState extends ConsumerState<PhoneLoginScreen> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Icon(Icons.flag_circle,
-                                        color: Colors.green,
+                                        color: SawaLoveTheme.success,
                                         size: 24), // Cameroon flag placeholder
                                     SizedBox(width: 8),
                                     Text('+237',
@@ -384,8 +385,8 @@ class _PhoneLoginScreenState extends ConsumerState<PhoneLoginScreen> {
                                             strokeWidth: 2,
                                           ),
                                         )
-                                      : Icon(Icons.g_mobiledata,
-                                          color: Colors.grey[700], size: 20),
+                                      : const Icon(Icons.g_mobiledata,
+                                          color: SawaLoveTheme.onSurfaceVariant, size: 20),
                                   label: const Text('Google'),
                                   style: OutlinedButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(
@@ -452,13 +453,13 @@ class _PhoneLoginScreenState extends ConsumerState<PhoneLoginScreen> {
                       ),
                       child: Row(
                         children: [
-                          CircleAvatar(
+                          const CircleAvatar(
                             radius: 20,
-                            backgroundColor: Colors.grey[300],
+                            backgroundColor: SawaLoveTheme.outlineVariant,
                           ), // Profile placeholder
-                          CircleAvatar(
+                          const CircleAvatar(
                             radius: 20,
-                            backgroundColor: Colors.blue[300],
+                            backgroundColor: SawaLoveTheme.tertiary,
                           ), // Profile placeholder
                           Container(
                             padding: const EdgeInsets.symmetric(

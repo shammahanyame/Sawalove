@@ -38,14 +38,14 @@ class _UnmatchConfirmationScreenState extends State<UnmatchConfirmationScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Warning
-              Card(
-                color: Colors.red.shade50,
+              const Card(
+                color: SawaLoveTheme.errorContainer,
                 child: Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.all(20),
                   child: Row(
                     children: [
-                      Icon(Icons.warning_amber_rounded, color: Colors.red.shade700, size: 32),
-                      const SizedBox(width: 16),
+                      Icon(Icons.warning_amber_rounded, color: SawaLoveTheme.errorColor, size: 32),
+                      SizedBox(width: 16),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,7 +53,7 @@ class _UnmatchConfirmationScreenState extends State<UnmatchConfirmationScreen> {
                             Text(
                               'Unmatching is permanent',
                               style: TextStyle(
-                                color: Colors.red.shade800,
+                                color: SawaLoveTheme.errorColor,
                                 fontWeight: FontWeight.w700,
                                 fontSize: 16,
                               ),
@@ -61,7 +61,7 @@ class _UnmatchConfirmationScreenState extends State<UnmatchConfirmationScreen> {
                             Text(
                               'This will delete your chats and matches.',
                               style: TextStyle(
-                                color: Colors.red.shade600,
+                                color: SawaLoveTheme.errorColor,
                               ),
                             ),
                           ],
@@ -119,7 +119,7 @@ class _UnmatchConfirmationScreenState extends State<UnmatchConfirmationScreen> {
                         context.pop(true);
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red.shade600,
+                        backgroundColor: SawaLoveTheme.errorColor,
                       ),
                       child: const Text('Unmatch', style: TextStyle(color: Colors.white)),
                     ),

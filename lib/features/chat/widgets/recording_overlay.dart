@@ -93,13 +93,13 @@ class _RecordingOverlayState extends ConsumerState<RecordingOverlay> with Ticker
                       width: double.infinity,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.red.withValues(alpha: 0.3),
+                        color: SawaLoveTheme.errorColor.withValues(alpha: 0.3),
                         borderRadius: BorderRadius.circular(2),
                       ),
                       child: FractionallySizedBox(
                         alignment: Alignment.centerLeft,
                         widthFactor: 1.0 - (_timerSeconds - 55) / 5,
-                        child: Container(color: Colors.red),
+                        child: Container(color: SawaLoveTheme.errorColor),
                       ),
                     ),
                   const SizedBox(height: 32),
@@ -108,12 +108,12 @@ class _RecordingOverlayState extends ConsumerState<RecordingOverlay> with Ticker
                     scale: _pulseController,
                     child: Container(
                       width: 64, height: 64,
-                      decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+                      decoration: const BoxDecoration(color: SawaLoveTheme.errorColor, shape: BoxShape.circle),
                       child: const Icon(Icons.mic, color: Colors.white, size: 32),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  Text('Recording · Enregistrement', style: SawaLoveTheme.headlineSmall?.copyWith(color: Colors.red)),
+                  Text('Recording · Enregistrement', style: SawaLoveTheme.headlineSmall?.copyWith(color: SawaLoveTheme.errorColor)),
                   const SizedBox(height: 16),
                   // Live waveform
                   SizedBox(
@@ -154,7 +154,7 @@ class _RecordingOverlayState extends ConsumerState<RecordingOverlay> with Ticker
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                           decoration: BoxDecoration(
-                            color: Colors.green,
+                            color: SawaLoveTheme.success,
                             borderRadius: BorderRadius.circular(24),
                           ),
                           child: const Text('Send', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
@@ -187,7 +187,7 @@ class LiveWaveformPainter extends CustomPainter {
     for (int i = 0; i < barCount; i++) {
       final progress = i / barCount;
       final height = (size.height * 0.6 * progress + size.height * 0.2 * amp).clamp(4.0, size.height * 0.8);
-      final paint = Paint()..color = Colors.red.withValues(alpha: 0.8 - progress * 0.4);
+      final paint = Paint()..color = SawaLoveTheme.errorColor.withValues(alpha: 0.8 - progress * 0.4);
 
       canvas.drawRRect(
         RRect.fromRectAndRadius(

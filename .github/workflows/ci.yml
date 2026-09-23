@@ -6,6 +6,10 @@
 # security regressions these tests permanently guard.
 #
 # Frontend: flutter analyze + flutter test.
+#
+# NOTE: the git repo root IS the Flutter app (pubspec.yaml lives at the
+# repository root) — no `working-directory:` is needed, and backend paths
+# like backend/php are relative to that same root.
 
 name: CI
 
@@ -98,6 +102,10 @@ jobs:
           php -d error_reporting="E_ALL & ~E_DEPRECATED" \
             tests/run_rate_limit_test.php http://127.0.0.1:8111
 
+      - name: Run DB-free security unit tests (30 assertions)
+        working-directory: backend/php
+        run: php tests/run_ai_security_unit_tests.php
+
       - name: Dump API server logs on failure
         if: failure()
         run: cat /tmp/api.log /tmp/api-rl.log 2>/dev/null || true
@@ -121,13 +129,10 @@ jobs:
           channel: stable
 
       - name: Pub get
-        working-directory: sawalove
         run: flutter pub get
 
       - name: Analyze
-        working-directory: sawalove
         run: flutter analyze --no-pub
 
       - name: Test
-        working-directory: sawalove
         run: flutter test

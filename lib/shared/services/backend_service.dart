@@ -462,6 +462,47 @@ class BackendService {
     await _sendJson('POST', '/me/data-export', requiresAuth: true);
   }
 
+  /// AI SUGGESTIONS — generated server-side through the capped gateway.
+  ///
+  /// Returns null on any failure (not configured, offline, budget exhausted,
+  /// provider error) so callers can fall back to built-in content: the
+  /// feature degrades gracefully, it never blocks the user or errors out.
+  /// Server responses are already validated and clamped (≤6 items, ≤120
+  /// chars); the client clamps again defensively before rendering.
+  Future<List<String>?> fetchAiIceBreakers({String about = ''}) async {
+    return _fetchAiSuggestions('/ai/icebreakers', about);
+  }
+
+  Future<List<String>?> fetchAiBioSuggestions({String about = ''}) async {
+    return _fetchAiSuggestions('/ai/bio-suggestions', about);
+  }
+
+  Future<List<String>?> _fetchAiSuggestions(String path, String about) async {
+    if (!isConfigured) return null;
+    try {
+      final decoded = await _sendJson(
+        'POST',
+        path,
+        body: {'about': about},
+        requiresAuth: true,
+      );
+      final raw = decoded['suggestions'];
+      if (raw is! List) return null;
+      final items = raw
+          .whereType<String>()
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .map((e) => e.length > 160 ? e.substring(0, 160) : e)
+          .take(6)
+          .toList();
+      return items.isEmpty ? null : items;
+    } catch (_) {
+      // Includes BackendAuthException (not signed in), 429 budget/user caps,
+      // and network errors — all degrade to the caller's static fallback.
+      return null;
+    }
+  }
+
   Future<Map<String, dynamic>> _sendJson(
     String method,
     String path, {

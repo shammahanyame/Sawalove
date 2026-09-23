@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sawalove/core/theme/theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sawalove/core/intent_picker_notifier.dart';
 import 'package:go_router/go_router.dart';
@@ -236,8 +237,8 @@ class _VisibilityChip extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            color: selected ? Colors.grey.shade200 : Colors.transparent,
-            border: Border.all(color: Colors.grey.shade300),
+            color: selected ? SawaLoveTheme.surfaceContainerHigh : Colors.transparent,
+            border: Border.all(color: SawaLoveTheme.outlineVariant),
           ),
           child: Text(
             label,

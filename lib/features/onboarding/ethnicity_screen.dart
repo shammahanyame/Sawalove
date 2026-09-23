@@ -131,7 +131,7 @@ decoration: const InputDecoration.collapsed(hintText: 'Primary language'),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(4),
                           ),
-child: const Icon(Icons.language, size: 16, color: Colors.grey),
+child: const Icon(Icons.language, size: 16, color: SawaLoveTheme.onSurfaceVariant),
                         ),
                         const SizedBox(width: 12),
                         Text(l, style: const TextStyle(fontSize: 16)),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sawalove/core/consent_notifier.dart';
+import 'package:sawalove/core/theme/theme.dart';
 
 class ConsentScreen extends ConsumerWidget {
   const ConsentScreen({super.key});
@@ -90,7 +91,7 @@ class ConsentScreen extends ConsumerWidget {
                   title: 'Necessary data processing',
                   description: 'Cannot be disabled / Ne peut pas etre desactive',
                   enabled: true,
-                  enabledColor: Colors.grey,
+                  enabledColor: SawaLoveTheme.onSurfaceVariant,
                 ),
                 const SizedBox(height: 24),
                 _ConsentToggle(
@@ -125,8 +126,8 @@ class ConsentScreen extends ConsumerWidget {
                       child: ElevatedButton(
                         onPressed: isReady ? () => ref.read(consentProvider.notifier).submitConsent(context) : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: isReady ? const Color(0xFFB30065) : Colors.grey,
-                          foregroundColor: Colors.white,
+                          backgroundColor: isReady ? SawaLoveTheme.primary : SawaLoveTheme.outlineVariant,
+                          foregroundColor: SawaLoveTheme.onPrimary,
                         ),
                         child: Text(isReady ? 'I agree' : 'Read docs first'),
                       ),
@@ -173,7 +174,7 @@ class ConsentScreen extends ConsumerWidget {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () => Navigator.pop(context, true), // Decline confirmed
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                      style: ElevatedButton.styleFrom(backgroundColor: SawaLoveTheme.errorColor),
                       child: const Text('Decline'),
                     ),
                   ),
@@ -227,11 +228,27 @@ class _DocumentCard extends StatelessWidget {
                     Row(
                       children: [
                         Expanded(child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold))),
-                        if (isRead) const Icon(Icons.check_circle, color: Colors.green),
+                        if (isRead)
+                          // Status is icon + text, never color alone.
+                          const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.check_circle, color: SawaLoveTheme.success, size: 18),
+                              SizedBox(width: 4),
+                              Text(
+                                'Read',
+                                style: TextStyle(
+                                  color: SawaLoveTheme.success,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
                       ],
                     ),
                     Text(summary),
-                    Text('v$version', style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                    Text('v$version', style: const TextStyle(fontSize: 12, color: SawaLoveTheme.onSurfaceVariant)),
                   ],
                 ),
               ),
@@ -282,7 +299,7 @@ class _ConsentToggle extends ConsumerWidget {
                 width: 52,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: enabled ? const Color(0xFFB30065) : const Color(0xFFD89CB4),
+                  color: enabled ? SawaLoveTheme.primary : SawaLoveTheme.outlineVariant,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Stack(
@@ -311,7 +328,7 @@ class _ConsentToggle extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  Text(description, style: TextStyle(color: Colors.grey.shade600)),
+                  Text(description, style: const TextStyle(color: SawaLoveTheme.onSurfaceVariant)),
                 ],
               ),
             ),
@@ -337,7 +354,7 @@ class _IndicatorDot extends StatelessWidget {
         height: 12,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: isFilled ? const Color(0xFFB30065) : Colors.grey.shade400,
+          color: isFilled ? SawaLoveTheme.primary : SawaLoveTheme.outlineVariant,
         ),
       ),
     );

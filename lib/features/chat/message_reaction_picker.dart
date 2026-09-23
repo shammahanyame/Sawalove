@@ -159,13 +159,13 @@ class _MessageReactionPickerState extends State<MessageReactionPicker>
               decoration: BoxDecoration(
                 color: _showFullPicker
                     ? SawaLoveTheme.primary.withValues(alpha: 0.15)
-                    : Colors.grey.shade100,
+                    : SawaLoveTheme.surfaceContainerLow,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 _showFullPicker ? Icons.expand_more : Icons.add,
                 size: 22,
-                color: _showFullPicker ? SawaLoveTheme.primary : Colors.grey.shade600,
+                color: _showFullPicker ? SawaLoveTheme.primary : SawaLoveTheme.onSurfaceVariant,
               ),
             ),
           ),
@@ -268,13 +268,13 @@ class _MessageReactionPickerState extends State<MessageReactionPicker>
               ListTile(
                 leading: Icon(
                   action.icon,
-                  color: action.isDestructive ? Colors.red : SawaLoveTheme.onSurface,
+                  color: action.isDestructive ? SawaLoveTheme.errorColor : SawaLoveTheme.onSurface,
                   size: 22,
                 ),
                 title: Text(
                   action.label,
                   style: TextStyle(
-                    color: action.isDestructive ? Colors.red : SawaLoveTheme.onSurface,
+                    color: action.isDestructive ? SawaLoveTheme.errorColor : SawaLoveTheme.onSurface,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -282,7 +282,7 @@ class _MessageReactionPickerState extends State<MessageReactionPicker>
                 dense: true,
               ),
               if (index < actions.length - 1)
-                Divider(height: 1, color: Colors.grey.shade100),
+                Divider(height: 1, color: SawaLoveTheme.outlineVariant.withValues(alpha: 0.5)),
             ],
           );
         }).toList(),

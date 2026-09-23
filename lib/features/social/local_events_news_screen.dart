@@ -43,7 +43,7 @@ class _LocalEventsNewsScreenState extends State<LocalEventsNewsScreen> {
                             color: SawaLoveTheme.primary.withValues(alpha: 0.1),
                             width: double.infinity,
                             height: 220,
-                            child: const Icon(Icons.event, size: 100, color: Colors.grey),
+                            child: const Icon(Icons.event, size: 100, color: SawaLoveTheme.onSurfaceVariant),
                           ),
                         ),
                         Positioned(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sawalove/core/theme/theme.dart';
 
 /// Missed call event bubble for chat thread
 /// Displays as a special message type distinct from text messages
@@ -44,10 +45,10 @@ class MissedCallBubble extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.red.withValues(alpha: 0.15),
+            color: SawaLoveTheme.errorColor.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Colors.red.withValues(alpha: 0.3),
+              color: SawaLoveTheme.errorColor.withValues(alpha: 0.3),
               width: 1,
             ),
           ),
@@ -57,7 +58,7 @@ class MissedCallBubble extends StatelessWidget {
 // Phone icon with arrow
               const Icon(
                 Icons.phone_callback,
-                color: Colors.red,
+                color: SawaLoveTheme.errorColor,
                 size: 24,
               ),
               const SizedBox(width: 12),
@@ -66,10 +67,10 @@ class MissedCallBubble extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(
+                    const Text(
                       'Missed video call',
                       style: TextStyle(
-                        color: Colors.red.shade700,
+                        color: SawaLoveTheme.errorColor,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
@@ -77,8 +78,8 @@ class MissedCallBubble extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       _formatTime(),
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
+                      style: const TextStyle(
+                        color: SawaLoveTheme.onSurfaceVariant,
                         fontSize: 12,
                       ),
                     ),
@@ -96,7 +97,7 @@ class MissedCallBubble extends StatelessWidget {
                 child: const Text(
                   'Call back',
                   style: TextStyle(
-                    color: Colors.red,
+                    color: SawaLoveTheme.errorColor,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
@@ -131,7 +132,7 @@ class MissedCallBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: Colors.red,
+        color: SawaLoveTheme.errorColor,
         borderRadius: BorderRadius.circular(10),
       ),
 child: Row(

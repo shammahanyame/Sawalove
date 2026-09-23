@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sawalove/shared/widgets/pressable_scale.dart';
 
 class ExploreScreen extends StatelessWidget {
   const ExploreScreen({super.key});
@@ -45,7 +46,7 @@ class ExploreScreen extends StatelessWidget {
                     itemCount: modes.length,
                     itemBuilder: (context, index) {
                       final mode = modes[index];
-                      return GestureDetector(
+                      return PressableScale(
                         onTap: () {
                           // Filter profiles by mode
                         },

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sawalove/core/theme/theme.dart';
 
 /// Banner widget for incoming call when app is in foreground
 /// 
@@ -141,7 +142,7 @@ class _CallBannerWidgetState extends State<CallBannerWidget>
                 // Decline button
                 _BannerButton(
                   icon: Icons.call_end,
-                  color: Colors.red,
+                  color: SawaLoveTheme.errorColor,
                   onTap: () {
                     _dismiss();
                     widget.onDecline();

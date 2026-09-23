@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/theme.dart';
+import '../../shared/widgets/pressable_scale.dart';
 
 class PlansScreen extends StatelessWidget {
   const PlansScreen({super.key});
@@ -65,7 +66,7 @@ class PlansScreen extends StatelessWidget {
                                     child: Column(
                                       children: [
                                         Text('Gold', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                                        Text('Popular', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                                        Text('Popular', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
                                       ],
                                     ),
                                   ),
@@ -122,7 +123,7 @@ class PlansScreen extends StatelessWidget {
                         ),
                         Expanded(
                           flex: 2,
-                          child: GestureDetector(
+                          child: PressableScale(
                             onTap: () => context.go('/premium/payment'),
                             child: const Card(
                               elevation: 8,
@@ -167,6 +168,31 @@ class PlansScreen extends StatelessWidget {
   }
 
   Widget _featureRow(IconData icon, List<String> values) {
+    // Checkmarks are icons, not emoji, so they stay themeable and translate.
+    Widget value(String raw, {bool emphasized = false}) {
+      final hasCheck = raw.startsWith('✅');
+      final text = hasCheck ? raw.substring(1).trim() : raw;
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (hasCheck) ...[
+            const Icon(Icons.check_circle, color: SawaLoveTheme.success, size: 16),
+            const SizedBox(width: 4),
+          ],
+          Flexible(
+            child: Text(
+              text,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: emphasized ? FontWeight.w700 : FontWeight.w500,
+                color: emphasized ? SawaLoveTheme.primary : null,
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -175,17 +201,17 @@ class PlansScreen extends StatelessWidget {
           const SizedBox(width: 16),
           Expanded(
             flex: 1,
-            child: Center(child: Text(values[0])),
+            child: Center(child: value(values[0])),
           ),
           const SizedBox(width: 16),
           Expanded(
             flex: 2,
-            child: Center(child: Text(values[1])),
+            child: Center(child: value(values[1], emphasized: true)),
           ),
           const SizedBox(width: 16),
           Expanded(
             flex: 1,
-            child: Center(child: Text(values[2])),
+            child: Center(child: value(values[2])),
           ),
         ],
       ),

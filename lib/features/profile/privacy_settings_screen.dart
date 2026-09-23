@@ -38,7 +38,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                     children: [
                       const Row(
                         children: [
-                          Icon(Icons.location_off, color: Colors.blue),
+                          Icon(Icons.location_off, color: SawaLoveTheme.tertiary),
                           SizedBox(width: 12),
                           Text('Location Privacy', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18)),
                         ],
@@ -57,7 +57,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
               const SizedBox(height: 24),
               // Active status
               SwitchListTile(
-                secondary: const Icon(Icons.circle_notifications, color: Colors.green),
+                secondary: const Icon(Icons.circle_notifications, color: SawaLoveTheme.success),
                 title: const Text('Show Active Status'),
                 subtitle: const Text('Green dot when online (15 min)'),
                 value: _activeStatus,
@@ -108,7 +108,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
               ListTile(
                 leading: Stack(
                   children: [
-                    const Icon(Icons.visibility_off, color: Colors.grey),
+                    const Icon(Icons.visibility_off, color: SawaLoveTheme.onSurfaceVariant),
                     Positioned(
                       right: 0,
                       bottom: 0,
@@ -116,7 +116,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                         width: 12,
                         height: 12,
                         decoration: const BoxDecoration(
-                          color: Colors.amber,
+                          color: SawaLoveTheme.warning,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -126,7 +126,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                 title: const Text('Incognito Mode'),
                 subtitle: const Text('Premium: Only show to liked users'),
                 trailing: _incognitoMode 
-                  ? const Icon(Icons.lock, color: Colors.amber, size: 20)
+                  ? const Icon(Icons.lock, color: SawaLoveTheme.warning, size: 20)
                   : ElevatedButton(
                       onPressed: () {}, // Go premium
                       child: const Text('Premium'),
@@ -144,7 +144,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
               const SizedBox(height: 24),
               // Moderation appeals
               ListTile(
-                leading: const Icon(Icons.gavel, color: Colors.orange),
+                leading: const Icon(Icons.gavel, color: SawaLoveTheme.warning),
                 title: const Text('Moderation Appeals'),
                 subtitle: const Text('Appeal bans or content flags'),
                 onTap: () => context.go('/safety/moderation-appeal'),
@@ -152,14 +152,14 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
               const SizedBox(height: 16),
               // Help & FAQ
               ListTile(
-                leading: const Icon(Icons.help_outline, color: Colors.green),
+                leading: const Icon(Icons.help_outline, color: SawaLoveTheme.success),
                 title: const Text('Help & FAQ'),
                 subtitle: const Text('Searchable help articles'),
                 onTap: () => context.go('/profile/help-faq'),
               ),
               // Contact Support
               ListTile(
-                leading: const Icon(Icons.support_agent, color: Colors.blue),
+                leading: const Icon(Icons.support_agent, color: SawaLoveTheme.tertiary),
                 title: const Text('Contact Support'),
                 subtitle: const Text('Tickets & chat'),
                 onTap: () => context.go('/profile/contact-support'),
@@ -171,7 +171,7 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                 onTap: () => context.go('/profile/notification-center'),
               ),
               ListTile(
-                leading: const Icon(Icons.share, color: Colors.green),
+                leading: const Icon(Icons.share, color: SawaLoveTheme.success),
                 title: const Text('Refer Friends'),
                 subtitle: const Text('Earn Premium days'),
                 onTap: () => context.go('/profile/refer-friends'),
@@ -183,15 +183,15 @@ class _PrivacySettingsScreenState extends State<PrivacySettingsScreen> {
                   padding: const EdgeInsets.all(20),
                   child: Row(
                     children: [
-                      const Icon(Icons.privacy_tip, color: Colors.blue),
+                      const Icon(Icons.privacy_tip, color: SawaLoveTheme.tertiary),
                       const SizedBox(width: 16),
-                      Expanded(
+                      const Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('Privacy Policy', style: TextStyle(fontWeight: FontWeight.w600)),
-                            const SizedBox(height: 4),
-                            Text('We never sell your data. Location is city-level only.', style: TextStyle(color: Colors.grey.shade600)),
+                            Text('Privacy Policy', style: TextStyle(fontWeight: FontWeight.w600)),
+                            SizedBox(height: 4),
+                            Text('We never sell your data. Location is city-level only.', style: TextStyle(color: SawaLoveTheme.onSurfaceVariant)),
                           ],
                         ),
                       ),

@@ -62,10 +62,10 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> wit
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.notifications_off, size: 64, color: Colors.grey),
+                const Icon(Icons.notifications_off, size: 64, color: SawaLoveTheme.onSurfaceVariant),
                 const SizedBox(height: 16),
                 Text('No ${_tabs[_currentIndex].text}', style: Theme.of(context).textTheme.headlineSmall),
-                Text('Turn on notifications in settings', style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.grey)),
+                Text('Turn on notifications in settings', style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: SawaLoveTheme.onSurfaceVariant)),
               ],
             ),
           )
@@ -82,7 +82,7 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> wit
                 ),
                 title: Text('${notif['user']}'),
                 subtitle: Text(notif['type']!),
-                trailing: Text(notif['time']!, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                trailing: Text(notif['time']!, style: const TextStyle(color: SawaLoveTheme.onSurfaceVariant, fontSize: 12)),
                 onTap: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Nav to ${notif['user']}'))),
               );
             },
@@ -99,7 +99,7 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> wit
         bottom: TabBar(
           controller: _tabController,
           labelColor: SawaLoveTheme.primary,
-          unselectedLabelColor: Colors.grey,
+          unselectedLabelColor: SawaLoveTheme.onSurfaceVariant,
           indicatorColor: SawaLoveTheme.primary,
           tabs: _tabs,
         ),

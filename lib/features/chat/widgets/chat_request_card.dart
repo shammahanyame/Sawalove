@@ -186,7 +186,7 @@ class ChatRequestCard extends ConsumerWidget {
                           icon: const Icon(Icons.close),
                           label: const Text('Back'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey,
+                            backgroundColor: SawaLoveTheme.onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -198,8 +198,8 @@ class ChatRequestCard extends ConsumerWidget {
                         child: OutlinedButton.icon(
                           onPressed: () => _declineRequest(context, ref),
                           style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.red,
-                            side: const BorderSide(color: Colors.red),
+                            foregroundColor: SawaLoveTheme.errorColor,
+                            side: const BorderSide(color: SawaLoveTheme.errorColor),
                             padding: const EdgeInsets.symmetric(vertical: 12),
                           ),
                           icon: const Icon(Icons.close),
@@ -323,7 +323,7 @@ class DeclineConfirmSheet extends ConsumerWidget {
                     Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
+                    backgroundColor: SawaLoveTheme.errorColor,
                   ),
                   child: const Text('Decline'),
                 ),

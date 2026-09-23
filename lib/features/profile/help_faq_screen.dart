@@ -91,7 +91,7 @@ class _HelpFaqScreenState extends State<HelpFaqScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.search_off, size: 64, color: Colors.grey),
+                          const Icon(Icons.search_off, size: 64, color: SawaLoveTheme.onSurfaceVariant),
                           const SizedBox(height: 16),
                           Text('No results found', style: Theme.of(context).textTheme.headlineSmall),
                           const SizedBox(height: 8),

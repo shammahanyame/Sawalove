@@ -66,8 +66,8 @@ class _MeetupPlacePickerScreenState extends State<MeetupPlacePickerScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      colors: [Colors.orange.shade400, Colors.orange.shade600]),
+                  gradient: const LinearGradient(
+                      colors: [SawaLoveTheme.warningContainer, SawaLoveTheme.warning]),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: const Row(
@@ -137,7 +137,7 @@ class _MeetupPlacePickerScreenState extends State<MeetupPlacePickerScreen> {
                             children: [
                               Text('${spot['safety']}'),
                               const Icon(Icons.star,
-                                  color: Colors.amber, size: 18),
+                                  color: SawaLoveTheme.warning, size: 18),
                               Radio<String>(value: name),
                             ],
                           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sawalove/core/theme/theme.dart';
 
 /// Quick action buttons for incoming call screen
 /// - Message · Texte
@@ -67,7 +68,7 @@ class _QuickAction extends StatelessWidget {
           decoration: BoxDecoration(
             border: Border.all(
               color: highlighted 
-                ? Colors.red.withValues(alpha: 0.5)
+                ? SawaLoveTheme.errorColor.withValues(alpha: 0.5)
                 : Colors.white.withValues(alpha: 0.2),
             ),
             borderRadius: BorderRadius.circular(16),
@@ -77,14 +78,14 @@ class _QuickAction extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                color: highlighted ? Colors.red : Colors.white70,
+                color: highlighted ? SawaLoveTheme.errorColor : Colors.white70,
                 size: 24,
               ),
               const SizedBox(height: 4),
               Text(
                 label,
                 style: TextStyle(
-                  color: highlighted ? Colors.red : Colors.white70,
+                  color: highlighted ? SawaLoveTheme.errorColor : Colors.white70,
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
                 ),

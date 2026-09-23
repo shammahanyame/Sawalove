@@ -51,7 +51,7 @@ class BlockedUsersScreen extends StatelessWidget {
                         title: Text(user['name']!),
                         subtitle: Text('${user['reason']} • ${user['date']}'),
                         trailing: IconButton(
-                          icon: const Icon(Icons.block, color: Colors.red),
+                          icon: const Icon(Icons.block, color: SawaLoveTheme.errorColor),
                           onPressed: () {
                             showDialog(
                               context: context,
@@ -70,7 +70,7 @@ class BlockedUsersScreen extends StatelessWidget {
                                         SnackBar(content: Text('${user['name']} unblocked')),
                                       );
                                     },
-                                    child: const Text('Unblock', style: TextStyle(color: Colors.red)),
+                                    child: const Text('Unblock', style: TextStyle(color: SawaLoveTheme.errorColor)),
                                   ),
                                 ],
                               ),

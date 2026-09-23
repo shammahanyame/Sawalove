@@ -91,7 +91,7 @@ class _RequestComposeScreenState extends ConsumerState<RequestComposeScreen> {
               decoration: BoxDecoration(
                 color: requestsRemaining > 0
                     ? SawaLoveTheme.primaryContainer.withValues(alpha: 0.8)
-                    : Colors.red.withValues(alpha: 0.2),
+                    : SawaLoveTheme.errorColor.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -99,7 +99,7 @@ class _RequestComposeScreenState extends ConsumerState<RequestComposeScreen> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
-                  color: requestsRemaining > 0 ? Colors.white : Colors.red,
+                  color: requestsRemaining > 0 ? Colors.white : SawaLoveTheme.errorColor,
                 ),
               ),
             ),
@@ -193,7 +193,7 @@ class _RequestComposeScreenState extends ConsumerState<RequestComposeScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: requestsRemaining > 0 ? SawaLoveTheme.primaryContainer : Colors.red.withValues(alpha: 0.2),
+                      color: requestsRemaining > 0 ? SawaLoveTheme.primaryContainer : SawaLoveTheme.errorColor.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -202,7 +202,7 @@ class _RequestComposeScreenState extends ConsumerState<RequestComposeScreen> {
                         Icon(
                           requestsRemaining > 0 ? Icons.chat : Icons.lock,
                           size: 16,
-                          color: requestsRemaining > 0 ? SawaLoveTheme.primary : Colors.red,
+                          color: requestsRemaining > 0 ? SawaLoveTheme.primary : SawaLoveTheme.errorColor,
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -212,7 +212,7 @@ class _RequestComposeScreenState extends ConsumerState<RequestComposeScreen> {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: requestsRemaining > 0 ? SawaLoveTheme.primary : Colors.red,
+                            color: requestsRemaining > 0 ? SawaLoveTheme.primary : SawaLoveTheme.errorColor,
                           ),
                         ),
                       ],

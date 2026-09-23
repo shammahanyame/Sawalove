@@ -58,4 +58,7 @@ flutter:
   generate: true
   assets:
     - assets/branding/
+    # Local font files so google_fonts does not need network on first launch
+    # (offline-first; also required for widget tests).
+    - assets/google_fonts/
   # L10n

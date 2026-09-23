@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sawalove/core/theme/theme.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -175,9 +176,9 @@ class _NumpadKey extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           shape: BoxShape.circle,
-          color: Colors.grey.shade100,
+          color: SawaLoveTheme.surfaceContainerLow,
         ),
         child: Center(
           child: Semantics(
@@ -210,11 +211,11 @@ class _DeleteKey extends StatelessWidget {
         label: 'Delete last digit',
         button: true,
         child: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.grey.shade100,
+            color: SawaLoveTheme.surfaceContainerLow,
           ),
-          child: const Icon(Icons.backspace_outlined, color: Colors.grey),
+          child: const Icon(Icons.backspace_outlined, color: SawaLoveTheme.onSurfaceVariant),
         ),
       ),
     );
@@ -228,9 +229,9 @@ class PinStrengthMeter extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Row(
       children: [
-        _StrengthSegment(color: Colors.red, label: 'Weak'),
-        _StrengthSegment(color: Colors.orange, label: 'Fair'),
-        _StrengthSegment(color: Colors.green, label: 'Strong'),
+        _StrengthSegment(color: SawaLoveTheme.errorColor, label: 'Weak'),
+        _StrengthSegment(color: SawaLoveTheme.warning, label: 'Fair'),
+        _StrengthSegment(color: SawaLoveTheme.success, label: 'Strong'),
       ],
     );
   }

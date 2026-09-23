@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sawalove/core/theme/theme.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sawalove/shared/services/firebase_service.dart';
 
@@ -21,16 +22,16 @@ class AccountPauseDeleteScreen extends ConsumerWidget {
             children: [
               GestureDetector(
                 onTap: () => _showPauseDialog(context, ref),
-                child: Card(
-                  color: Colors.orange.shade50,
+                child: const Card(
+                  color: SawaLoveTheme.warningContainer,
                   child: Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: EdgeInsets.all(20),
                     child: Row(
                       children: [
                         Icon(Icons.pause_circle_filled,
-                            color: Colors.orange.shade600, size: 40),
-                        const SizedBox(width: 20),
-                        const Expanded(
+                            color: SawaLoveTheme.warning, size: 40),
+                        SizedBox(width: 20),
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -40,11 +41,11 @@ class AccountPauseDeleteScreen extends ConsumerWidget {
                                       fontSize: 18)),
                               SizedBox(height: 4),
                               Text('Hide from discovery, keep matches/chats',
-                                  style: TextStyle(color: Colors.grey)),
+                                  style: TextStyle(color: SawaLoveTheme.onSurfaceVariant)),
                             ],
                           ),
                         ),
-                        const Icon(Icons.chevron_right),
+                        Icon(Icons.chevron_right),
                       ],
                     ),
                   ),
@@ -53,20 +54,20 @@ class AccountPauseDeleteScreen extends ConsumerWidget {
               const SizedBox(height: 24),
               GestureDetector(
                 onTap: () => _showDeleteDialog(context, ref),
-                child: Card(
-                  color: Colors.red.shade50,
+                child: const Card(
+                  color: SawaLoveTheme.errorContainer,
                   child: Padding(
-                    padding: const EdgeInsets.all(20),
+                    padding: EdgeInsets.all(20),
                     child: Row(
                       children: [
                         Icon(Icons.delete_forever,
-                            color: Colors.red.shade600, size: 40),
-                        const SizedBox(width: 20),
+                            color: SawaLoveTheme.errorColor, size: 40),
+                        SizedBox(width: 20),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 'Delete Account',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w700,
@@ -74,13 +75,13 @@ class AccountPauseDeleteScreen extends ConsumerWidget {
                                   color: Color(0xFFB71C1C),
                                 ),
                               ),
-                              const SizedBox(height: 4),
+                              SizedBox(height: 4),
                               Text('Permanent deletion. 30-day recovery.',
-                                  style: TextStyle(color: Colors.red.shade600)),
+                                  style: TextStyle(color: SawaLoveTheme.errorColor)),
                             ],
                           ),
                         ),
-                        const Icon(Icons.chevron_right,
+                        Icon(Icons.chevron_right,
                             color: Color(0xFFE57373)),
                       ],
                     ),
@@ -90,7 +91,7 @@ class AccountPauseDeleteScreen extends ConsumerWidget {
               const Spacer(),
               Card(
                 child: ListTile(
-                  leading: const Icon(Icons.download, color: Colors.blue),
+                  leading: const Icon(Icons.download, color: SawaLoveTheme.tertiary),
                   title: const Text('Download Your Data'),
                   subtitle: const Text('Profile, matches, chats (JSON)'),
                   trailing: const Icon(Icons.chevron_right),
@@ -121,7 +122,7 @@ class AccountPauseDeleteScreen extends ConsumerWidget {
               Navigator.pop(dialogContext);
               _pauseAccount(context, ref);
             },
-            child: const Text('Pause', style: TextStyle(color: Colors.orange)),
+            child: const Text('Pause', style: TextStyle(color: SawaLoveTheme.warning)),
           ),
         ],
       ),
@@ -156,7 +157,7 @@ class AccountPauseDeleteScreen extends ConsumerWidget {
               Navigator.pop(dialogContext);
               _requestDeletion(context, ref);
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: SawaLoveTheme.errorColor),
             child: const Text('Delete'),
           ),
         ],

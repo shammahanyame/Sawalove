@@ -100,7 +100,7 @@ class _ReferFriendsScreenState extends State<ReferFriendsScreen> {
                     icon: const Icon(Icons.sms),
                     label: const Text('SMS'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
+                      backgroundColor: SawaLoveTheme.tertiary,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
                     ),
@@ -120,7 +120,7 @@ class _ReferFriendsScreenState extends State<ReferFriendsScreen> {
                   children: [
                     const Row(
                       children: [
-                        Icon(Icons.star, color: Colors.amber, size: 28),
+                        Icon(Icons.star, color: SawaLoveTheme.warning, size: 28),
                         SizedBox(width: 12),
                         Text('Rewards (3 active referrals)', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                       ],
@@ -132,7 +132,7 @@ class _ReferFriendsScreenState extends State<ReferFriendsScreen> {
                         separatorBuilder: (context, index) => const SizedBox(height: 12),
                         itemBuilder: (context, index) {
                           final referral = _referrals[index];
-                          final statusColor = referral['status'] == 'Active' ? Colors.green : Colors.orange;
+                          final statusColor = referral['status'] == 'Active' ? SawaLoveTheme.success : SawaLoveTheme.warning;
                           return Card(
                             child: ListTile(
                               leading: CircleAvatar(

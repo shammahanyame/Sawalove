@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:sawalove/core/theme/theme.dart';
 import 'package:go_router/go_router.dart';
 
 /// Declined call screen - shown when recipient declines
@@ -76,12 +77,12 @@ class _DeclinedCallScreenState extends State<DeclinedCallScreen> {
                   width: 80,
                   height: 80,
                   decoration: BoxDecoration(
-                    color: Colors.red.withValues(alpha: 0.2),
+                    color: SawaLoveTheme.errorColor.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.call_end,
-                    color: Colors.red,
+                    color: SawaLoveTheme.errorColor,
                     size: 40,
                   ),
                 ),

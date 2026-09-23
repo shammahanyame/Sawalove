@@ -24,13 +24,13 @@ class PaymentFailedScreen extends StatelessWidget {
               Container(
                 width: 120,
                 height: 120,
-                decoration: BoxDecoration(
-                  color: Colors.red.shade50,
+                decoration: const BoxDecoration(
+                  color: SawaLoveTheme.errorContainer,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.error,
-                  color: Colors.red,
+                  color: SawaLoveTheme.errorColor,
                   size: 64,
                 ),
               ),
@@ -57,7 +57,7 @@ class PaymentFailedScreen extends StatelessWidget {
                     children: [
                       const Row(
                         children: [
-                          Icon(Icons.error_outline, color: Colors.orange),
+                          Icon(Icons.error_outline, color: SawaLoveTheme.warning),
                           SizedBox(width: 12),
                           Text('Common issues', style: TextStyle(fontWeight: FontWeight.w600)),
                         ],
@@ -109,7 +109,7 @@ class PaymentFailedScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
-          const Icon(Icons.info_outline, size: 20, color: Colors.orange),
+          const Icon(Icons.info_outline, size: 20, color: SawaLoveTheme.warning),
           const SizedBox(width: 12),
           Expanded(
             child: RichText(

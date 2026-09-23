@@ -29,14 +29,14 @@ class LinkedAccountsScreen extends StatelessWidget {
                   leading: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.green.shade50,
+                      color: SawaLoveTheme.successContainer,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Icon(Icons.phone_android, color: Colors.green.shade700),
+                    child: const Icon(Icons.phone_android, color: SawaLoveTheme.success),
                   ),
                   title: const Text('Phone Number'),
                   subtitle: const Text('+237 677 123 456'),
-                  trailing: const Icon(Icons.verified, color: Colors.green),
+                  trailing: const Icon(Icons.verified, color: SawaLoveTheme.success),
                 ),
               ),
               const SizedBox(height: 16),
@@ -45,8 +45,8 @@ class LinkedAccountsScreen extends StatelessWidget {
                 leading: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.blue.shade400, Colors.blue.shade600],
+                    gradient: const LinearGradient(
+                      colors: [SawaLoveTheme.tertiary, Color(0xFF004B5E)],
                     ),
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -62,7 +62,7 @@ class LinkedAccountsScreen extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue.shade600,
+                    backgroundColor: SawaLoveTheme.tertiary,
                   ),
                   child: const Text('Connect', style: TextStyle(color: Colors.white)),
                 ),
@@ -73,8 +73,8 @@ class LinkedAccountsScreen extends StatelessWidget {
                 leading: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.blue.shade800, Colors.indigo],
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF004B5E), Color(0xFF003242)],
                     ),
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -90,7 +90,7 @@ class LinkedAccountsScreen extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.indigo,
+                    backgroundColor: SawaLoveTheme.tertiary,
                   ),
                   child: const Text('Connect', style: TextStyle(color: Colors.white)),
                 ),
@@ -113,9 +113,9 @@ class LinkedAccountsScreen extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              Text(
+              const Text(
                 '⚠️ You can disconnect anytime. Phone number always required.',
-                style: TextStyle(color: Colors.orange.shade700, fontSize: 12),
+                style: TextStyle(color: SawaLoveTheme.warning, fontSize: 12),
               ),
               const SizedBox(height: 24),
             ],

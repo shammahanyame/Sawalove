@@ -18,13 +18,13 @@ class UndoScreen extends StatelessWidget {
                 width: 120,
                 height: 120,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.orange.shade400, Colors.orange.shade600],
+                  gradient: const LinearGradient(
+                    colors: [SawaLoveTheme.warningContainer, SawaLoveTheme.warning],
                   ),
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.orange.withValues(alpha: 0.4),
+                      color: Colors.white.withValues(alpha: 0.4),
                       blurRadius: 32,
                       offset: const Offset(0, 12),
                     ),
@@ -104,13 +104,13 @@ class UndoScreen extends StatelessWidget {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Last swipe undone!'),
-                            backgroundColor: Colors.orange,
+                            backgroundColor: SawaLoveTheme.warning,
                           ),
                         );
                         context.pop();
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange.shade600,
+                        backgroundColor: SawaLoveTheme.warning,
                         padding: const EdgeInsets.symmetric(vertical: 20),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
                       ),

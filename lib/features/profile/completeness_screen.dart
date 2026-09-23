@@ -276,11 +276,11 @@ class ProfileCompletenessScreen extends ConsumerWidget {
         gradient: LinearGradient(
           colors: isUnlocked
               ? [milestone.color.withValues(alpha: 0.12), milestone.color.withValues(alpha: 0.05)]
-              : [Colors.grey.shade100, Colors.grey.shade50],
+              : [SawaLoveTheme.surfaceContainerLow, SawaLoveTheme.surface],
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isUnlocked ? milestone.color.withValues(alpha: 0.3) : Colors.grey.shade200,
+          color: isUnlocked ? milestone.color.withValues(alpha: 0.3) : SawaLoveTheme.surfaceContainerHigh,
         ),
       ),
       child: Column(
@@ -288,7 +288,7 @@ class ProfileCompletenessScreen extends ConsumerWidget {
         children: [
           Icon(
             isUnlocked ? Icons.emoji_events : Icons.lock_outline,
-            color: isUnlocked ? milestone.color : Colors.grey,
+            color: isUnlocked ? milestone.color : SawaLoveTheme.onSurfaceVariant,
             size: 28,
           ),
           const SizedBox(height: 6),
@@ -297,14 +297,14 @@ class ProfileCompletenessScreen extends ConsumerWidget {
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w700,
-              color: isUnlocked ? SawaLoveTheme.onSurface : Colors.grey,
+              color: isUnlocked ? SawaLoveTheme.onSurface : SawaLoveTheme.onSurfaceVariant,
             ),
           ),
           Text(
             milestone.title,
             style: TextStyle(
               fontSize: 11,
-              color: isUnlocked ? SawaLoveTheme.onSurfaceVariant : Colors.grey,
+              color: isUnlocked ? SawaLoveTheme.onSurfaceVariant : SawaLoveTheme.outlineVariant,
             ),
             textAlign: TextAlign.center,
             maxLines: 2,

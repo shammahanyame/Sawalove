@@ -702,20 +702,20 @@ class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
                   decoration: BoxDecoration(
                     color: activeFilterCount > 0
                         ? SawaLoveTheme.errorColor.withValues(alpha: 0.1)
-                        : Colors.grey.withValues(alpha: 0.1),
+                        : SawaLoveTheme.onSurfaceVariant.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                     border: activeFilterCount > 0
                         ? Border.all(
                             color:
                                 SawaLoveTheme.errorColor.withValues(alpha: 0.3))
-                        : Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+                        : Border.all(color: SawaLoveTheme.outlineVariant.withValues(alpha: 0.3)),
                   ),
                   child: Text(
                     'Reset all',
                     style: TextStyle(
                       color: activeFilterCount > 0
                           ? SawaLoveTheme.errorColor
-                          : Colors.grey,
+                          : SawaLoveTheme.onSurfaceVariant,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

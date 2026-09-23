@@ -91,11 +91,11 @@ class SwipeCard extends ConsumerWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    stops: const [0.0, 0.6, 1.0],
+                    stops: const [0.0, 0.45, 1.0],
                     colors: [
+                      Colors.black.withValues(alpha: 0.35),
                       Colors.transparent,
-                      Colors.transparent,
-                      Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.9),
+                      Colors.black.withValues(alpha: 0.85),
                     ],
                   ),
                 ),
@@ -111,18 +111,23 @@ class SwipeCard extends ConsumerWidget {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        '$name, $age',
-                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                      Expanded(
+                        child: Text(
+                          '$name, $age',
+                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const Spacer(),
+                      const SizedBox(width: 8),
+                      // Solid surface keeps the badge legible over any photo.
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
+                          color: Colors.white.withValues(alpha: 0.95),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
@@ -130,14 +135,14 @@ class SwipeCard extends ConsumerWidget {
                           children: [
                             Icon(
                               Icons.verified,
-                              color: Theme.of(context).primaryColor,
+                              color: Theme.of(context).colorScheme.primary,
                               size: 16,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               'Verified',
                               style: TextStyle(
-                                color: Theme.of(context).primaryColor,
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -150,45 +155,76 @@ class SwipeCard extends ConsumerWidget {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.location_on, color: Colors.white70, size: 16),
+                      const Icon(Icons.location_on, color: Colors.white, size: 16),
                       const SizedBox(width: 4),
-                      Text(location, style: const TextStyle(color: Colors.white70)),
+                      Flexible(
+                        child: Text(
+                          location,
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.location_city, color: Colors.white, size: 16),
-                            const SizedBox(width: 4),
-                            Text('Village: $village', style: const TextStyle(color: Colors.white, fontSize: 12)),
-                          ],
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.45),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.white.withValues(alpha: 0.35)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.location_city, color: Colors.white, size: 16),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  village,
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor.withValues(alpha: 0.4),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: Theme.of(context).primaryColor.withValues(alpha: 0.5)),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(Icons.favorite, color: Colors.white, size: 16),
-                            const SizedBox(width: 4),
-                            Text('Goal: $goal', style: const TextStyle(color: Colors.white, fontSize: 12)),
-                          ],
+                      Flexible(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.45),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Colors.white.withValues(alpha: 0.35)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.favorite, color: Colors.white, size: 16),
+                              const SizedBox(width: 4),
+                              Flexible(
+                                child: Text(
+                                  goal,
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -196,8 +232,8 @@ class SwipeCard extends ConsumerWidget {
                   const SizedBox(height: 12),
                   Text(
                     bio,
-                    style: const TextStyle(
-                      color: Colors.white70,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.white,
                       height: 1.3,
                     ),
                     maxLines: 2,

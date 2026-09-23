@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sawalove/core/theme/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class TermsConsentScreen extends StatefulWidget {
@@ -115,7 +116,7 @@ class _TermsConsentScreenState extends State<TermsConsentScreen> {
                         child: const Text(
                           'Appeal process available.',
                           style: TextStyle(
-                            color: Colors.blue,
+                            color: SawaLoveTheme.tertiary,
                             decoration: TextDecoration.underline,
                           ),
                         ),

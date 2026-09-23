@@ -16,6 +16,8 @@ class MyApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'SawaLove',
       theme: SawaLoveTheme.lightTheme,
+      darkTheme: SawaLoveTheme.darkTheme,
+      themeMode: settings.themeMode,
       locale: settings.locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: const [

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sawalove/core/theme/theme.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class ProfilePeekCard extends StatelessWidget {
@@ -41,14 +42,14 @@ class ProfilePeekCard extends StatelessWidget {
                 placeholder: (_, __) => Container(
                   width: 64,
                   height: 64,
-                  color: Colors.grey.shade200,
-                  child: const Icon(Icons.person, color: Colors.grey),
+                  color: SawaLoveTheme.surfaceContainerHigh,
+                  child: const Icon(Icons.person, color: SawaLoveTheme.onSurfaceVariant),
                 ),
                 errorWidget: (_, __, ___) => Container(
                   width: 64,
                   height: 64,
-                  color: Colors.grey.shade200,
-                  child: const Icon(Icons.person, color: Colors.grey),
+                  color: SawaLoveTheme.surfaceContainerHigh,
+                  child: const Icon(Icons.person, color: SawaLoveTheme.onSurfaceVariant),
                 ),
               ),
             ),

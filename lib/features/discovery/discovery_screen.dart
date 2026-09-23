@@ -9,6 +9,7 @@ import 'package:sawalove/shared/providers/discovery_provider.dart';
 import 'package:sawalove/shared/providers/swipe_history_provider.dart';
 import 'package:sawalove/shared/models/swipe_record.dart';
 import 'package:sawalove/shared/widgets/swipe_card.dart';
+import 'package:sawalove/shared/widgets/pressable_scale.dart';
 import 'package:sawalove/features/discovery/controllers/super_like_controller.dart';
 import 'package:sawalove/features/discovery/controllers/rewind_controller.dart';
 
@@ -85,15 +86,14 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
                 if (filterState.hasActiveFilters)
                   Positioned(
                     right: -2,
-                    top: -2,
-                    child: Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
+                    top: -2,                      child: Container(
+                        width: 8,
+                        height: 8,
+                        decoration: const BoxDecoration(
+                          color: SawaLoveTheme.primary,
+                          shape: BoxShape.circle,
+                        ),
                       ),
-                    ),
                   ),
               ],
             ),
@@ -122,12 +122,26 @@ class _DiscoveryScreenState extends ConsumerState<DiscoveryScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline, size: 64, color: Colors.grey),
+              const Icon(Icons.error_outline, size: 64, color: SawaLoveTheme.onSurfaceVariant),
               const SizedBox(height: 16),
               Text('Could not load profiles', style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 8),
+              Text(
+                'Check your connection and try again.',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: SawaLoveTheme.onSurfaceVariant,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: () => ref.refresh(discoveryProfilesProvider),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: SawaLoveTheme.primary,
+                  foregroundColor: SawaLoveTheme.onPrimary,
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                ),
                 child: const Text('Retry'),
               ),
             ],
@@ -212,7 +226,7 @@ class _SwipeControls extends ConsumerWidget {
         // Rewind
         _ActionButton(
           icon: Icons.refresh,
-          color: const Color(0xFFFFC107),
+          color: SawaLoveTheme.onSurfaceVariant, // neutral: not an accent action
           size: 48,
           onTap: () => RewindController.initiate(context, ref: ref),
           tooltip: 'Undo',
@@ -220,7 +234,7 @@ class _SwipeControls extends ConsumerWidget {
         // Nope
         _ActionButton(
           icon: Icons.close,
-          color: Colors.red,
+          color: SawaLoveTheme.onSurface, // neutral: pass is a dismissive action
           size: 64,
           onTap: () => onSwipe('nope', profile, currentIndex),
           tooltip: 'Pass',
@@ -244,7 +258,7 @@ class _SwipeControls extends ConsumerWidget {
         // Boost
         _ActionButton(
           icon: Icons.bolt,
-          color: Colors.amber,
+          color: SawaLoveTheme.onSurfaceVariant, // neutral: not an accent action
           size: 48,
           onTap: () => context.push('/premium/boost'),
           tooltip: 'Boost',
@@ -273,17 +287,17 @@ class _ActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Tooltip(
       message: tooltip,
-      child: GestureDetector(
+      child: PressableScale(
         onTap: onTap,
         child: Container(
           width: size,
           height: size,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: color.withValues(alpha: 0.3),
+                color: Colors.black.withValues(alpha: 0.12),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),

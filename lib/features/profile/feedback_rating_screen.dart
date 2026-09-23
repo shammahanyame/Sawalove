@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sawalove/shared/widgets/pressable_scale.dart';
 import '../../core/theme/theme.dart';
 
 class FeedbackRatingScreen extends StatefulWidget {
@@ -28,7 +29,7 @@ class _FeedbackRatingScreenState extends State<FeedbackRatingScreen> {
         content: Text(_feedbackController.text.isNotEmpty 
           ? 'Thanks for your feedback!' 
           : 'Thanks for rating $_rating ⭐!'),
-        backgroundColor: _rating >= 4 ? SawaLoveTheme.primary : Colors.orange,
+        backgroundColor: _rating >= 4 ? SawaLoveTheme.primary : SawaLoveTheme.warning,
       ),
     );
     // Analytics log
@@ -69,7 +70,7 @@ class _FeedbackRatingScreenState extends State<FeedbackRatingScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(5, (index) {
                   final starRating = index + 1;
-                  return GestureDetector(
+                  return PressableScale(
                     onTap: () => setState(() => _rating = starRating),
                     child: Icon(
                       starRating <= _rating ? Icons.star : Icons.star_border,

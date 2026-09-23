@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sawalove/core/theme/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class BoostSuccessScreen extends StatelessWidget {
@@ -16,7 +17,7 @@ class BoostSuccessScreen extends StatelessWidget {
                 children: [
                   const SizedBox(
                     height: 200,
-                    child: Icon(Icons.rocket_launch, color: Colors.orange, size: 120),
+                    child: Icon(Icons.rocket_launch, color: SawaLoveTheme.warning, size: 120),
                   ),
                   const SizedBox(height: 32),
                   const Text(

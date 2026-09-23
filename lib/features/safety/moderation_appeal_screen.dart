@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/theme/theme.dart';
 
 class ModerationAppealScreen extends StatefulWidget {
   const ModerationAppealScreen({super.key});
@@ -58,13 +59,18 @@ class _ModerationAppealScreenState extends State<ModerationAppealScreen> {
                     child: ListTile(
                       leading: CircleAvatar(
                         backgroundColor: _getStatusColor(appeal['status']!).withValues(alpha: 0.2),
-                        child: Text(appeal['status']![0], style: TextStyle(color: _getStatusColor(appeal['status']!))),
+                        child: Icon(_getStatusIcon(appeal['status']!), color: _getStatusColor(appeal['status']!), size: 22),
                       ),
                       title: Text('${appeal['type']}'),
                       subtitle: Text(appeal['date']!),
                       trailing: Chip(
+                        avatar: Icon(_getStatusIcon(appeal['status']!), color: _getStatusIconColor(appeal['status']!), size: 16),
                         label: Text(appeal['status']!),
-                        backgroundColor: _getStatusColor(appeal['status']!),
+                        backgroundColor: _getStatusColor(appeal['status']!).withValues(alpha: 0.15),
+                        labelStyle: TextStyle(
+                          color: _getStatusIconColor(appeal['status']!),
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   )),
@@ -79,7 +85,7 @@ class _ModerationAppealScreenState extends State<ModerationAppealScreen> {
                       children: [
                         Row(
                           children: [
-                            const Icon(Icons.gavel, color: Colors.orange),
+                            const Icon(Icons.gavel, color: SawaLoveTheme.warning),
                             const SizedBox(width: 12),
                             Text('New Appeal', style: Theme.of(context).textTheme.titleLarge!.copyWith(fontWeight: FontWeight.w700)),
                           ],
@@ -113,8 +119,8 @@ class _ModerationAppealScreenState extends State<ModerationAppealScreen> {
                         ListTile(
                           leading: Stack(
                             children: [
-                              const Icon(Icons.photo, color: Colors.grey),
-                              if (_hasPhoto) const Positioned(right: 0, child: Icon(Icons.check_circle, color: Colors.green, size: 20)),
+                              const Icon(Icons.photo, color: SawaLoveTheme.onSurfaceVariant),
+                              if (_hasPhoto) const Positioned(right: 0, child: Icon(Icons.check_circle, color: SawaLoveTheme.success, size: 20)),
                             ],
                           ),
                           title: const Text('Add photo evidence'),
@@ -146,7 +152,7 @@ class _ModerationAppealScreenState extends State<ModerationAppealScreen> {
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFE91E63),
+                              backgroundColor: SawaLoveTheme.primary,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                             child: const Text('Submit Appeal', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
@@ -166,10 +172,32 @@ class _ModerationAppealScreenState extends State<ModerationAppealScreen> {
 
   Color _getStatusColor(String status) {
     return switch (status) {
-      'Pending Review' => Colors.orange,
-      'Approved' => Colors.green,
-      'Rejected' => Colors.red,
-      _ => Colors.grey,
+      'Pending Review' => SawaLoveTheme.warning,
+      'Approved' => SawaLoveTheme.success,
+      'Rejected' => SawaLoveTheme.errorColor,
+      _ => SawaLoveTheme.onSurfaceVariant,
+    };
+  }
+
+  Color _getStatusIconColor(String status) {
+    // Icons and label text use a darker tone of the container color so the
+    // chip stays readable on its 15%-alpha background in both themes.
+    return switch (status) {
+      'Pending Review' => SawaLoveTheme.warning,
+      'Approved' => SawaLoveTheme.success,
+      'Rejected' => SawaLoveTheme.errorColor,
+      _ => SawaLoveTheme.onSurfaceVariant,
+    };
+  }
+
+  IconData _getStatusIcon(String status) {
+    // Status is never conveyed by color alone: each state has a distinct
+    // icon plus the full text label.
+    return switch (status) {
+      'Pending Review' => Icons.schedule,
+      'Approved' => Icons.check_circle,
+      'Rejected' => Icons.cancel,
+      _ => Icons.help_outline,
     };
   }
 }

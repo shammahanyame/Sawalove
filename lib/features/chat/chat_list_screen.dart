@@ -201,7 +201,9 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen>
         onLongPress: () => _showContextMenu(item),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          color: item.unreadCount > 0 ? Colors.white : const Color(0xFFFFF4F6),
+          color: item.unreadCount > 0
+              ? SawaLoveTheme.surfaceContainerLowest
+              : SawaLoveTheme.surface,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             children: [
@@ -218,11 +220,10 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen>
                         Expanded(
                           child: Text(
                             item.matchName,
-                            style: TextStyle(
+                            style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                               fontWeight: item.unreadCount > 0 
                                   ? FontWeight.w600 
                                   : FontWeight.normal,
-                              fontSize: 13,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -231,8 +232,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen>
                         const SizedBox(width: 8),
                         Text(
                           _timeAgo(item.lastMessageAt),
-                          style: const TextStyle(
-                            fontSize: 12,
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: SawaLoveTheme.onSurfaceVariant,
                           ),
                         ),
@@ -241,8 +241,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen>
                     const SizedBox(height: 4),
                     Text(
                       _previewText(item),
-                      style: TextStyle(
-                        fontSize: 13,
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                         color: item.unreadCount > 0 
                             ? SawaLoveTheme.onSurface 
                             : SawaLoveTheme.onSurfaceVariant,
@@ -274,15 +273,14 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen>
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF22C55E),
+                    color: SawaLoveTheme.success,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Text(
+                  child: Text(
                     'New match - Nouveau match',
-                    style: TextStyle(
+                    style: Theme.of(context).textTheme.labelSmall!.copyWith(
                       color: Colors.white,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
@@ -373,12 +371,12 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen>
           ),
         // Muted speaker
         if (item.isMuted)
-          Positioned(
+          const Positioned(
             right: 0,
             bottom: 0,
             child: Icon(
               Icons.volume_off_outlined,
-              color: Colors.grey.shade500,
+              color: SawaLoveTheme.onSurfaceVariant,
               size: 16,
             ),
           ),
@@ -408,12 +406,12 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen>
     return Stack(
       children: [
         Container(
-          color: Colors.green.withValues(alpha: 0.1),
+          color: SawaLoveTheme.success.withValues(alpha: 0.1),
           alignment: Alignment.centerRight,
           padding: const EdgeInsets.only(right: 20),
           child: const Icon(
             Icons.volume_off,
-            color: Colors.green,
+            color: SawaLoveTheme.success,
             size: 24,
           ),
         ),
@@ -452,7 +450,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen>
             ListTile(
               leading: Icon(
                 item.isMuted ? Icons.volume_up : Icons.volume_off,
-                color: item.isMuted ? Colors.green : Colors.grey,
+                color: item.isMuted ? SawaLoveTheme.success : SawaLoveTheme.onSurfaceVariant,
               ),
               title: Text(item.isMuted ? 'Unmute' : 'Mute'),
               onTap: () {
@@ -474,7 +472,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen>
               )
             else
               ListTile(
-                leading: const Icon(Icons.star_purple500, color: Colors.amber),
+                leading: const Icon(Icons.star_purple500, color: SawaLoveTheme.warning),
                 title: const Text('Pin conversation'),
                 subtitle: const Text('Premium feature'),
                 onTap: () {
@@ -483,7 +481,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen>
                 },
               ),
             ListTile(
-              leading: const Icon(Icons.block, color: Colors.red),
+              leading: const Icon(Icons.block, color: SawaLoveTheme.errorColor),
               title: const Text('Block user'),
               onTap: () {
                 context.go('/safety/block/${item.matchId}');
@@ -491,7 +489,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen>
               },
             ),
             ListTile(
-              leading: const Icon(Icons.flag, color: Colors.orange),
+              leading: const Icon(Icons.flag, color: SawaLoveTheme.warning),
               title: const Text('Report'),
               onTap: () {
                 context.go('/safety/report/${item.matchId}');
@@ -580,19 +578,17 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen>
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'No conversations yet',
-              style: TextStyle(
-                fontSize: 20,
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
                 fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'When you match with someone, your conversations will appear here',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
+              style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                 color: SawaLoveTheme.onSurfaceVariant,
               ),
             ),

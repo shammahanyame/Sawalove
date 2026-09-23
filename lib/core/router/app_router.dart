@@ -251,7 +251,11 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           path: '/request/undo/:requestId',
           builder: (c, s) =>
               UndoDeclineScreen(requestId: s.pathParameters['requestId']!)),
-      GoRoute(path: '/ice-breakers', builder: (c, s) => IceBreakersScreen()),
+      // Peer name is optional untrusted display input; the screen clamps it.
+      GoRoute(
+          path: '/ice-breakers',
+          builder: (c, s) => IceBreakersScreen(
+              participantName: s.uri.queryParameters['name'])),
       GoRoute(
           path: '/gif-sticker', builder: (c, s) => const GifStickerPicker()),
       GoRoute(
