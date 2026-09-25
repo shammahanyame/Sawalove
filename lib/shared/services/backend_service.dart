@@ -503,6 +503,128 @@ class BackendService {
     }
   }
 
+  /// SWIPES — records a like/nope/super_like and returns the resulting
+  /// match state. The server creates a match when the target has already
+  /// liked us, and re-liking after an unmatch reactivates the conversation.
+  Future<SwipeResult> sendSwipe({
+    required String targetUserId,
+    required String action, // 'like' | 'nope' | 'super_like'
+  }) async {
+    final decoded = await _sendJson(
+      'POST',
+      '/swipes',
+      body: {
+        'targetUserId': targetUserId,
+        'action': action,
+      },
+      requiresAuth: true,
+    );
+    return SwipeResult(
+      matched: decoded['matched'] == true,
+      matchId: decoded['match_id']?.toString(),
+    );
+  }
+
+  /// LIKES — users who liked us and we have not swiped yet ("Likes You" grid).
+  Future<List<Map<String, dynamic>>> fetchIncomingLikes({int limit = 20}) async {
+    final decoded = await _sendJson(
+      'GET',
+      '/likes',
+      query: {'limit': '$limit'},
+      requiresAuth: true,
+    );
+    return _readListOfMaps(decoded['likes']);
+  }
+
+  /// MATCHES — active matches with the other user's public profile and the
+  /// last message preview for the inbox.
+  Future<List<Map<String, dynamic>>> fetchMatches({int limit = 30}) async {
+    final decoded = await _sendJson(
+      'GET',
+      '/matches',
+      query: {'limit': '$limit'},
+      requiresAuth: true,
+    );
+    return _readListOfMaps(decoded['matches']);
+  }
+
+  /// MESSAGES — paginated chronological conversation for a match the caller
+  /// participates in. Server enforces access and unmatch state.
+  Future<List<Map<String, dynamic>>> fetchMessages(
+    String matchId, {
+    int limit = 50,
+  }) async {
+    final decoded = await _sendJson(
+      'GET',
+      '/matches/${Uri.encodeComponent(matchId)}/messages',
+      query: {'limit': '$limit'},
+      requiresAuth: true,
+    );
+    return _readListOfMaps(decoded['messages']);
+  }
+
+  Future<Map<String, dynamic>> sendMessage(
+    String matchId,
+    String body,
+  ) async {
+    final decoded = await _sendJson(
+      'POST',
+      '/matches/${Uri.encodeComponent(matchId)}/messages',
+      body: {'body': body},
+      requiresAuth: true,
+    );
+    final message = decoded['message'];
+    if (message is Map) return Map<String, dynamic>.from(message);
+    throw BackendAuthException(code: 'invalid-message-response');
+  }
+
+  /// UNMATCH — hides the conversation from this side. History stays readable
+  /// for the other side, and a future mutual like reactivates the match.
+  Future<void> unmatch(String matchId) async {
+    await _sendJson(
+      'DELETE',
+      '/matches/${Uri.encodeComponent(matchId)}',
+      requiresAuth: true,
+    );
+  }
+
+  /// MATCH DETAIL — one match with the other user's public profile. Used by
+  /// the chat header to resolve the peer's uid for report/block actions.
+  Future<Map<String, dynamic>?> fetchMatch(String matchId) async {
+    final decoded = await _sendJson(
+      'GET',
+      '/matches/${Uri.encodeComponent(matchId)}',
+      requiresAuth: true,
+    );
+    final match = decoded['match'];
+    if (match is Map) return Map<String, dynamic>.from(match);
+    return null;
+  }
+
+  /// BLOCKING — hides both accounts from each other across discovery, likes,
+  /// matches, and chat. Idempotent on the server.
+  Future<void> blockUser(String uid) async {
+    await _sendJson(
+      'POST',
+      '/users/${Uri.encodeComponent(uid)}/block',
+      requiresAuth: true,
+    );
+  }
+
+  Future<void> unblockUser(String uid) async {
+    await _sendJson(
+      'DELETE',
+      '/users/${Uri.encodeComponent(uid)}/block',
+      requiresAuth: true,
+    );
+  }
+
+  /// Accounts I have blocked (for the Blocked users settings screen).
+  Future<List<Map<String, dynamic>>> fetchBlockedUsers() async {
+    final decoded = await _sendJson('GET', '/blocks', requiresAuth: true);
+    return _readListOfMaps(decoded['blocks']);
+  }
+
   /// REPORTING — files a report against another user. Reasons must match
   /// the server's enum (harassment, fake_profile, inappropriate_photos,
   /// scam, other). Throws BackendAuthException on API error so callers can
@@ -620,6 +742,7 @@ class BackendService {
           headers: headers,
           body: body == null ? null : jsonEncode(body),
         ),
+      'DELETE' => http.delete(uri, headers: headers),
       _ => throw ArgumentError('Unsupported method: $method'),
     }
         .timeout(const Duration(seconds: 20));
@@ -749,6 +872,14 @@ class BackendService {
 class User {
   final String uid;
   User({required this.uid});
+}
+
+/// Result of POST /swipes.
+class SwipeResult {
+  final bool matched;
+  final String? matchId;
+
+  const SwipeResult({required this.matched, this.matchId});
 }
 
 class BackendAuthException implements Exception {

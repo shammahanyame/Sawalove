@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/theme.dart';
+import '../../core/config/feature_flags.dart';
 import '../../shared/providers/preferences_provider.dart';
 import '../../shared/services/firebase_service.dart';
 
@@ -31,10 +32,12 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
         ),
         centerTitle: true,
         actions: [
-          TextButton(
-            onPressed: _showDemoMenu,
-            child: const Text('Demo'),
-          ),
+          // Demo state switcher is a dev-only helper; hidden in release.
+          if (kShowDemoHelpers)
+            TextButton(
+              onPressed: _showDemoMenu,
+              child: const Text('Demo'),
+            ),
         ],
       ),
       body: SafeArea(

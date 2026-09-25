@@ -3,44 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/theme.dart';
-import 'models/gif_result.dart';
 import 'models/sticker.dart';
 import 'providers/gif_sticker_provider.dart';
 
-class GifStickerPicker extends ConsumerStatefulWidget {
+/// Offline emoji sticker picker. Picking a sticker pops it to the caller,
+/// which sends it as a chat message.
+///
+/// The old GIF tab was removed: it had no API provider or key behind it and
+/// could only ever render an empty grid (a fake feature — Play's Deceptive
+/// Behaviour policy treats that as grounds for removal).
+class GifStickerPicker extends ConsumerWidget {
   const GifStickerPicker({super.key});
 
   @override
-  ConsumerState<GifStickerPicker> createState() => _GifStickerPickerState();
-}
-
-class _GifStickerPickerState extends ConsumerState<GifStickerPicker>
-    with SingleTickerProviderStateMixin {
-  late final TabController _tabController;
-  final _searchController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    _tabController.addListener(() {
-      if (_tabController.indexIsChanging) {
-        ref
-            .read(gifStickerProvider.notifier)
-            .switchTab(PickerTab.values[_tabController.index]);
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(gifStickerProvider);
 
     return SafeArea(
@@ -53,182 +29,29 @@ class _GifStickerPickerState extends ConsumerState<GifStickerPicker>
         ),
         child: Column(
           children: [
-            _Header(
-              tabController: _tabController,
-              searchController: _searchController,
-              onSearchChanged:
-                  ref.read(gifStickerProvider.notifier).onQueryChanged,
-              onClose: () => Navigator.of(context).maybePop(),
-            ),
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 8, 8),
+              child: Row(
                 children: [
-                  _GifGrid(state: state),
-                  _StickerGrid(state: state),
+                  const Expanded(
+                    child: Text(
+                      'Stickers',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: 'Close',
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.of(context).maybePop(),
+                  ),
                 ],
               ),
             ),
+            Expanded(child: _StickerGrid(state: state)),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  const _Header({
-    required this.tabController,
-    required this.searchController,
-    required this.onSearchChanged,
-    required this.onClose,
-  });
-
-  final TabController tabController;
-  final TextEditingController searchController;
-  final ValueChanged<String> onSearchChanged;
-  final VoidCallback onClose;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 8, 8),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: TabBar(
-                  controller: tabController,
-                  tabs: const [
-                    Tab(text: 'GIFs'),
-                    Tab(text: 'Stickers'),
-                  ],
-                  indicatorColor: SawaLoveTheme.primary,
-                  labelColor: SawaLoveTheme.primary,
-                  labelStyle: const TextStyle(fontWeight: FontWeight.w700),
-                  unselectedLabelColor: SawaLoveTheme.onSurfaceVariant,
-                ),
-              ),
-              IconButton(
-                tooltip: 'Close',
-                icon: const Icon(Icons.close),
-                onPressed: onClose,
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          TextField(
-            controller: searchController,
-            textInputAction: TextInputAction.search,
-            onChanged: onSearchChanged,
-            decoration: InputDecoration(
-              hintText: 'Search GIFs',
-              prefixIcon: const Icon(Icons.search),
-              isDense: true,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(24),
-                borderSide: BorderSide.none,
-              ),
-              filled: true,
-              fillColor: SawaLoveTheme.surface,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _GifGrid extends ConsumerWidget {
-  const _GifGrid({required this.state});
-
-  final GifStickerState state;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final notifier = ref.read(gifStickerProvider.notifier);
-
-    return Column(
-      children: [
-        SizedBox(
-          height: 44,
-          child: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            scrollDirection: Axis.horizontal,
-            itemCount: state.trendingChips.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 8),
-            itemBuilder: (context, index) {
-              final chip = state.trendingChips[index];
-              final selected = chip == state.selectedChip;
-              return ChoiceChip(
-                label: Text(chip),
-                selected: selected,
-                onSelected: (_) => notifier.selectChip(selected ? null : chip),
-                selectedColor: SawaLoveTheme.primaryContainer,
-                labelStyle: TextStyle(
-                  color: selected
-                      ? SawaLoveTheme.onSurface
-                      : SawaLoveTheme.onSurfaceVariant,
-                  fontWeight: FontWeight.w600,
-                ),
-              );
-            },
-          ),
-        ),
-        Expanded(
-          child: state.isLoading && state.gifs.isEmpty
-              ? const Center(child: CircularProgressIndicator())
-              : state.gifs.isEmpty
-                  ? const _EmptyState(
-                      icon: Icons.gif_box_outlined,
-                      title: 'No GIFs found',
-                    )
-                  : GridView.builder(
-                      padding: const EdgeInsets.fromLTRB(12, 4, 12, 16),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 8,
-                        mainAxisSpacing: 8,
-                        childAspectRatio: 1,
-                      ),
-                      itemCount: state.gifs.length,
-                      itemBuilder: (context, index) {
-                        return _GifTile(gif: state.gifs[index]);
-                      },
-                    ),
-        ),
-      ],
-    );
-  }
-}
-
-class _GifTile extends StatelessWidget {
-  const _GifTile({required this.gif});
-
-  final GifResult gif;
-
-  @override
-  Widget build(BuildContext context) {
-    final imageUrl = gif.previewUrl.isNotEmpty ? gif.previewUrl : gif.gifUrl;
-
-    return InkWell(
-      borderRadius: BorderRadius.circular(8),
-      onTap: () => Navigator.pop(context, gif),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: CachedNetworkImage(
-          imageUrl: imageUrl,
-          fit: BoxFit.cover,
-          placeholder: (_, __) => const ColoredBox(
-            color: SawaLoveTheme.surfaceContainerHighest,
-            child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-          ),
-          errorWidget: (_, __, ___) => const ColoredBox(
-            color: SawaLoveTheme.surfaceContainerHighest,
-            child: Icon(Icons.broken_image_outlined),
-          ),
         ),
       ),
     );
@@ -365,5 +188,3 @@ class _EmptyState extends StatelessWidget {
     );
   }
 }
-
-// Usage: showModalBottomSheet(context: context, builder: (_) => const GifStickerPicker());

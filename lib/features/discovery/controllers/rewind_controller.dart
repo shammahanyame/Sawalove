@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sawalove/shared/providers/discovery_provider.dart';
 import 'package:sawalove/shared/providers/quota_provider.dart';
 import 'package:sawalove/shared/providers/swipe_history_provider.dart';
 import 'package:sawalove/features/discovery/providers/rewind_modal_provider.dart';
@@ -46,6 +47,26 @@ class RewindController {
     // 1. Optimistic local state update
     ref.read(swipeHistoryProvider.notifier).popLast();
     ref.read(quotaProvider.notifier).decrementRewind();
+
+    // The server excludes already-swiped users from GET /users, so the
+    // rewound profile only returns via this local snapshot. The deck
+    // dedupes by uid, so prepending is safe even when the server list
+    // still contains the profile.
+    final snapshot = lastSwipe.profile;
+    if (snapshot.isNotEmpty) {
+      final snapshotUid =
+          (snapshot['uid'] ?? snapshot['id'] ?? '').toString();
+      final restored = ref.read(rewoundProfilesProvider);
+      final alreadyRestored = snapshotUid.isNotEmpty &&
+          restored.any((p) =>
+              (p['uid'] ?? p['id'] ?? '').toString() == snapshotUid);
+      if (!alreadyRestored) {
+        ref.read(rewoundProfilesProvider.notifier).state = [
+          snapshot,
+          ...restored,
+        ];
+      }
+    }
 
     // 2. Haptic
     await HapticFeedback.lightImpact();

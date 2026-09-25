@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sawalove/core/theme/theme.dart';
 import 'package:sawalove/shared/providers/inbox_provider.dart';
 import 'package:sawalove/shared/models/inbox_item.dart';
+import 'package:sawalove/shared/services/backend_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'widgets/chat_request_card.dart';
@@ -197,7 +198,7 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen>
         ref.read(inboxProvider.notifier).deleteConversation(item.matchId);
       },
       child: InkWell(
-        onTap: () => context.go('/chat/${item.matchId}'),
+        onTap: () => context.push('/chat/${item.matchId}'),
         onLongPress: () => _showContextMenu(item),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
@@ -296,7 +297,29 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen>
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(22),
-          child: CachedNetworkImage(
+          // No photo yet → initial-letter placeholder (an empty image URL
+          // must never hit the network layer).
+          child: item.avatarUrl.isEmpty
+              ? Container(
+                  width: 44,
+                  height: 44,
+                  decoration: const BoxDecoration(
+                    color: SawaLoveTheme.surfaceContainer,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      item.matchName.isNotEmpty
+                          ? item.matchName[0].toUpperCase()
+                          : '?',
+                      style: const TextStyle(
+                        color: SawaLoveTheme.onSurfaceVariant,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                )
+              : CachedNetworkImage(
             imageUrl: item.avatarUrl,
             width: 44,
             height: 44,
@@ -484,16 +507,18 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen>
               leading: const Icon(Icons.block, color: SawaLoveTheme.errorColor),
               title: const Text('Block user'),
               onTap: () {
-                context.go('/safety/block/${item.matchId}');
                 Navigator.pop(context);
+                _confirmBlock(item);
               },
             ),
             ListTile(
               leading: const Icon(Icons.flag, color: SawaLoveTheme.warning),
               title: const Text('Report'),
               onTap: () {
-                context.go('/safety/report/${item.matchId}');
                 Navigator.pop(context);
+                // The server expects a USER id, never a match id.
+                if (item.peerUid.isEmpty) return;
+                context.push('/safety/report/${item.peerUid}');
               },
             ),
           ],
@@ -511,6 +536,57 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen>
       return 'You: ${item.lastMessagePreview}';
     } else {
       return item.lastMessagePreview;
+    }
+  }
+
+  /// Blocks [item]'s peer on the server: both profiles, likes, matches, and
+  /// chats between the two accounts are hidden immediately afterwards.
+  Future<void> _confirmBlock(InboxItem item) async {
+    if (item.peerUid.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Blocking is unavailable right now.')),
+      );
+      return;
+    }
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Block user?'),
+        content: Text(
+          'Block ${item.matchName}? They will no longer see your profile, '
+          'and your matches and chats with them will be hidden.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            style: TextButton.styleFrom(
+              foregroundColor: SawaLoveTheme.errorColor,
+            ),
+            child: const Text('Block'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    try {
+      await ref.read(backendServiceProvider).blockUser(item.peerUid);
+      if (!mounted) return;
+      // Recreate the notifier so the inbox reloads from the server (the
+      // blocked match is now excluded by the API).
+      ref.invalidate(inboxProvider);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${item.matchName} has been blocked.')),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not block this user. Please try again.')),
+      );
     }
   }
 

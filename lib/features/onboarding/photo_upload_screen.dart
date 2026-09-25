@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/config/feature_flags.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:reorderable_grid/reorderable_grid.dart';
 import '../../core/theme/theme.dart';
@@ -232,7 +233,7 @@ class _PhotoUploadScreenState extends ConsumerState<PhotoUploadScreen> {
         ),
         centerTitle: true,
         actions: [
-          if (!isReorderMode)
+          if (!isReorderMode && kShowDemoHelpers)
             TextButton(
               onPressed: () {
                 // Demo helper: cycle through states

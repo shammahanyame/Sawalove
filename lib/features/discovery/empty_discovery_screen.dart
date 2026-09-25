@@ -55,7 +55,7 @@ class EmptyDiscoveryScreen extends StatelessWidget {
                     width: double.infinity,
                     height: 56,
                     child: ElevatedButton.icon(
-                      onPressed: () => context.go('/discovery/filters'),
+                      onPressed: () => context.go('/discover/filters'),
                       icon: const Icon(Icons.tune),
                       label: const Text('Widen Filters'),
                       style: ElevatedButton.styleFrom(

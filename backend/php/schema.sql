@@ -159,6 +159,73 @@ create table if not exists moderation_actions (
   constraint moderation_actions_target_fk foreign key (target_user_id) references users(id) on delete cascade
 ) engine=InnoDB default charset=utf8mb4 collate=utf8mb4_unicode_ci;
 
+-- SWIPES: one row per like/nope/super_like. A mutual pair of likes creates
+-- a match row. Swipes are kept (not deleted) so a user cannot re-swipe the
+-- same target infinitely and 'who liked me' can be answered efficiently.
+create table if not exists swipes (
+  id bigint unsigned auto_increment primary key,
+  swiper_id char(36) not null,
+  target_id char(36) not null,
+  action enum('like', 'nope', 'super_like') not null,
+  created_at datetime not null default current_timestamp,
+  unique key swipes_swiper_target_unique (swiper_id, target_id),
+  key swipes_target_action_idx (target_id, action, created_at),
+  constraint swipes_swiper_fk foreign key (swiper_id) references users(id) on delete cascade,
+  constraint swipes_target_fk foreign key (target_id) references users(id) on delete cascade,
+  constraint swipes_no_self_swipe_check check (swiper_id <> target_id)
+) engine=InnoDB default charset=utf8mb4 collate=utf8mb4_unicode_ci;
+
+-- MATCHES: created when two users like each other. Either side can unmatch,
+-- which nulls their side; the row is only deleted when both sides unmatch or
+-- an account is deleted.
+create table if not exists matches (
+  id char(36) primary key,
+  user_a_id char(36) not null,
+  user_b_id char(36) not null,
+  -- 'a' or 'b': which side has unmatched (null = both active).
+  unmatched_by enum('a', 'b') null,
+  unmatched_at datetime null,
+  created_at datetime not null default current_timestamp,
+  unique key matches_pair_unique (user_a_id, user_b_id),
+  key matches_user_a_idx (user_a_id, created_at),
+  key matches_user_b_idx (user_b_id, created_at),
+  constraint matches_user_a_fk foreign key (user_a_id) references users(id) on delete cascade,
+  constraint matches_user_b_fk foreign key (user_b_id) references users(id) on delete cascade,
+  constraint matches_distinct_users_check check (user_a_id <> user_b_id)
+) engine=InnoDB default charset=utf8mb4 collate=utf8mb4_unicode_ci;
+
+-- MESSAGES: chat messages inside a match. Soft-deleted via deleted_at when a
+-- user unmatches (conversation is hidden, audit trail remains).
+create table if not exists messages (
+  id char(36) primary key,
+  seq bigint unsigned not null auto_increment,
+  match_id char(36) not null,
+  sender_id char(36) not null,
+  body text not null,
+  created_at datetime not null default current_timestamp,
+  deleted_at datetime null,
+  unique key messages_seq_unique (seq),
+  key messages_match_seq_idx (match_id, seq),
+  constraint messages_match_fk foreign key (match_id) references matches(id) on delete cascade,
+  constraint messages_sender_fk foreign key (sender_id) references users(id) on delete cascade,
+  constraint messages_body_len_check check (char_length(body) between 1 and 4000)
+) engine=InnoDB default charset=utf8mb4 collate=utf8mb4_unicode_ci;
+
+-- BLOCKS: one row per blocking direction. A block by either side hides both
+-- accounts from each other (discovery deck, likes, matches, profile lookups)
+-- and stops swipes/messages between them. Reversible via unblock.
+create table if not exists blocks (
+  id bigint unsigned auto_increment primary key,
+  blocker_id char(36) not null,
+  blocked_id char(36) not null,
+  created_at datetime not null default current_timestamp,
+  unique key blocks_pair_unique (blocker_id, blocked_id),
+  key blocks_blocked_idx (blocked_id),
+  constraint blocks_blocker_fk foreign key (blocker_id) references users(id) on delete cascade,
+  constraint blocks_blocked_fk foreign key (blocked_id) references users(id) on delete cascade,
+  constraint blocks_no_self_block_check check (blocker_id <> blocked_id)
+) engine=InnoDB default charset=utf8mb4 collate=utf8mb4_unicode_ci;
+
 -- Housekeeping: purge stale rows so these tables do not grow forever.
 -- Kept as single-statement events so the file imports with the plain
 -- mysql CLI (no DELIMITER juggling required).
@@ -181,3 +248,30 @@ create event if not exists sawalove_housekeeping_ai_usage
 on schedule every 1 day
 do
   delete from ai_usage where day < utc_date() - interval 90 day;
+
+create event if not exists sawalove_housekeeping_swipes
+on schedule every 1 day
+do
+  delete from swipes
+  where action = 'nope'
+    and created_at < utc_timestamp() - interval 90 day;
+
+-- Push notification tokens (FCM registration tokens per device).
+-- A user may be signed in on several devices; each device has its own token.
+-- Stale tokens are replaced by the upsert on /me/push-token and pruned here
+-- when the device never refreshes them (apps refresh on every launch).
+create table if not exists push_tokens (
+  token varchar(4096) not null,
+  user_id char(36) not null,
+  platform varchar(20) not null default 'android',
+  created_at datetime not null default current_timestamp,
+  last_seen_at datetime not null default current_timestamp,
+  primary key token_pk (token(255)),
+  key push_tokens_user_idx (user_id),
+  constraint push_tokens_user_fk foreign key (user_id) references users(id) on delete cascade
+) engine=InnoDB default charset=utf8mb4 collate=utf8mb4_unicode_ci;
+
+create event if not exists sawalove_housekeeping_push_tokens
+on schedule every 1 day
+do
+  delete from push_tokens where last_seen_at < utc_timestamp() - interval 90 day;

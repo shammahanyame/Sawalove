@@ -206,35 +206,36 @@ class CompletenessNotifier extends StateNotifier<CompletenessState> {
     ));
 
     final percentage = points.clamp(0, 100);
-    final visibilityBoost = percentage >= 50
-        ? '+$percentage% more visibility'
-        : null;
 
+    // Milestones are honest progress goals. Earlier titles promised real
+    // rewards ("Free 30-min Boost", "1-week Premium trial", fabricated
+    // "+N% more visibility") that no backend ever grants — Play treats
+    // undeliverable rewards as deceptive behaviour.
     final milestones = [
       Milestone(
         threshold: 25,
-        title: 'Appear in search',
+        title: 'Solid profile basics',
         icon: 'search',
         color: const Color(0xFFB30065),
         unlocked: percentage >= 25,
       ),
       Milestone(
         threshold: 50,
-        title: 'Free 30-min Boost',
+        title: 'Profile taking shape',
         icon: 'bolt',
         color: const Color(0xFFFFAB00),
         unlocked: percentage >= 50,
       ),
       Milestone(
         threshold: 75,
-        title: '1-week Premium trial',
+        title: 'Nearly complete',
         icon: 'star',
         color: const Color(0xFFBA7517),
         unlocked: percentage >= 75,
       ),
       Milestone(
         threshold: 100,
-        title: 'Daily Super Likes ×7 days',
+        title: 'Profile complete',
         icon: 'double_arrow',
         color: const Color(0xFF1D9E75),
         unlocked: percentage >= 100,
@@ -246,23 +247,8 @@ class CompletenessNotifier extends StateNotifier<CompletenessState> {
       points: points,
       tasks: tasks,
       milestones: milestones,
-      visibilityBoost: visibilityBoost,
+      visibilityBoost: null,
     );
-  }
-
-  Future<void> claimReward(int milestonePct) async {
-    try {
-      final newRewards = [
-        ...state.claimedRewards,
-        ClaimedReward(
-          type: 'milestone_$milestonePct',
-          expiresAt: DateTime.now().add(const Duration(days: 7)),
-        ),
-      ];
-      state = state.copyWith(claimedRewards: newRewards);
-    } catch (_) {
-      // Silently fail – UI shows snackbar separately
-    }
   }
 
   Task? getNextTask() {

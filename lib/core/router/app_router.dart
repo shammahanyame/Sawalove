@@ -5,11 +5,13 @@ import 'package:go_router/go_router.dart';
 // Core
 import '../splash_screen.dart';
 import '../language_selection_screen.dart';
+import '../age_gate_screen.dart';
 import '../consent_screen.dart';
 import '../offline_screen.dart';
+import '../coming_soon_screen.dart';
+import '../config/feature_flags.dart';
 import '../force_update_screen.dart';
 import '../whats_new_screen.dart';
-import '../refer_friends_screen.dart' as core_refer;
 import '../reengagement_nudge_screen.dart';
 import '../account_suspended_screen.dart';
 import '../matches/match_success_screen.dart';
@@ -70,6 +72,7 @@ import '../../features/chat/unmatch_confirmation_screen.dart';
 // Profile
 import '../../features/profile/self_profile_screen.dart';
 import '../../features/profile/peer_profile_screen.dart';
+import '../../features/profile/legal_document_screen.dart';
 import '../../features/profile/edit_profile_screen.dart';
 import '../../features/profile/photo_viewer_screen.dart';
 import '../../features/profile/completeness_screen.dart';
@@ -86,9 +89,10 @@ import '../../features/profile/help_faq_screen.dart';
 import '../../features/profile/contact_support_screen.dart';
 import '../../features/profile/geo_tag_status_screen.dart';
 import '../../features/profile/refer_friends_screen.dart' as profile_refer;
-import '../../features/profile/document_pages.dart';
 
-// Premium
+// Premium screens are only registered when SHOW_PREMIUM=true. Play's
+// Payments policy forbids the current Mobile Money checkout for digital
+// goods, so release builds have no premium routes at all.
 import '../../features/premium/premium_checkout_screen.dart';
 import '../../features/premium/plans_screen.dart';
 import '../../features/premium/feature_gate_screen.dart';
@@ -107,7 +111,8 @@ import '../../features/safety/moderation_appeal_screen.dart';
 import '../../features/safety/moderation_queue_screen.dart';
 
 // Location
-import '../../features/location/nearby_map_screen.dart';
+import '../../features/location/nearby_map_screen.dart'
+    if (dart.library.io) '../../features/location/nearby_map_screen.dart';
 import '../../features/location/location_rationale_screen.dart';
 import '../../features/location/meetup_place_picker_screen.dart';
 import '../../features/location/traveling_banner_screen.dart';
@@ -119,14 +124,27 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/splash',
     debugLogDiagnostics: false,
+    // Unknown routes and navigation errors render a recoverable screen
+    // instead of throwing (an unhandled GoRouter exception is a hard crash).
+    errorBuilder: (context, state) {
+      final detail = state.error?.toString() ?? '';
+      final isMissingRoute = detail.contains('no routes');
+      return RouteErrorScreen(
+        title: isMissingRoute ? 'Page not found' : 'Something went wrong',
+        message: isMissingRoute
+            ? "This screen doesn't exist or has moved."
+            : 'We could not open this screen. Please go back and try again.',
+      );
+    },
     routes: [
       // ── Splash ──────────────────────────────────────────────────────────
       GoRoute(path: '/splash', builder: (c, s) => const SplashScreen()),
 
-      // ── Language ────────────────────────────────────────────────────────
+      // ── Language / age gate ────────────────────────────────────────────
       GoRoute(
           path: '/language-select',
           builder: (c, s) => const LanguageSelectionScreen()),
+      GoRoute(path: '/age-gate', builder: (c, s) => const AgeGateScreen()),
 
       // ── Auth ────────────────────────────────────────────────────────────
       GoRoute(path: '/login', builder: (c, s) => const PhoneLoginScreen()),
@@ -190,12 +208,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
               path: '/home/discover',
               builder: (c, s) => const DiscoveryScreen()),
           GoRoute(
-              path: '/home/explore', builder: (c, s) => const ExploreScreen()),
-          GoRoute(
+              path: '/home/explore', builder: (c, s) => const ExploreScreen()),      GoRoute(
               path: '/home/matches',
               builder: (c, s) => const LikesMatchesScreen()),
-          GoRoute(
-              path: '/home/chat', builder: (c, s) => const ChatListScreen()),
+      GoRoute(
+              path: '/home/chat',
+              builder: gated(kShowChat, (c, s) => const ChatListScreen(),
+                  feature: 'Messaging')),
           GoRoute(
               path: '/home/profile',
               builder: (c, s) => const SelfProfileScreen()),
@@ -226,77 +245,134 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             MatchSuccessScreen(matchId: s.pathParameters['matchId']!),
       ),
 
-      // ── Chat ────────────────────────────────────────────────────────────
+      // ── Chat (messaging has no backend yet — gated in release) ─────────
       GoRoute(
         path: '/chat/:matchId',
-        builder: (c, s) =>
-            ChatDetailScreen(matchId: s.pathParameters['matchId']!),
+        builder: gated(kShowChat,
+            (c, s) => ChatDetailScreen(matchId: s.pathParameters['matchId']!),
+            feature: 'Messaging'),
       ),
       GoRoute(
         path: '/chat/:matchId/voice-message',
-        builder: (c, s) =>
-            ChatDetailScreen(matchId: s.pathParameters['matchId']!),
+        builder: gated(kShowChat,
+            (c, s) => ChatDetailScreen(matchId: s.pathParameters['matchId']!),
+            feature: 'Messaging'),
       ),
       GoRoute(
-          path: '/chat-request', builder: (c, s) => const ChatRequestScreen()),
-      GoRoute(path: '/chat', builder: (c, s) => const ChatListScreen()),
+          path: '/chat-request',
+          builder: gated(kShowChat, (c, s) => const ChatRequestScreen(),
+              feature: 'Chat requests')),
+      GoRoute(
+          path: '/chat',
+          builder: gated(kShowChat, (c, s) => const ChatListScreen(),
+              feature: 'Messaging')),
       GoRoute(
           path: '/request/compose/:uid',
-          builder: (c, s) =>
-              RequestComposeScreen(recipientUid: s.pathParameters['uid']!)),
+          builder: gated(
+              kShowChat,
+              (c, s) =>
+                  RequestComposeScreen(recipientUid: s.pathParameters['uid']!),
+              feature: 'Chat requests')),
       GoRoute(
           path: '/request/decline-confirm/:requestId',
-          builder: (c, s) =>
-              DeclineConfirmScreen(requestId: s.pathParameters['requestId']!)),
+          builder: gated(
+              kShowChat,
+              (c, s) =>
+                  DeclineConfirmScreen(requestId: s.pathParameters['requestId']!),
+              feature: 'Chat requests')),
       GoRoute(
           path: '/request/undo/:requestId',
-          builder: (c, s) =>
-              UndoDeclineScreen(requestId: s.pathParameters['requestId']!)),
+          builder: gated(
+              kShowChat,
+              (c, s) =>
+                  UndoDeclineScreen(requestId: s.pathParameters['requestId']!),
+              feature: 'Chat requests')),
       // Peer name is optional untrusted display input; the screen clamps it.
       GoRoute(
           path: '/ice-breakers',
-          builder: (c, s) => IceBreakersScreen(
-              participantName: s.uri.queryParameters['name'])),
+          builder: gated(
+              kShowChat,
+              (c, s) => IceBreakersScreen(
+                  participantName: s.uri.queryParameters['name']),
+              feature: 'Ice breakers')),
       GoRoute(
-          path: '/gif-sticker', builder: (c, s) => const GifStickerPicker()),
+          path: '/gif-sticker',
+          builder: gated(kShowChat, (c, s) => const GifStickerPicker(),
+              feature: 'GIFs & stickers')),
       GoRoute(
           path: '/unmatch',
-          builder: (c, s) => const UnmatchConfirmationScreen()),
+          builder: gated(
+              kShowChat,
+              (c, s) => UnmatchConfirmationScreen(
+                  matchId: s.uri.queryParameters['matchId']),
+              feature: 'Unmatching')),
 
-      // ── Calls ───────────────────────────────────────────────────────────
+      // ── Calls (Agora not integrated yet — gated in release) ────────────
       GoRoute(
           path: '/call/incoming',
-          builder: (c, s) => const IncomingCallScreen()),
-      GoRoute(path: '/call/video', builder: (c, s) => const VideoCallScreen()),
+          builder: gated(kShowCalls, (c, s) => const IncomingCallScreen(),
+              feature: 'Calls')),
       GoRoute(
-          path: '/chat/video-call', builder: (c, s) => const VideoCallScreen()),
+          path: '/call/video',
+          builder: gated(kShowCalls, (c, s) => const VideoCallScreen(),
+              feature: 'Video calls')),
+      GoRoute(
+          path: '/chat/video-call',
+          builder: gated(kShowCalls, (c, s) => const VideoCallScreen(),
+              feature: 'Video calls')),
       GoRoute(
         path: '/call/declined',
-        builder: (c, s) => DeclinedCallScreen(
-          callerName: s.uri.queryParameters['callerName'] ?? 'Someone',
+        builder: gated(
+          kShowCalls,
+          (c, s) => DeclinedCallScreen(
+            callerName: s.uri.queryParameters['callerName'] ?? 'Someone',
+          ),
+          feature: 'Calls',
         ),
       ),
       GoRoute(
         path: '/chat/call-declined',
-        builder: (c, s) => DeclinedCallScreen(
-          callerName: s.uri.queryParameters['callerName'] ?? 'Someone',
+        builder: gated(
+          kShowCalls,
+          (c, s) => DeclinedCallScreen(
+            callerName: s.uri.queryParameters['callerName'] ?? 'Someone',
+          ),
+          feature: 'Calls',
         ),
       ),
       GoRoute(
         path: '/call/busy',
-        builder: (c, s) => BusyUnavailableScreen(
-          recipientName: s.uri.queryParameters['recipientName'] ?? 'Someone',
-          isOnAnotherCall: s.uri.queryParameters['isOnAnotherCall'] == 'true',
-          hasDoNotDisturb: s.uri.queryParameters['hasDnd'] == 'true',
+        builder: gated(
+          kShowCalls,
+          (c, s) => BusyUnavailableScreen(
+            recipientName: s.uri.queryParameters['recipientName'] ?? 'Someone',
+            isOnAnotherCall: s.uri.queryParameters['isOnAnotherCall'] == 'true',
+            hasDoNotDisturb: s.uri.queryParameters['hasDnd'] == 'true',
+          ),
+          feature: 'Calls',
         ),
       ),
       GoRoute(
         path: '/chat/call-busy',
-        builder: (c, s) => BusyUnavailableScreen(
-          recipientName: s.uri.queryParameters['recipientName'] ?? 'Someone',
-          isOnAnotherCall: s.uri.queryParameters['isOnAnotherCall'] == 'true',
-          hasDoNotDisturb: s.uri.queryParameters['hasDnd'] == 'true',
+        builder: gated(
+          kShowCalls,
+          (c, s) => BusyUnavailableScreen(
+            recipientName: s.uri.queryParameters['recipientName'] ?? 'Someone',
+            isOnAnotherCall: s.uri.queryParameters['isOnAnotherCall'] == 'true',
+            hasDoNotDisturb: s.uri.queryParameters['hasDnd'] == 'true',
+          ),
+          feature: 'Calls',
         ),
+      ),
+
+      // ── Legal documents (real content, EN/FR by app locale) ─────────────
+      GoRoute(
+        path: '/profile/privacy-policy',
+        builder: (c, s) => LegalDocumentScreen.privacyPolicyOf(c),
+      ),
+      GoRoute(
+        path: '/profile/terms',
+        builder: (c, s) => LegalDocumentScreen.termsOfServiceOf(c),
       ),
 
       // ── Profile settings (specific routes BEFORE parameterised :uid) ────
@@ -335,12 +411,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
           path: '/profile/privacy',
           builder: (c, s) => const PrivacySettingsScreen()),
-      GoRoute(
-          path: '/profile/privacy-policy',
-          builder: (c, s) => const PrivacyPolicyPage()),
-      GoRoute(
-          path: '/profile/terms',
-          builder: (c, s) => const TermsOfServicePage()),
+
 
       GoRoute(
           path: '/profile/blocked',
@@ -388,37 +459,80 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         ],
       ),
 
-      // ── Premium ─────────────────────────────────────────────────────────
-      GoRoute(
-          path: '/premium', builder: (c, s) => const PremiumCheckoutScreen()),
-      GoRoute(
-          path: '/premium/boost', builder: (c, s) => const BoostTimerScreen()),
-      GoRoute(path: '/premium/plans', builder: (c, s) => const PlansScreen()),
-      GoRoute(
-          path: '/premium/gate', builder: (c, s) => const FeatureGateScreen()),
-      GoRoute(
+      // ── Premium (gated) ─────────────────────────────────────────────────
+      if (kShowPremium) ...[
+        GoRoute(
+            path: '/premium', builder: (c, s) => const PremiumCheckoutScreen()),
+        GoRoute(
+            path: '/premium/boost', builder: (c, s) => const BoostTimerScreen()),
+        GoRoute(
+            path: '/premium/plans', builder: (c, s) => const PlansScreen()),
+        GoRoute(
+            path: '/premium/gate', builder: (c, s) => const FeatureGateScreen()),
+        GoRoute(
+            path: '/premium/payment',
+            builder: (c, s) => const PaymentProcessingScreen()),
+        GoRoute(
+            path: '/premium/failed',
+            builder: (c, s) => const PaymentFailedScreen()),
+        GoRoute(
+            path: '/premium/history',
+            builder: (c, s) => const PurchaseHistoryScreen()),
+        GoRoute(
+            path: '/premium/success',
+            builder: (c, s) => const BoostSuccessScreen()),
+        GoRoute(
+            path: '/premium/boost-timer',
+            builder: (c, s) => const BoostTimerScreen()),
+      ] else ...[
+        GoRoute(
+          path: '/premium',
+          builder: (c, s) => const ComingSoonScreen(feature: 'Premium'),
+        ),
+        GoRoute(
+          path: '/premium/boost',
+          builder: (c, s) => const ComingSoonScreen(feature: 'Boosts'),
+        ),
+        GoRoute(
+          path: '/premium/plans',
+          builder: (c, s) => const ComingSoonScreen(feature: 'Premium plans'),
+        ),
+        GoRoute(
+          path: '/premium/gate',
+          builder: (c, s) => const ComingSoonScreen(feature: 'Premium'),
+        ),
+        GoRoute(
           path: '/premium/payment',
-          builder: (c, s) => const PaymentProcessingScreen()),
-      GoRoute(
+          builder: (c, s) => const ComingSoonScreen(feature: 'Payments'),
+        ),
+        GoRoute(
           path: '/premium/failed',
-          builder: (c, s) => const PaymentFailedScreen()),
-      GoRoute(
+          builder: (c, s) => const ComingSoonScreen(feature: 'Payments'),
+        ),
+        GoRoute(
           path: '/premium/history',
-          builder: (c, s) => const PurchaseHistoryScreen()),
-      GoRoute(
+          builder: (c, s) => const ComingSoonScreen(feature: 'Purchase history'),
+        ),
+        GoRoute(
           path: '/premium/success',
-          builder: (c, s) => const BoostSuccessScreen()),
-      GoRoute(
+          builder: (c, s) => const ComingSoonScreen(feature: 'Boosts'),
+        ),
+        GoRoute(
           path: '/premium/boost-timer',
-          builder: (c, s) => const BoostTimerScreen()),
+          builder: (c, s) => const ComingSoonScreen(feature: 'Boosts'),
+        ),
+      ],
 
       // ── Safety ──────────────────────────────────────────────────────────
       GoRoute(path: '/safety', builder: (c, s) => const SafetyCenterScreen()),
       GoRoute(
-          path: '/safety/sos', builder: (c, s) => const EmergencySosScreen()),
+          path: '/safety/sos',
+          builder: gated(kShowSos, (c, s) => const EmergencySosScreen(),
+              feature: 'Emergency SOS')),
       GoRoute(
           path: '/safety/contacts',
-          builder: (c, s) => const EmergencySosScreen()),
+          builder: gated(kShowSos, (c, s) => const EmergencySosScreen(),
+              feature: 'Emergency contacts')),
       GoRoute(
         path: '/safety/report/:uid',
         builder: (c, s) => ReportUserScreen(
@@ -428,11 +542,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(
-          path: '/safety/block/:uid',
-          builder: (c, s) => const BlockedUsersScreen()),
-      GoRoute(
           path: '/safety/id-verification',
-          builder: (c, s) => const IdVerificationScreen()),
+          builder: gated(kShowIdVerification,
+              (c, s) => const IdVerificationScreen(),
+              feature: 'ID verification')),
       GoRoute(
           path: '/safety/moderation-appeal',
           builder: (c, s) => const ModerationAppealScreen()),
@@ -442,7 +555,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
 
       // ── Location ────────────────────────────────────────────────────────
       GoRoute(
-          path: '/location/nearby', builder: (c, s) => const NearbyMapScreen()),
+          path: '/location/nearby',
+          builder: gated(kShowNearbyMap, (c, s) => const NearbyMapScreen(),
+              feature: 'The nearby map')),
       GoRoute(
           path: '/location/rationale',
           builder: (c, s) => const LocationRationaleScreen()),
@@ -472,7 +587,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/whats-new', builder: (c, s) => const WhatsNewScreen()),
       GoRoute(
           path: '/refer',
-          builder: (c, s) => const core_refer.ReferFriendsScreen()),
+          builder: (c, s) => const profile_refer.ReferFriendsScreen()),
       GoRoute(
           path: '/reengagement',
           builder: (c, s) => const ReengagementNudgeScreen()),
@@ -482,6 +597,19 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
+
+/// Wraps a route builder so unfinished features render an honest
+/// "Coming soon" screen in release builds instead of a non-functional UI.
+/// Play's Deceptive Behaviour policy treats sham features as grounds for
+/// removal, and users rate them 1 star.
+GoRouterWidgetBuilder gated(
+  bool enabled,
+  GoRouterWidgetBuilder real, {
+  String feature = 'This feature',
+}) {
+  if (enabled) return real;
+  return (context, state) => ComingSoonScreen(feature: feature);
+}
 
 // ── Bottom-nav shell ────────────────────────────────────────────────────────
 
@@ -514,6 +642,69 @@ class ScaffoldWithBottomNav extends ConsumerWidget {
         onTap: (i) {
           if (i >= 0 && i < _tabs.length) context.go(_tabs[i]);
         },
+      ),
+    );
+  }
+}
+
+/// Friendly fallback for unknown routes and navigation errors.
+///
+/// GoRouter throws a hard exception without an `errorBuilder`, which surfaces
+/// as a red error screen in release builds — a crash users one-star and Play
+/// flags as instability.
+class RouteErrorScreen extends StatelessWidget {
+  const RouteErrorScreen({super.key, required this.title, required this.message});
+
+  final String title;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final canGoBack = Navigator.of(context).canPop();
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.explore_off_rounded,
+                size: 64,
+                color: Theme.of(context).colorScheme.outline,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                title,
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineSmall
+                    ?.copyWith(fontWeight: FontWeight.w800),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                message,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              if (canGoBack)
+                OutlinedButton(
+                  onPressed: () => context.pop(),
+                  child: const Text('Go back'),
+                ),
+              if (canGoBack) const SizedBox(height: 12),
+              FilledButton(
+                onPressed: () => context.go('/'),
+                child: const Text('Back to start'),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

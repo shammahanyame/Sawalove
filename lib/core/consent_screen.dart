@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sawalove/core/consent_notifier.dart';
 import 'package:sawalove/core/theme/theme.dart';
 
@@ -49,7 +50,10 @@ class ConsentScreen extends ConsumerWidget {
                   summary: 'Age 18+, no impersonation/harassment, Cameroon law applies.',
                   pdfUrl: 'https://sawalove.com/tos.pdf',
                   icon: Icons.description,
-                  onExpand: () => ref.read(consentProvider.notifier).openTos(),
+                  onExpand: () {
+                    ref.read(consentProvider.notifier).openTos();
+                    context.push('/profile/terms');
+                  },
                   isRead: consent.hasOpenedTos,
                 ),
                 const SizedBox(height: 16),
@@ -60,7 +64,10 @@ class ConsentScreen extends ConsumerWidget {
                   summary: 'No data sold, city-level location only, right to delete.',
                   pdfUrl: 'https://sawalove.com/privacy.pdf',
                   icon: Icons.security,
-                  onExpand: () => ref.read(consentProvider.notifier).openPrivacy(),
+                  onExpand: () {
+                    ref.read(consentProvider.notifier).openPrivacy();
+                    context.push('/profile/privacy-policy');
+                  },
                   isRead: consent.hasOpenedPP,
                 ),
                 const SizedBox(height: 16),

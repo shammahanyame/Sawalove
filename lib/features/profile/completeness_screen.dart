@@ -3,15 +3,65 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sawalove/core/theme/theme.dart';
 import 'package:sawalove/shared/providers/completeness_provider.dart';
-import 'package:sawalove/shared/providers/user_provider.dart';
+import 'package:sawalove/shared/services/backend_service.dart';
 import 'widgets/progress_ring_painter.dart';
 
-class ProfileCompletenessScreen extends ConsumerWidget {
+class ProfileCompletenessScreen extends ConsumerStatefulWidget {
   const ProfileCompletenessScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final userAsync = ref.watch(userProvider);
+  ConsumerState<ProfileCompletenessScreen> createState() =>
+      _ProfileCompletenessScreenState();
+}
+
+class _ProfileCompletenessScreenState
+    extends ConsumerState<ProfileCompletenessScreen> {
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  /// Computes the score from the signed-in user's REAL profile instead of
+  /// the old `{'uid': ...}` stub, which always rendered everything
+  /// incomplete no matter how complete the profile actually was.
+  Future<void> _load() async {
+    final backend = ref.read(backendServiceProvider);
+    if (!backend.isConfigured || !backend.isSignedIn) {
+      if (mounted) setState(() => _loading = false);
+      return;
+    }
+    try {
+      final profile = await backend.getUserProfile(backend.currentUserId!);
+      if (profile != null) {
+        final prefs = profile['preferences'];
+        final photo = (profile['photo'] ?? '').toString();
+        final bio = (profile['bio'] ?? '').toString();
+        final intent = (profile['intent'] ?? '').toString();
+        final village = (profile['village'] ?? '').toString();
+        final phone = (profile['phone'] ?? '').toString();
+        ref.read(completenessProvider.notifier).computeFromUser({
+          'photos': [if (photo.isNotEmpty) photo],
+          // No server-side photo verification exists yet — never claim it.
+          'isPhotoVerified': false,
+          'bio': bio == 'New to SawaLove.' ? '' : bio,
+          'phoneVerified': phone.isNotEmpty,
+          'intents': [if (intent.isNotEmpty) intent],
+          'religion': prefs is Map ? prefs['religion'] : null,
+          'preferences': prefs,
+          'tribeRegion': village.isEmpty ? null : village,
+        });
+      }
+    } catch (_) {
+      // Score is a convenience; keep the previous state on failure.
+    }
+    if (mounted) setState(() => _loading = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final completenessState = ref.watch(completenessProvider);
 
     return Scaffold(
@@ -22,20 +72,9 @@ class ProfileCompletenessScreen extends ConsumerWidget {
         elevation: 0,
         foregroundColor: SawaLoveTheme.onSurface,
       ),
-      body: userAsync.when(
-        data: (user) {
-          if (user == null) {
-            return const Center(child: Text('No user data'));
-          }
-          // Compute completeness from user data
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            ref.read(completenessProvider.notifier).computeFromUser({'uid': user.uid});
-          });
-          return _buildContent(context, ref, completenessState);
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('Error: $error')),
-      ),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : _buildContent(context, ref, completenessState),
     );
   }
 
@@ -136,7 +175,7 @@ class ProfileCompletenessScreen extends ConsumerWidget {
 
           // Milestones
           Text(
-            'Milestone Rewards',
+            'Milestones',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 16),
@@ -155,14 +194,6 @@ class ProfileCompletenessScreen extends ConsumerWidget {
               },
             ),
           ),
-
-          // Reward banners
-          ...state.milestones
-              .where((m) => m.unlocked && !m.claimed)
-              .map((milestone) => Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: _rewardBanner(context, ref, milestone),
-                  )),
 
           const SizedBox(height: 40),
         ],
@@ -315,48 +346,4 @@ class ProfileCompletenessScreen extends ConsumerWidget {
     );
   }
 
-  Widget _rewardBanner(BuildContext context, WidgetRef ref, Milestone milestone) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [milestone.color.withValues(alpha: 0.15), milestone.color.withValues(alpha: 0.05)],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: milestone.color.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.emoji_events, color: milestone.color, size: 24),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  milestone.title,
-                  style: TextStyle(fontWeight: FontWeight.w600, color: milestone.color),
-                ),
-                Text(
-                  'Tap to claim your reward',
-                  style: TextStyle(fontSize: 12, color: milestone.color.withValues(alpha: 0.7)),
-                ),
-              ],
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () =>
-                ref.read(completenessProvider.notifier).claimReward(milestone.threshold),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: milestone.color,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            ),
-            child: const Text('Claim', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
-  }
 }

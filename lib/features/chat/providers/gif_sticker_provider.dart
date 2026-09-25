@@ -1,121 +1,37 @@
-import 'dart:async';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../models/gif_result.dart';
 import '../models/sticker.dart';
 import '../models/sticker_pack.dart';
 
-enum PickerTab { gif, sticker }
-
-const _noSelectedChipChange = Object();
-
+/// Offline sticker state. The GIF half of the picker was removed: it had no
+/// provider or API key behind it, so it could only ever render an empty grid.
 class GifStickerState {
-  final PickerTab currentTab;
-  final String query;
-  final bool isLoading;
-  final List<GifResult> gifs;
   final List<StickerPack> packs;
   final int selectedPackIndex;
-  final List<String> trendingChips;
-  final String? selectedChip;
 
   const GifStickerState({
-    this.currentTab = PickerTab.gif,
-    this.query = '',
-    this.isLoading = false,
-    this.gifs = const [],
     this.packs = const [],
     this.selectedPackIndex = 0,
-    this.trendingChips = const [
-      'Trending',
-      'Funny',
-      'Love',
-      'Dance',
-      'African',
-      'Party',
-      'Crying',
-      'Strong',
-    ],
-    this.selectedChip,
   });
 
   GifStickerState copyWith({
-    PickerTab? currentTab,
-    String? query,
-    bool? isLoading,
-    List<GifResult>? gifs,
     List<StickerPack>? packs,
     int? selectedPackIndex,
-    Object? selectedChip = _noSelectedChipChange,
   }) {
     return GifStickerState(
-      currentTab: currentTab ?? this.currentTab,
-      query: query ?? this.query,
-      isLoading: isLoading ?? this.isLoading,
-      gifs: gifs ?? this.gifs,
       packs: packs ?? this.packs,
       selectedPackIndex: selectedPackIndex ?? this.selectedPackIndex,
-      selectedChip: identical(selectedChip, _noSelectedChipChange)
-          ? this.selectedChip
-          : selectedChip as String?,
     );
   }
 }
 
 class GifStickerNotifier extends StateNotifier<GifStickerState> {
-  GifStickerNotifier(this.ref) : super(const GifStickerState()) {
+  GifStickerNotifier() : super(const GifStickerState()) {
     loadStickerPacks();
-    loadTrendingGifs();
-  }
-
-  final Ref ref;
-  Timer? _debounceTimer;
-
-  void switchTab(PickerTab tab) {
-    state = state.copyWith(currentTab: tab);
-  }
-
-  void onQueryChanged(String query) {
-    _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(milliseconds: 400), () {
-      state = state.copyWith(query: query, selectedChip: null);
-      if (query.trim().isNotEmpty) {
-        searchGifs(query.trim());
-      } else {
-        loadTrendingGifs();
-      }
-    });
-  }
-
-  Future<void> searchGifs(String query) async {
-    state = state.copyWith(isLoading: true);
-    try {
-      state = state.copyWith(gifs: const [], isLoading: false);
-    } catch (_) {
-      state = state.copyWith(isLoading: false);
-    }
-  }
-
-  Future<void> loadTrendingGifs() async {
-    await searchGifs('');
   }
 
   Future<void> loadStickerPacks() async {
-    try {
-      state = state.copyWith(packs: _defaultPacks());
-    } catch (_) {
-      state = state.copyWith(packs: _defaultPacks());
-    }
-  }
-
-  void selectChip(String? chip) {
-    state = state.copyWith(selectedChip: chip);
-    if (chip == null) {
-      loadTrendingGifs();
-    } else {
-      searchGifs(chip);
-    }
+    state = state.copyWith(packs: _defaultPacks());
   }
 
   void selectPack(int index) {
@@ -274,14 +190,9 @@ class GifStickerNotifier extends StateNotifier<GifStickerState> {
     return const [popular, love, cameroon];
   }
 
-  @override
-  void dispose() {
-    _debounceTimer?.cancel();
-    super.dispose();
-  }
 }
 
 final gifStickerProvider =
     StateNotifierProvider<GifStickerNotifier, GifStickerState>((ref) {
-  return GifStickerNotifier(ref);
+  return GifStickerNotifier();
 });

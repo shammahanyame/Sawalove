@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sawalove/l10n/app_localizations.dart';
+import 'package:sawalove/l10n/app_localizations_en.dart';
+import 'package:sawalove/l10n/app_localizations_fr.dart';
 import '../../shared/services/backend_service.dart';
 
 class ReportUserScreen extends ConsumerStatefulWidget {
@@ -20,31 +23,71 @@ class ReportUserScreen extends ConsumerStatefulWidget {
 }
 
 class _ReportUserScreenState extends ConsumerState<ReportUserScreen> {
-  String? _selectedReason;
-  bool _submitting = false;
+  /// Locale-independent reason keys. Selection state and the mapping to the
+  /// server enum use these — never display labels, which change with the
+  /// app language (the old code keyed on English labels, so a French caller
+  /// such as the photo viewer silently failed to submit).
+  static const String _keyInappropriate = 'inappropriate';
+  static const String _keySpam = 'spam';
+  static const String _keyHarassment = 'harassment';
+  static const String _keyUnderage = 'underage';
+  static const String _keyOther = 'other';
 
-  /// UI labels → the server's report reason enum. 'Underage' has no dedicated
-  /// server category, so it files as 'other' with the concern spelled out in
-  /// details — moderation triage reads the note.
-  static const Map<String, String> _reasonApiKeys = {
-    'Inappropriate content': 'inappropriate_photos',
-    'Spam or fake profile': 'fake_profile',
-    'Harassment': 'harassment',
-    'Underage': 'other',
-    'Other': 'other',
+  /// Reason key → the server's report reason enum. 'Underage' has no
+  /// dedicated server category, so it files as 'other' with the concern
+  /// spelled out in details — moderation triage reads the note.
+  static const Map<String, String> _apiReasonByKey = {
+    _keyInappropriate: 'inappropriate_photos',
+    _keySpam: 'fake_profile',
+    _keyHarassment: 'harassment',
+    _keyUnderage: 'other',
+    _keyOther: 'other',
   };
 
-  String? _apiReason(String? label) {
-    if (label == null) return null;
-    final key = _reasonApiKeys[label];
-    if (key == null) return null;
-    if (label == 'Underage') return 'other';
-    return key;
+  String? _selectedKey;
+  bool _submitting = false;
+  bool _initialReasonMapped = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_initialReasonMapped) return;
+    _initialReasonMapped = true;
+    final raw = widget.initialReason?.trim();
+    if (_selectedKey == null && raw != null && raw.isNotEmpty) {
+      _selectedKey = _keyForLabel(raw);
+    }
   }
 
-  String? _detailsFor(String label) {
+  /// Maps a display label (localized by the caller, e.g. the photo viewer,
+  /// or the legacy hardcoded English) back to a reason key. Both generated
+  /// locales are consulted so the mapping survives locale mismatches.
+  String? _keyForLabel(String label) {
+    final en = AppLocalizationsEn();
+    final fr = AppLocalizationsFr();
+    final table = <String, String>{
+      en.reportReasonInappropriate: _keyInappropriate,
+      fr.reportReasonInappropriate: _keyInappropriate,
+      'Inappropriate content': _keyInappropriate,
+      en.reportReasonSpam: _keySpam,
+      fr.reportReasonSpam: _keySpam,
+      'Spam or fake profile': _keySpam,
+      en.reportReasonHarassment: _keyHarassment,
+      fr.reportReasonHarassment: _keyHarassment,
+      'Harassment': _keyHarassment,
+      en.reportReasonUnderage: _keyUnderage,
+      fr.reportReasonUnderage: _keyUnderage,
+      'Underage': _keyUnderage,
+      en.reportReasonOther: _keyOther,
+      fr.reportReasonOther: _keyOther,
+      'Other': _keyOther,
+    };
+    return table[label];
+  }
+
+  String? _detailsFor(String key) {
     final parts = <String>[
-      if (label == 'Underage') 'Underage concern.',
+      if (key == _keyUnderage) 'Underage concern.',
       if (widget.photoUrl != null && widget.photoUrl!.isNotEmpty)
         'Reported from a photo.',
     ];
@@ -52,15 +95,18 @@ class _ReportUserScreenState extends ConsumerState<ReportUserScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _selectedReason = widget.initialReason;
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isPhotoReport =
         widget.photoUrl != null && widget.photoUrl!.isNotEmpty;
+
+    final options = <(String, IconData, String)>[
+      (_keyInappropriate, Icons.image, l10n.reportReasonInappropriate),
+      (_keySpam, Icons.block, l10n.reportReasonSpam),
+      (_keyHarassment, Icons.warning, l10n.reportReasonHarassment),
+      (_keyUnderage, Icons.child_care, l10n.reportReasonUnderage),
+      (_keyOther, Icons.more_horiz, l10n.reportReasonOther),
+    ];
 
     return Scaffold(
       appBar:
@@ -91,44 +137,21 @@ class _ReportUserScreenState extends ConsumerState<ReportUserScreen> {
             Expanded(
               child: ListView(
                 children: [
-                  _ReportOption(
-                    reason: 'Inappropriate content',
-                    icon: Icons.image,
-                    selected: _selectedReason == 'Inappropriate content',
-                    onTap: () => _selectReason('Inappropriate content'),
-                  ),
-                  _ReportOption(
-                    reason: 'Spam or fake profile',
-                    icon: Icons.block,
-                    selected: _selectedReason == 'Spam or fake profile',
-                    onTap: () => _selectReason('Spam or fake profile'),
-                  ),
-                  _ReportOption(
-                    reason: 'Harassment',
-                    icon: Icons.warning,
-                    selected: _selectedReason == 'Harassment',
-                    onTap: () => _selectReason('Harassment'),
-                  ),
-                  _ReportOption(
-                    reason: 'Underage',
-                    icon: Icons.child_care,
-                    selected: _selectedReason == 'Underage',
-                    onTap: () => _selectReason('Underage'),
-                  ),
-                  _ReportOption(
-                    reason: 'Other',
-                    icon: Icons.more_horiz,
-                    selected: _selectedReason == 'Other',
-                    onTap: () => _selectReason('Other'),
-                  ),
+                  for (final (key, icon, label) in options)
+                    _ReportOption(
+                      reason: label,
+                      icon: icon,
+                      selected: _selectedKey == key,
+                      onTap: () => _selectReason(key),
+                    ),
                 ],
               ),
             ),
-              SizedBox(
+            SizedBox(
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed: _selectedReason == null || _submitting
+                onPressed: _selectedKey == null || _submitting
                     ? null
                     : _submitReport,
                 child: _submitting
@@ -146,15 +169,22 @@ class _ReportUserScreenState extends ConsumerState<ReportUserScreen> {
     );
   }
 
-  void _selectReason(String reason) {
-    setState(() => _selectedReason = reason);
+  void _selectReason(String key) {
+    setState(() => _selectedKey = key);
   }
 
   Future<void> _submitReport() async {
-    final label = _selectedReason;
-    if (label == null || _submitting) return;
-    final apiReason = _apiReason(label);
-    if (apiReason == null) return;
+    final key = _selectedKey;
+    if (key == null || _submitting) return;
+    final apiReason = _apiReasonByKey[key];
+    if (apiReason == null) {
+      // Defensive: keys only ever come from the list above.
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Choose a reason first.')),
+      );
+      return;
+    }
 
     // Preview/demo contexts render this screen with no target uid; there is
     // nothing real to file, so keep the legacy confirmation behavior.
@@ -175,7 +205,7 @@ class _ReportUserScreenState extends ConsumerState<ReportUserScreen> {
           .submitReport(
             reportedUserId: uid,
             reason: apiReason,
-            details: _detailsFor(label),
+            details: _detailsFor(key),
           );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

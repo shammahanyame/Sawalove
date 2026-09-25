@@ -13,14 +13,17 @@ import 'package:sawalove/core/theme/theme.dart';
 import 'package:sawalove/features/chat/chat_list_screen.dart';
 import 'package:sawalove/shared/models/inbox_item.dart';
 import 'package:sawalove/shared/providers/inbox_provider.dart';
+import 'package:sawalove/shared/services/backend_service.dart';
 import 'package:sawalove/shared/widgets/glass_bottom_nav.dart';
 import 'package:sawalove/shared/widgets/pressable_scale.dart';
 
 /// InboxNotifier whose initial empty stream can be overridden by seeding
 /// [state] after the first pump (the base constructor loads an empty list).
 class _FakeInboxNotifier extends InboxNotifier {
-  _FakeInboxNotifier() : super(InboxRepository(), '');
+  _FakeInboxNotifier() : super(InboxRepository(_FakeBackend()));
 }
+
+class _FakeBackend extends BackendService {}
 
 void main() {
   // Tests must not hit the network for font files; assertions on size,

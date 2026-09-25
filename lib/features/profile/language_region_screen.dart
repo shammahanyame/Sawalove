@@ -173,8 +173,8 @@ class _LanguageRegionScreenState extends ConsumerState<LanguageRegionScreen> {
                             const SizedBox(height: 12),
                             Text(
                               _languageCode == 'fr'
-                                  ? 'Bonjour Amaka! Bienvenue sur SawaLove.'
-                                  : 'Hello Amaka! Welcome to SawaLove.',
+                                  ? 'Bonjour ! Bienvenue sur SawaLove.'
+                                  : 'Hello! Welcome to SawaLove.',
                               style: Theme.of(context).textTheme.bodyMedium,
                             ),
                           ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sawalove/shared/widgets/pressable_scale.dart';
+import 'package:sawalove/core/config/feature_flags.dart';
 
 class ExploreScreen extends StatelessWidget {
   const ExploreScreen({super.key});
@@ -33,6 +34,15 @@ class ExploreScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text('Choose your mode', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 12),
+                  Text(
+                    // Modes are a future feature; until they filter anything,
+                    // the copy must not imply tapping will change results.
+                    kShipCompleteFeaturesOnly
+                        ? 'Modes are coming soon. For now, use the filters on the Discover tab to tune who you see.'
+                        : 'Select a mode to filter profiles.',
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  ),
                   const SizedBox(height: 24),
                   GridView.builder(
                     shrinkWrap: true,
@@ -47,9 +57,11 @@ class ExploreScreen extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final mode = modes[index];
                       return PressableScale(
-                        onTap: () {
-                          // Filter profiles by mode
-                        },
+                        onTap: kShipCompleteFeaturesOnly
+                            ? null // No-op UI reads as broken; disabled until real.
+                            : () {
+                                // Filter profiles by mode
+                              },
                         child: Container(
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.surfaceContainerLow,
@@ -61,7 +73,13 @@ class ExploreScreen extends StatelessWidget {
                               Icon(Icons.people, size: 48, color: Theme.of(context).primaryColor),
                               const SizedBox(height: 12),
                               Text(mode, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                              Text('Find $mode connections', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                              Text(
+                                kShipCompleteFeaturesOnly
+                                    ? 'Coming soon'
+                                    : 'Find $mode connections',
+                                style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                                textAlign: TextAlign.center,
+                              ),
                             ],
                           ),
                         ),
@@ -77,4 +95,3 @@ class ExploreScreen extends StatelessWidget {
     );
   }
 }
-

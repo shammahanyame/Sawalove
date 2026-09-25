@@ -61,6 +61,16 @@ if (validatesReleaseApiConfig) {
     require(!apiBaseUrl.contains("10.0.2.2")) {
         "API_BASE_URL must point to a public HTTPS API, not an emulator host."
     }
+
+    // Play policy guards: a release bundle must not ship unfinished feature
+    // stubs or a non-Play-Billing payments flow. See lib/core/config/feature_flags.dart.
+    require(dartDefines["SHIP_COMPLETE_FEATURES_ONLY"] != "false") {
+        "SHIP_COMPLETE_FEATURES_ONLY=false is not allowed for a release App Bundle."
+    }
+    require(dartDefines["SHOW_PREMIUM"] != "true") {
+        "SHOW_PREMIUM=true is not allowed for a release App Bundle until " +
+            "Google Play Billing replaces the Mobile Money checkout."
+    }
 }
 
 android {

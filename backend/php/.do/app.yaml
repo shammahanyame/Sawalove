@@ -36,8 +36,11 @@ databases:
 services:
   - name: sawalove-api
     http_port: 8080
+    # dockerfile_path is relative to the repo root; source_dir is the Docker
+    # BUILD CONTEXT (per DO's app-spec reference), so it must point at the
+    # directory the Dockerfile's COPY instructions use (public/, src/).
     dockerfile_path: backend/php/Dockerfile
-    source_dir: /
+    source_dir: backend/php
     instance_count: 1
     instance_size_slug: basic-xxs
     health_check:

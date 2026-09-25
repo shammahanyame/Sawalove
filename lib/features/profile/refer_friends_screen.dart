@@ -2,6 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../core/theme/theme.dart';
 
+/// Invite friends — copies a real, verifiable invite message to the
+/// clipboard.
+///
+/// The previous version invented a referral code the backend never
+/// validates, fake "active referrals", and promised Premium rewards that
+/// are never granted — all Play Deceptive Behaviour violations. There is no
+/// referral attribution backend yet, so this screen shares an honest invite
+/// link and promises nothing it cannot deliver.
 class ReferFriendsScreen extends StatefulWidget {
   const ReferFriendsScreen({super.key});
 
@@ -10,13 +18,22 @@ class ReferFriendsScreen extends StatefulWidget {
 }
 
 class _ReferFriendsScreenState extends State<ReferFriendsScreen> {
-  final String _referralCode = 'SAWA${DateTime.now().millisecondsSinceEpoch.toRadixString(36).toUpperCase().substring(0, 6)}';
-  
-  final List<Map<String, String>> _referrals = [
-    {'friend': 'Pierre M.', 'status': 'Active', 'reward': '7 days Premium'},
-    {'friend': 'Sarah K.', 'status': 'Pending', 'reward': 'Pending'},
-    {'friend': 'David B.', 'status': 'Active', 'reward': '3 days Premium'},
-  ];
+  static const String _packageName = 'com.shammah.sawalove';
+  static const String _storeUrl =
+      'https://play.google.com/store/apps/details?id=$_packageName';
+
+  String get _inviteMessage =>
+      'Meet me on SawaLove — dating app for Cameroon! $_storeUrl';
+
+  Future<void> _copyInvite() async {
+    await Clipboard.setData(ClipboardData(text: _inviteMessage));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Invite copied — paste it into WhatsApp or SMS.'),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +49,6 @@ class _ReferFriendsScreenState extends State<ReferFriendsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Your referral code
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(24),
@@ -40,120 +56,59 @@ class _ReferFriendsScreenState extends State<ReferFriendsScreen> {
                     children: [
                       const Row(
                         children: [
-                          Icon(Icons.card_giftcard, color: SawaLoveTheme.primary, size: 28),
+                          Icon(Icons.card_giftcard,
+                              color: SawaLoveTheme.primary, size: 28),
                           SizedBox(width: 12),
-                          Text('Your Referral Code', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18)),
+                          Expanded(
+                            child: Text(
+                              'Invite your friends',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w700, fontSize: 18),
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              _referralCode,
-                              style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, letterSpacing: 4),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.copy),
-                            onPressed: () {
-                              Clipboard.setData(ClipboardData(text: _referralCode));
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Code copied!')),
-                              );
-                            },
-                          ),
-                        ],
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: SawaLoveTheme.surfaceContainerLow,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          _inviteMessage,
+                          style: const TextStyle(fontSize: 14, height: 1.4),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                      const SizedBox(height: 12),
-                      Text('Share this code: "Join SawaLove with $_referralCode for free Super Likes!"'),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.copy),
+                          label: const Text('Copy invite'),
+                          onPressed: _copyInvite,
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 24),
-              // Share buttons
-              const Text('Invite your friends:', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      icon: const Icon(Icons.message),
-                      label: const Text('WhatsApp'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF25D366),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      onPressed: () {
-                        // Mock share
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('WhatsApp share: "Join SawaLove with $_referralCode"')),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.sms),
-                    label: const Text('SMS'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: SawaLoveTheme.tertiary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-                    ),
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('SMS sent with referral code')),
-                      );
-                    },
-                  ),
-                ],
+              Text(
+                'How it works',
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.w700),
               ),
-              const SizedBox(height: 32),
-              // Rewards tracker
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Row(
-                      children: [
-                        Icon(Icons.star, color: SawaLoveTheme.warning, size: 28),
-                        SizedBox(width: 12),
-                        Text('Rewards (3 active referrals)', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Expanded(
-                      child: ListView.separated(
-                        itemCount: _referrals.length,
-                        separatorBuilder: (context, index) => const SizedBox(height: 12),
-                        itemBuilder: (context, index) {
-                          final referral = _referrals[index];
-                          final statusColor = referral['status'] == 'Active' ? SawaLoveTheme.success : SawaLoveTheme.warning;
-                          return Card(
-                            child: ListTile(
-                              leading: CircleAvatar(
-                                backgroundColor: statusColor.withValues(alpha: 0.2),
-                                child: Icon(Icons.person, color: statusColor),
-                              ),
-                              title: Text(referral['friend']!),
-                              subtitle: Text('${referral['status']} • ${referral['reward']}'),
-                              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                              onTap: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Reward details: ${referral['reward']}')),
-                                );
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
+              const SizedBox(height: 8),
+              const Text(
+                'Copy the invite above and send it to a friend. Once they '
+                'install SawaLove from the link, you can start matching — '
+                'no codes needed.',
+                style: TextStyle(color: SawaLoveTheme.onSurfaceVariant),
               ),
             ],
           ),
@@ -162,4 +117,3 @@ class _ReferFriendsScreenState extends State<ReferFriendsScreen> {
     );
   }
 }
-

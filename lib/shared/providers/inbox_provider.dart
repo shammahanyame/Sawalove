@@ -1,51 +1,87 @@
 // lib/shared/providers/inbox_provider.dart
 
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sawalove/shared/services/firebase_service.dart';
+import 'package:sawalove/shared/services/backend_service.dart';
 
 import '../models/inbox_item.dart';
 
 final currentUserProvider = Provider<User?>((ref) {
-  return ref.watch(firebaseServiceProvider).currentUser;
+  return ref.watch(backendServiceProvider).currentUser;
 });
 
 final inboxRepositoryProvider = Provider<InboxRepository>((ref) {
-  return InboxRepository();
+  return InboxRepository(ref.watch(backendServiceProvider));
 });
 
+/// Talks to the PHP API (`GET /matches`, `DELETE /matches/{id}`).
 class InboxRepository {
-  Stream<List<InboxItem>> watchInbox(String uid) {
-    return Stream.value([]);
+  final BackendService _backend;
+
+  InboxRepository(this._backend);
+
+  Future<List<InboxItem>> fetchInbox() async {
+    final matches = await _backend.fetchMatches(limit: 30);
+    return [
+      for (final m in matches)
+        InboxItem(
+          matchId: m['id']?.toString() ?? '',
+          peerUid: m['user']?['id']?.toString() ?? '',
+          matchName: (m['user']?['name'] ?? 'Someone').toString(),
+          avatarUrl: m['user']?['photo']?.toString() ?? '',
+          isOnline: false,
+          isSuperLike: false,
+          isMuted: false,
+          isPinned: false,
+          unreadCount: 0,
+          messageCount: m['lastMessage'] == null ? 0 : 1,
+          lastMessagePreview:
+              m['lastMessage']?['body']?.toString() ?? 'Say hi 👋',
+          lastMessageAt: DateTime.tryParse(
+                  m['lastMessage']?['at']?.toString() ??
+                      m['matchedAt']?.toString() ??
+                      '') ??
+              DateTime.now(),
+          lastMessageFromMe: m['lastMessage']?['fromMe'] == true,
+          isTyping: false,
+          lastMessageIsVoiceNote: false,
+          lastMessageDuration: '',
+        ),
+    ];
   }
 
-  Future<void> markRead(String uid, String matchId) async {}
-
-  Future<void> deleteConversation(String uid, String matchId) async {}
-
-  Future<void> muteConversation(String uid, String matchId, bool mute) async {}
-
-  Future<void> pinConversation(String uid, String matchId, bool pin) async {}
-
-  Future<void> acceptRequest(String uid, String requestId) async {}
-
-  Future<void> declineRequest(String uid, String requestId) async {}
-
-  Future<void> undoDeclineRequest(String uid, String requestId) async {}
+  Future<void> unmatch(String matchId) => _backend.unmatch(matchId);
 }
 
 class InboxNotifier extends StateNotifier<AsyncValue<List<InboxItem>>> {
   final InboxRepository _repository;
-  final String _uid;
+  Timer? _pollTimer;
 
-  InboxNotifier(this._repository, this._uid) : super(const AsyncValue.loading()) {
-    _loadInbox();
+  InboxNotifier(this._repository) : super(const AsyncValue.loading()) {
+    _start();
   }
 
-  void _loadInbox() {
-    _repository.watchInbox(_uid).listen(
-          (items) => state = AsyncValue.data(items),
-          onError: (error, stack) => state = AsyncValue.error(error, stack),
-        );
+  void _start() {
+    _loadInbox();
+    _pollTimer = Timer.periodic(
+      const Duration(seconds: 15),
+      (_) => _loadInbox(silent: true),
+    );
+  }
+
+  Future<void> _loadInbox({bool silent = false}) async {
+    if (!silent) state = const AsyncValue.loading();
+    try {
+      final items = await _repository.fetchInbox();
+      if (!mounted) return;
+      state = AsyncValue.data(items);
+    } catch (error, stack) {
+      // Keep previous data on background refresh failures.
+      if (silent && state.hasValue) return;
+      if (!mounted) return;
+      state = AsyncValue.error(error, stack);
+    }
   }
 
   List<InboxItem> get filtered => state.valueOrNull ?? [];
@@ -55,79 +91,37 @@ class InboxNotifier extends StateNotifier<AsyncValue<List<InboxItem>>> {
     return items.fold(0, (sum, item) => sum + item.unreadCount);
   }
 
-  Future<void> markReadLocally(String matchId) async {
-    await _repository.markRead(_uid, matchId);
-  }
-
   Future<void> deleteConversation(String matchId) async {
-    await _repository.deleteConversation(_uid, matchId);
-  }
-
-  Future<void> toggleMute(String matchId) async {
+    // Optimistic removal, then best-effort server unmatch.
     final items = state.valueOrNull ?? [];
-    final item = items.firstWhere((i) => i.matchId == matchId);
-    await _repository.muteConversation(_uid, matchId, !item.isMuted);
-  }
-
-  Future<void> togglePin(String matchId) async {
-    final items = state.valueOrNull ?? [];
-    final item = items.firstWhere((i) => i.matchId == matchId);
-    await _repository.pinConversation(_uid, matchId, !item.isPinned);
-  }
-
-  Future<void> toggleReadStatus(String matchId) async {
-    final items = [...state.valueOrNull ?? <InboxItem>[]];
-    final index = items.indexWhere((item) => item.matchId == matchId);
-    if (index == -1) return;
-
-    final item = items[index];
-    items[index] = InboxItem(
-      matchId: item.matchId,
-      matchName: item.matchName,
-      avatarUrl: item.avatarUrl,
-      isOnline: item.isOnline,
-      isSuperLike: item.isSuperLike,
-      isMuted: item.isMuted,
-      isPinned: item.isPinned,
-      unreadCount: item.unreadCount > 0 ? 0 : 1,
-      messageCount: item.messageCount,
-      lastMessagePreview: item.lastMessagePreview,
-      lastMessageAt: item.lastMessageAt,
-      lastMessageFromMe: item.lastMessageFromMe,
-      isTyping: item.isTyping,
-      lastMessageIsVoiceNote: item.lastMessageIsVoiceNote,
-      lastMessageDuration: item.lastMessageDuration,
+    state = AsyncValue.data(
+      items.where((i) => i.matchId != matchId).toList(),
     );
-    state = AsyncValue.data(items);
+    try {
+      await _repository.unmatch(matchId);
+    } catch (_) {
+      await _loadInbox(silent: true);
+    }
   }
 
-  Future<void> acceptRequest(String requestId) async {
-    await _repository.acceptRequest(_uid, requestId);
-  }
+  Future<void> toggleMute(String matchId) async {}
+  Future<void> togglePin(String matchId) async {}
+  Future<void> toggleReadStatus(String matchId) async {}
+  Future<void> acceptRequest(String requestId) async {}
+  Future<void> declineRequest(String requestId) async {}
+  Future<void> undoDecline(String requestId) async {}
 
-  Future<void> declineRequest(String requestId) async {
-    await _repository.declineRequest(_uid, requestId);
-  }
-
-  Future<void> undoDecline(String requestId) async {
-    if (_uid.isEmpty) return;
-    await _repository.undoDeclineRequest(_uid, requestId);
+  @override
+  void dispose() {
+    _pollTimer?.cancel();
+    super.dispose();
   }
 }
 
 final inboxProvider =
     StateNotifierProvider<InboxNotifier, AsyncValue<List<InboxItem>>>((ref) {
-  final uid = ref.watch(currentUserProvider)?.uid;
-  if (uid == null) {
-    return _InboxNotifierStub();
-  }
-  final repository = ref.watch(inboxRepositoryProvider);
-  return InboxNotifier(repository, uid);
+  return InboxNotifier(ref.watch(inboxRepositoryProvider));
 });
-
-class _InboxNotifierStub extends InboxNotifier {
-  _InboxNotifierStub() : super(InboxRepository(), '');
-}
 
 final searchQueryProvider = StateProvider<String>((ref) => '');
 

@@ -47,7 +47,8 @@ class _LanguageSelectionScreenState
         widget.onSettingsChange?.call();
         context.pop();
       } else {
-        context.go('/login');
+        // First launch: confirm 18+ before any account is created.
+        context.go('/age-gate');
       }
     } catch (e) {
       if (!mounted) return;

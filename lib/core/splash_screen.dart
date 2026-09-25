@@ -96,8 +96,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   Future<void> _selectLanguage(String language) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('preferred_language', language);
-    await prefs.setBool('first_launch_done', true);
-    if (mounted) context.go('/login');
+    // first_launch_done is only set after the 18+ gate is passed.
+    if (mounted) context.go('/age-gate');
   }
 
   @override

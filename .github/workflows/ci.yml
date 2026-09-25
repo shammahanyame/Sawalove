@@ -1,7 +1,7 @@
 # SawaLove CI
 #
 # Backend: boots the real PHP API against a real MySQL 8 service container and
-# runs the full integration suite (55 assertions) plus the brute-force
+# runs the full integration suite (113 assertions) plus the brute-force
 # rate-limit enforcement test. See backend/php/tests/REGRESSIONS.md for the
 # security regressions these tests permanently guard.
 #
@@ -76,7 +76,7 @@ jobs:
           done
           echo "API failed to become healthy"; cat /tmp/api.log; exit 1
 
-      - name: Run integration suite (55 assertions)
+      - name: Run integration suite (113 assertions)
         working-directory: backend/php
         env:
           DB_DSN: "mysql:host=127.0.0.1;port=3307;dbname=sawalove_test"

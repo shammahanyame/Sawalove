@@ -36,8 +36,9 @@ doctl apps create --spec backend/php/.do/app.yaml
 
 Alternatively: dashboard → **Create App** → **Deploy from App Spec** and
 paste `backend/php/.do/app.yaml`, or click through the GitHub repo picker and
-set `dockerfile_path: backend/php/Dockerfile`, `http_port: 8080`, health
-check `/health`.
+set `dockerfile_path: backend/php/Dockerfile`, `source_dir: backend/php`
+(the Docker build context — COPY paths in the Dockerfile are relative to it),
+`http_port: 8080`, health check `/health`.
 
 ## 3. Import the database schema
 
@@ -51,7 +52,17 @@ mysql -h <DB_HOST> -P <DB_PORT> -u doadmin -p <DB_NAME> < backend/php/schema.sql
 mysql -h <DB_HOST> -P <DB_PORT> -u doadmin -p <DB_NAME> \
   -e "show tables; show events;"
 # expect: users, sessions, phone_otps, profile_photos, account_deletion_requests,
-#         data_export_requests, auth_rate_limits + 3 housekeeping events
+#         data_export_requests, auth_rate_limits, ai_usage, reports,
+#         moderation_actions, swipes, matches, messages, blocks, push_tokens
+#         + 6 housekeeping events
+# Existing databases: also apply migrations/ in order (001, 002, 003).
+```
+
+Already deployed an older schema? Re-importing is destructive; instead apply
+just the chat migration:
+
+```bash
+mysql -h <DB_HOST> -P <DB_PORT> -u doadmin -p <DB_NAME> < backend/php/migrations/001_chat_tables.sql
 ```
 
 ## 4. Set the real secrets (before launch)

@@ -1,33 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/theme/theme.dart';
+import '../../../shared/models/inbox_item.dart';
+import '../../../shared/providers/inbox_provider.dart';
+import '../matches/likes_matches_screen.dart';
 
-class NotificationCenterScreen extends StatefulWidget {
+/// Activity feed backed by real API data: incoming likes (`GET /likes`) and
+/// matches/conversations (`GET /matches`). The old version showed invented
+/// "Sarah K. liked your photo" entries — fabricated social activity, which
+/// Play's Deceptive Behaviour policy treats as grounds for removal.
+class NotificationCenterScreen extends ConsumerStatefulWidget {
   const NotificationCenterScreen({super.key});
 
   @override
-  State<NotificationCenterScreen> createState() => _NotificationCenterScreenState();
+  ConsumerState<NotificationCenterScreen> createState() =>
+      _NotificationCenterScreenState();
 }
 
-class _NotificationCenterScreenState extends State<NotificationCenterScreen> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  int _currentIndex = 0;
-
-  final List<Tab> _tabs = const [
-    Tab(icon: Icon(Icons.thumb_up), text: 'Likes'),
-    Tab(icon: Icon(Icons.favorite), text: 'Matches'),
-    Tab(icon: Icon(Icons.message), text: 'Messages'),
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: _tabs.length, vsync: this);
-    _tabController.addListener(() {
-      if (_tabController.indexIsChanging) {
-        setState(() => _currentIndex = _tabController.index);
-      }
-    });
-  }
+class _NotificationCenterScreenState
+    extends ConsumerState<NotificationCenterScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController =
+      TabController(length: 3, vsync: this);
 
   @override
   void dispose() {
@@ -35,62 +31,167 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> wit
     super.dispose();
   }
 
-  Widget _buildNotificationList() {
-    List<Map<String, String>> notifications = [];
+  String _timeAgo(DateTime time) {
+    final diff = DateTime.now().difference(time);
+    if (diff.inMinutes < 1) return 'now';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
+    if (diff.inHours < 24) return '${diff.inHours}h ago';
+    if (diff.inDays < 7) return '${diff.inDays}d ago';
+    return '${diff.inDays ~/ 7}w ago';
+  }
 
-    if (_currentIndex == 0) { // Likes
-      notifications = [
-        {'user': 'Sarah K.', 'time': '2h ago', 'type': 'liked your photo'},
-        {'user': 'David B.', 'time': '5h ago', 'type': 'liked you'},
-        {'user': 'Aminata', 'time': '1d ago', 'type': 'super liked'},
-      ];
-    } else if (_currentIndex == 1) { // Matches
-      notifications = [
-        {'user': 'Sarah K.', 'time': '3h ago', 'type': 'You matched! Say hello'},
-        {'user': 'Aminata', 'time': '1d ago', 'type': 'New match! Mutual like'},
-      ];
-    } else { // Messages
-      notifications = [
-        {'user': 'Sarah K.', 'time': '1m ago', 'type': 'New message: Hey! 👋'},
-        {'user': 'David B.', 'time': '4h ago', 'type': '2 new messages'},
-        {'user': 'Aminata', 'time': '6h ago', 'type': 'Replied to your photo'},
-      ];
-    }
-
-    return notifications.isEmpty
-        ? Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.notifications_off, size: 64, color: SawaLoveTheme.onSurfaceVariant),
-                const SizedBox(height: 16),
-                Text('No ${_tabs[_currentIndex].text}', style: Theme.of(context).textTheme.headlineSmall),
-                Text('Turn on notifications in settings', style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: SawaLoveTheme.onSurfaceVariant)),
-              ],
+  Widget _empty(String message) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.notifications_off,
+                size: 64, color: SawaLoveTheme.onSurfaceVariant),
+            const SizedBox(height: 16),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge
+                  ?.copyWith(color: SawaLoveTheme.onSurfaceVariant),
             ),
-          )
-        : ListView.separated(
-            itemCount: notifications.length,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _avatar(String photo, String name) {
+    return CircleAvatar(
+      backgroundColor: SawaLoveTheme.primary.withValues(alpha: 0.2),
+      foregroundImage:
+          photo.isEmpty ? null : CachedNetworkImageProvider(photo),
+      child: photo.isEmpty
+          ? Text(
+              name.isEmpty ? '?' : name.characters.first.toUpperCase(),
+              style: const TextStyle(
+                color: SawaLoveTheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            )
+          : null,
+    );
+  }
+
+  Widget _buildLikes() {
+    final likesAsync = ref.watch(incomingLikesProvider);
+    return likesAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, _) => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('Could not load likes.'),
+            const SizedBox(height: 12),
+            OutlinedButton(
+              onPressed: () => ref.invalidate(incomingLikesProvider),
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      ),
+      data: (likes) {
+        if (likes.isEmpty) return _empty('No new likes yet.');
+        return RefreshIndicator(
+          onRefresh: () async => ref.invalidate(incomingLikesProvider),
+          child: ListView.separated(
+            physics: const AlwaysScrollableScrollPhysics(),
+            itemCount: likes.length,
             separatorBuilder: (context, index) => const Divider(height: 1),
             itemBuilder: (context, index) {
-              final notif = notifications[index];
+              final profile = likes[index];
+              final uid = profile['id']?.toString() ?? '';
+              final name = profile['name']?.toString().trim() ?? '';
+              final displayName =
+                  name.isEmpty ? 'SawaLove user' : name.split(' ').first;
               return ListTile(
-                contentPadding: const EdgeInsets.all(16),
-                leading: CircleAvatar(
-                  backgroundColor: SawaLoveTheme.primary.withValues(alpha: 0.2),
-                  child: Text(notif['user']![0], style: const TextStyle(color: SawaLoveTheme.primary, fontWeight: FontWeight.bold)),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                leading: _avatar(
+                  profile['photo']?.toString() ?? '',
+                  displayName,
                 ),
-                title: Text('${notif['user']}'),
-                subtitle: Text(notif['type']!),
-                trailing: Text(notif['time']!, style: const TextStyle(color: SawaLoveTheme.onSurfaceVariant, fontSize: 12)),
-                onTap: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Nav to ${notif['user']}'))),
+                title: Text(displayName),
+                subtitle: const Text('Likes you'),
+                trailing: const Icon(Icons.chevron_right,
+                    color: SawaLoveTheme.onSurfaceVariant),
+                onTap: uid.isEmpty ? null : () => context.push('/profile/$uid'),
               );
             },
-          );
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildMatches(List<InboxItem> matches) {
+    if (matches.isEmpty) return _empty('No new matches yet.');
+    return ListView.separated(
+      itemCount: matches.length,
+      separatorBuilder: (context, index) => const Divider(height: 1),
+      itemBuilder: (context, index) {
+        final item = matches[index];
+        return ListTile(
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          leading: _avatar(item.avatarUrl, item.matchName),
+          title: Text(item.matchName),
+          subtitle: const Text('New match — say hello!'),
+          trailing: Text(
+            _timeAgo(item.lastMessageAt),
+            style: const TextStyle(
+                color: SawaLoveTheme.onSurfaceVariant, fontSize: 12),
+          ),
+          onTap: () =>
+              context.push('/chat/${Uri.encodeComponent(item.matchId)}'),
+        );
+      },
+    );
+  }
+
+  Widget _buildMessages(List<InboxItem> conversations) {
+    if (conversations.isEmpty) return _empty('No new messages yet.');
+    return ListView.separated(
+      itemCount: conversations.length,
+      separatorBuilder: (context, index) => const Divider(height: 1),
+      itemBuilder: (context, index) {
+        final item = conversations[index];
+        return ListTile(
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          leading: _avatar(item.avatarUrl, item.matchName),
+          title: Text(item.matchName),
+          subtitle: Text(
+            item.lastMessageFromMe
+                ? 'You: ${item.lastMessagePreview}'
+                : item.lastMessagePreview,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          trailing: Text(
+            _timeAgo(item.lastMessageAt),
+            style: const TextStyle(
+                color: SawaLoveTheme.onSurfaceVariant, fontSize: 12),
+          ),
+          onTap: () =>
+              context.push('/chat/${Uri.encodeComponent(item.matchId)}'),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final inboxAsync = ref.watch(inboxProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notifications'),
@@ -101,23 +202,61 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> wit
           labelColor: SawaLoveTheme.primary,
           unselectedLabelColor: SawaLoveTheme.onSurfaceVariant,
           indicatorColor: SawaLoveTheme.primary,
-          tabs: _tabs,
+          tabs: const [
+            Tab(icon: Icon(Icons.thumb_up), text: 'Likes'),
+            Tab(icon: Icon(Icons.favorite), text: 'Matches'),
+            Tab(icon: Icon(Icons.message), text: 'Messages'),
+          ],
         ),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(0),
-          child: TabBarView(
-            controller: _tabController,
-            children: [
-              _buildNotificationList(),
-              _buildNotificationList(),
-              _buildNotificationList(),
-            ],
-          ),
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            _buildLikes(),
+            // Matches & messages share the inbox; a match with no messages
+            // is a new match, anything else is a conversation.
+            inboxAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, _) => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Could not load activity.'),
+                    const SizedBox(height: 12),
+                    OutlinedButton(
+                      onPressed: () => ref.invalidate(inboxProvider),
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
+              data: (items) => _buildMatches(
+                items.where((i) => i.messageCount == 0).toList(),
+              ),
+            ),
+            inboxAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, _) => Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Could not load activity.'),
+                    const SizedBox(height: 12),
+                    OutlinedButton(
+                      onPressed: () => ref.invalidate(inboxProvider),
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
+              data: (items) => _buildMessages(
+                items.where((i) => i.messageCount > 0).toList(),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
-

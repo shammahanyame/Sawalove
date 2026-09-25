@@ -1,5 +1,9 @@
 class InboxItem {
   final String matchId;
+
+  /// The other participant's user id — required for report/block actions
+  /// (the server expects a user id, never a match id).
+  final String peerUid;
   final String matchName;
   final String avatarUrl;
   final bool isOnline;
@@ -17,6 +21,7 @@ class InboxItem {
 
   InboxItem({
     required this.matchId,
+    this.peerUid = '',
     required this.matchName,
     required this.avatarUrl,
     this.isOnline = false,
@@ -36,6 +41,7 @@ class InboxItem {
   factory InboxItem.fromJson(Map<String, dynamic> data) {
     return InboxItem(
       matchId: data['matchId'] as String? ?? data['match_id'] as String? ?? '',
+      peerUid: data['peerUid'] as String? ?? data['peer_uid'] as String? ?? '',
       matchName: data['matchName'] as String? ?? data['match_name'] as String? ?? '',
       avatarUrl: data['avatarUrl'] as String? ?? data['avatar_url'] as String? ?? '',
       isOnline: data['isOnline'] as bool? ?? data['is_online'] as bool? ?? false,
@@ -66,6 +72,7 @@ class InboxItem {
   Map<String, dynamic> toJson() {
     return {
       'match_id': matchId,
+      'peer_uid': peerUid,
       'match_name': matchName,
       'avatar_url': avatarUrl,
       'is_online': isOnline,

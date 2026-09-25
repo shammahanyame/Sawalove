@@ -8,6 +8,12 @@ final discoveryProfilesProvider = StreamProvider<List<Map<String, dynamic>>>((re
 
 final currentSwipeIndexProvider = StateProvider<int>((ref) => 0);
 
+/// Profiles restored by a rewind. The server excludes already-swiped users
+/// from `GET /users`, so a rewound profile only comes back from the local
+/// snapshot stored in swipe history.
+final rewoundProfilesProvider =
+    StateProvider<List<Map<String, dynamic>>>((ref) => const []);
+
 // Swipe action notifier
 class SwipeNotifier extends StateNotifier<int> {
   SwipeNotifier() : super(0);

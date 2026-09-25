@@ -236,7 +236,200 @@ function main(): int
     $afterSignout = $client->withToken($token)->get('/session');
     check($result, 'token is rejected after signout', $afterSignout['status'] === 401);
 
-    // ── 404 & method handling ─────────────────────────────────────────
+    // ── Likes, matches & chat ───────────────────────────────────────
+    echo "\nLikes, matches & chat\n";
+    $signupA = $client->post('/auth/email/signup', [
+        'name' => 'Alice Chat', 'email' => 'alice-' . bin2hex(random_bytes(4)) . '@example.com',
+        'password' => 'correct-horse-battery',
+    ]);
+    $signupB = $client->post('/auth/email/signup', [
+        'name' => 'Bob Chat', 'email' => 'bob-' . bin2hex(random_bytes(4)) . '@example.com',
+        'password' => 'correct-horse-battery',
+    ]);
+    $signupC = $client->post('/auth/email/signup', [
+        'name' => 'Cara Lurker', 'email' => 'cara-' . bin2hex(random_bytes(4)) . '@example.com',
+        'password' => 'correct-horse-battery',
+    ]);
+    $aId = $signupA['body']['user']['id']; $aTok = $signupA['body']['session']['token'];
+    $bId = $signupB['body']['user']['id']; $bTok = $signupB['body']['session']['token'];
+    $cId = $signupC['body']['user']['id']; $cTok = $signupC['body']['session']['token'];
+
+    $A = $client->withToken($aTok);
+    $B = $client->withToken($bTok);
+    $C = $client->withToken($cTok);
+    $A->put('/users/' . $aId, ['visible' => true]);
+    $B->put('/users/' . $bId, ['visible' => true]);
+    $C->put('/users/' . $cId, ['visible' => true]);
+
+    // Swipe validation
+    $badAction = $A->post('/swipes', ['targetUserId' => $bId, 'action' => 'love']);
+    check($result, 'swipe rejects unknown action (422)', $badAction['status'] === 422, "got {$badAction['status']}");
+    $selfSwipe = $A->post('/swipes', ['targetUserId' => $aId, 'action' => 'like']);
+    check($result, 'self-swipe rejected (422)', $selfSwipe['status'] === 422);
+    $ghostSwipe = $A->post('/swipes', ['targetUserId' => 'nonexistent-user', 'action' => 'like']);
+    check($result, 'swipe on unknown target returns 404 (no enumeration)', $ghostSwipe['status'] === 404);
+    $anonSwipe = $client->post('/swipes', ['targetUserId' => $bId, 'action' => 'like']);
+    check($result, 'anonymous swipe rejected (401)', $anonSwipe['status'] === 401);
+
+    // One-way like: no match yet
+    $likeAB = $A->post('/swipes', ['targetUserId' => $bId, 'action' => 'like']);
+    check($result, 'one-way like returns matched=false', $likeAB['status'] === 200 && $likeAB['body']['matched'] === false);
+
+    // C cannot see B's match list; B has no matches yet
+    $noMatches = $B->get('/matches');
+    check($result, 'no match before reciprocity', ($noMatches['body']['matches'] ?? []) === []);
+
+    // Reciprocal like creates a match
+    $likeBA = $B->post('/swipes', ['targetUserId' => $aId, 'action' => 'like']);
+    check($result, 'reciprocal like creates a match', $likeBA['status'] === 200 && $likeBA['body']['matched'] === true && is_string($likeBA['body']['match_id']));
+    $matchId = (string)$likeBA['body']['match_id'];
+
+    // Re-swiping the same person is idempotent (upsert), still matched
+    $relike = $A->post('/swipes', ['targetUserId' => $bId, 'action' => 'like']);
+    check($result, 're-like is idempotent and keeps the match', $relike['status'] === 200 && $relike['body']['matched'] === true);
+
+    // Likes list: B liked A back, so A's pending likes should be empty (B consumed)
+    // C likes A -> A should now see C in /likes
+    $C->post('/swipes', ['targetUserId' => $aId, 'action' => 'like']);
+    $likesA = $A->get('/likes');
+    $likerIds = array_map(static fn (array $u) => $u['id'] ?? '', $likesA['body']['likes'] ?? []);
+    check($result, 'GET /likes shows pending likers', in_array($cId, $likerIds, true), json_encode($likerIds));
+    check($result, 'GET /likes never leaks email/phone',
+        !isset($likesA['body']['likes'][0]['email']) || $likesA['body']['likes'][0]['email'] === null);
+
+    // Matches list shows the match on both sides with the other user's data
+    $matchesA = $A->get('/matches');
+    $matchIdsA = array_map(static fn (array $m) => $m['id'] ?? '', $matchesA['body']['matches'] ?? []);
+    check($result, 'GET /matches lists the new match for A', in_array($matchId, $matchIdsA, true));
+    $matchA = $matchesA['body']['matches'][array_search($matchId, $matchIdsA, true)];
+    check($result, 'match shows the OTHER user\'s profile, not mine', ($matchA['user']['id'] ?? '') === $bId);
+    $matchesB = $B->get('/matches');
+    $matchIdsB = array_map(static fn (array $m) => $m['id'] ?? '', $matchesB['body']['matches'] ?? []);
+    check($result, 'GET /matches lists the new match for B', in_array($matchId, $matchIdsB, true));
+
+    // Messaging
+    $unauthMsg = $client->get('/matches/' . $matchId . '/messages');
+    check($result, 'messages require auth (401)', $unauthMsg['status'] === 401);
+    $outsiderMsg = $C->get('/matches/' . $matchId . '/messages');
+    check($result, 'outsider cannot read messages (404, no enumeration)', $outsiderMsg['status'] === 404);
+
+    $empty = $A->get('/matches/' . $matchId . '/messages');
+    check($result, 'empty conversation returns []', ($empty['body']['messages'] ?? null) === []);
+
+    $send1 = $A->post('/matches/' . $matchId . '/messages', ['body' => 'Bonjour Bob!']);
+    check($result, 'A sends a message (201)', $send1['status'] === 201 && ($send1['body']['message']['body'] ?? '') === 'Bonjour Bob!');
+    $send2 = $B->post('/matches/' . $matchId . '/messages', ['body' => 'Salut Alice!']);
+    check($result, 'B sends a message (201)', $send2['status'] === 201);
+
+    $thread = $A->get('/matches/' . $matchId . '/messages');
+    $bodies = array_map(static fn (array $m) => $m['body'] ?? '', $thread['body']['messages'] ?? []);
+    check($result, 'conversation returns both messages in order', $bodies === ['Bonjour Bob!', 'Salut Alice!'], json_encode($bodies));
+    $first = $thread['body']['messages'][0] ?? [];
+    check($result, 'fromMe is true for my own messages', $first['fromMe'] === true);
+    $threadB = $B->get('/matches/' . $matchId . '/messages');
+    check($result, 'fromMe is false for the other side', ($threadB['body']['messages'][0]['fromMe'] ?? null) === false);
+
+    $badMsg = $A->post('/matches/' . $matchId . '/messages', ['body' => str_repeat('x', 4001)]);
+    check($result, 'message over 4000 chars rejected (422)', $badMsg['status'] === 422);
+    $blankMsg = $A->post('/matches/' . $matchId . '/messages', ['body' => '   ']);
+    check($result, 'blank message rejected (422)', $blankMsg['status'] === 422);
+    $fakeMatch = $A->get('/matches/does-not-exist/messages');
+    check($result, 'unknown match returns 404', $fakeMatch['status'] === 404);
+
+    // lastMessage preview appears in the matches list
+    $matchesA2 = $A->get('/matches');
+    $mA = $matchesA2['body']['matches'][array_search($matchId, array_map(static fn (array $m) => $m['id'] ?? '', $matchesA2['body']['matches'] ?? []), true)];
+    check($result, 'match list includes lastMessage preview', ($mA['lastMessage']['body'] ?? '') === 'Salut Alice!');
+    check($result, 'lastMessage.fromMe computed per viewer', ($mA['lastMessage']['fromMe'] ?? null) === false);
+
+    // Unmatch: A unmatched -> conversation hidden for A, still visible for B (read-only history)
+    $unmatch = $A->delete('/matches/' . $matchId);
+    check($result, 'DELETE /matches/{id} unmatches (ok)', ($unmatch['body']['ok'] ?? false) === true);
+    $afterA = $A->get('/matches/' . $matchId . '/messages');
+    check($result, 'unmatched side sees 404 on the conversation', $afterA['status'] === 404);
+    $afterAList = $A->get('/matches');
+    $stillThereA = in_array($matchId, array_map(static fn (array $m) => $m['id'] ?? '', $afterAList['body']['matches'] ?? []));
+    check($result, 'unmatched side no longer lists the match', $stillThereA === false);
+    $afterB = $B->get('/matches/' . $matchId . '/messages');
+    check($result, 'other side still sees history after unmatch', $afterB['status'] === 200 && count($afterB['body']['messages']) === 2);
+    $bSendAfter = $B->post('/matches/' . $matchId . '/messages', ['body' => 'hello?']);
+    check($result, 'cannot send after the other side unmatched (410)', $bSendAfter['status'] === 410);
+    // Re-like reactivates
+    $relikeAfter = $A->post('/swipes', ['targetUserId' => $bId, 'action' => 'like']);
+    check($result, 're-like reactivates the match', $relikeAfter['status'] === 200 && $relikeAfter['body']['matched'] === true);
+    $reactivated = $A->get('/matches/' . $matchId . '/messages');
+    check($result, 'history intact after reactivation', $reactivated['status'] === 200 && count($reactivated['body']['messages']) === 2);
+
+    // ── Blocking ───────────────────────────────────────────────
+    echo "\nBlocking\n";
+    $anonBlock = $client->post('/users/' . $cId . '/block');
+    check($result, 'anonymous block rejected (401)', $anonBlock['status'] === 401, "got {$anonBlock['status']}");
+    $selfBlock = $A->post('/users/' . $aId . '/block');
+    check($result, 'self-block rejected (422)', $selfBlock['status'] === 422, "got {$selfBlock['status']}");
+    $ghostBlock = $A->post('/users/nonexistent-user/block');
+    check($result, 'block on unknown user returns 404 (no enumeration)', $ghostBlock['status'] === 404, "got {$ghostBlock['status']}");
+    $anonListBlocks = $client->get('/blocks');
+    check($result, 'GET /blocks requires auth (401)', $anonListBlocks['status'] === 401);
+
+    // A blocks C (C liked A earlier, so C is in A's likes list)
+    $blockC = $A->post('/users/' . $cId . '/block');
+    check($result, 'block returns ok', $blockC['status'] === 200 && ($blockC['body']['ok'] ?? false) === true);
+    $blockCAgain = $A->post('/users/' . $cId . '/block');
+    check($result, 'duplicate block is idempotent (200)', $blockCAgain['status'] === 200, "got {$blockCAgain['status']}");
+
+    $likesAfterBlock = $A->get('/likes');
+    $likerIdsAfter = array_map(static fn (array $u) => $u['id'] ?? '', $likesAfterBlock['body']['likes'] ?? []);
+    check($result, 'blocked liker disappears from GET /likes', !in_array($cId, $likerIdsAfter, true), json_encode($likerIdsAfter));
+
+    // Authenticated discovery deck excludes self, swiped, and blocked users
+    $deckA = $A->get('/users?visible=true&limit=50');
+    $deckIdsA = array_map(static fn (array $u) => $u['id'] ?? '', $deckA['body']['users'] ?? []);
+    check($result, 'authenticated deck never includes myself', !in_array($aId, $deckIdsA, true));
+    check($result, 'authenticated deck excludes already-swiped users', !in_array($bId, $deckIdsA, true), json_encode($deckIdsA));
+    check($result, 'authenticated deck excludes blocked users', !in_array($cId, $deckIdsA, true));
+    check($result, 'deck filtering keeps other visible users', count($deckIdsA) >= 1, json_encode($deckIdsA));
+
+    $deckC = $C->get('/users?visible=true&limit=50');
+    $deckIdsC = array_map(static fn (array $u) => $u['id'] ?? '', $deckC['body']['users'] ?? []);
+    check($result, 'blocked direction also filtered for the other side', !in_array($aId, $deckIdsC, true), json_encode($deckIdsC));
+    check($result, 'unrelated profiles still visible to C', in_array($bId, $deckIdsC, true), json_encode($deckIdsC));
+
+    $profileBlockedA = $A->get('/users/' . $cId);
+    check($result, 'blocker cannot read blocked profile (404)', $profileBlockedA['status'] === 404, "got {$profileBlockedA['status']}");
+    $profileBlockedC = $C->get('/users/' . $aId);
+    check($result, 'blocked side cannot read blocker profile (404)', $profileBlockedC['status'] === 404, "got {$profileBlockedC['status']}");
+
+    $blocksA = $A->get('/blocks');
+    $blockedIds = array_map(static fn (array $u) => $u['id'] ?? '', $blocksA['body']['blocks'] ?? []);
+    check($result, 'GET /blocks lists the blocked user', in_array($cId, $blockedIds, true), json_encode($blockedIds));
+
+    // B blocks A -> the active match disappears for BOTH sides and chat/swipe stop
+    $blockAbyB = $B->post('/users/' . $aId . '/block');
+    check($result, 'B can block A (200)', $blockAbyB['status'] === 200, "got {$blockAbyB['status']}");
+    $matchesWhileBlockedA = $A->get('/matches');
+    $idsWhileBlockedA = array_map(static fn (array $m) => $m['id'] ?? '', $matchesWhileBlockedA['body']['matches'] ?? []);
+    check($result, 'match hidden from blocker side', !in_array($matchId, $idsWhileBlockedA, true));
+    $matchesWhileBlockedB = $B->get('/matches');
+    $idsWhileBlockedB = array_map(static fn (array $m) => $m['id'] ?? '', $matchesWhileBlockedB['body']['matches'] ?? []);
+    check($result, 'match hidden from blocked side', !in_array($matchId, $idsWhileBlockedB, true));
+    $msgWhileBlocked = $A->post('/matches/' . $matchId . '/messages', ['body' => 'are you there?']);
+    check($result, 'cannot message a blocked pair (404)', $msgWhileBlocked['status'] === 404, "got {$msgWhileBlocked['status']}");
+    $swipeWhileBlocked = $A->post('/swipes', ['targetUserId' => $bId, 'action' => 'like']);
+    check($result, 'cannot swipe a blocked pair (404, no leak)', $swipeWhileBlocked['status'] === 404, "got {$swipeWhileBlocked['status']}");
+
+    // Unblock restores visibility
+    $unblockA = $B->delete('/users/' . $aId . '/block');
+    check($result, 'unblock returns ok', $unblockA['status'] === 200 && ($unblockA['body']['ok'] ?? false) === true);
+    $unblockAgain = $B->delete('/users/' . $aId . '/block');
+    check($result, 'duplicate unblock is idempotent (200)', $unblockAgain['status'] === 200);
+    $matchesAfterUnblock = $B->get('/matches');
+    $idsAfterUnblock = array_map(static fn (array $m) => $m['id'] ?? '', $matchesAfterUnblock['body']['matches'] ?? []);
+    check($result, 'unblocking restores the match', in_array($matchId, $idsAfterUnblock, true), json_encode($idsAfterUnblock));
+    $blocksAfter = $A->get('/blocks');
+    $blockedAfter = array_map(static fn (array $u) => $u['id'] ?? '', $blocksAfter['body']['blocks'] ?? []);
+    check($result, 'blocker list no longer contains A-blocked user after unblock', !in_array($aId, $blockedAfter, true));
+
+    // ── 404 & method handling ─────────────────────────────────────
     echo "\nRouting\n";
     check($result, 'unknown endpoint returns JSON 404', $client->get('/definitely-not-here')['status'] === 404);
     check($result, 'OPTIONS preflight returns 204', $client->options('/users') === 204);
@@ -334,6 +527,11 @@ final class ApiTestClient
     public function put(string $path, array $body): array
     {
         return $this->request('PUT', $path, $body);
+    }
+
+    public function delete(string $path): array
+    {
+        return $this->request('DELETE', $path);
     }
 
     public function options(string $path): int
