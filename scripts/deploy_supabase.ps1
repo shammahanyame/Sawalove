@@ -42,7 +42,7 @@ if ($Functions) {
     $functions = @("ai-icebreakers", "ai-bio-suggestions")
     foreach ($fn in $functions) {
         Write-Host "Deploying edge function: $fn"
-        Invoke-Supabase @("functions deploy $fn --project-ref $ProjectRef --no-verify-jwt=false")
+        Invoke-Supabase @("functions deploy $fn --project-ref $ProjectRef")
     }
 
     # Smoke test each function; a bad deploy is reported but the previous
