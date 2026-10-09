@@ -32,6 +32,8 @@ dependencies:
   just_audio: ^0.9.40
   # Storage
   shared_preferences: ^2.5.3
+  # Supabase backend (auth, database, storage, edge functions)
+  supabase_flutter: ^2.8.0
   path_provider: ^2.1.5
   pinput: ^6.0.2
   logger: ^2.0.2+1

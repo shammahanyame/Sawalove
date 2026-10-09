@@ -1,28 +1,81 @@
-# Supabase Backend
+# SawaLove Backend
 
-This Flutter app uses Supabase directly from Dart. There is no separate Node,
-Python, PHP, or Firebase backend in the current code.
+The Flutter app talks to **Supabase** directly (Postgres + Auth + Storage +
+Edge Functions). There is no separate PHP/Node server anymore — the previous
+`backend/php` API was fully migrated into SQL migrations and Edge Functions in
+`supabase/`.
 
-## Create The Backend
+## One-time setup
 
-1. Open your Supabase project.
-2. Go to `SQL Editor`.
-3. Run `supabase/migrations/20260602000000_initial_schema.sql`.
-4. Optional for testing: run `supabase/seed/visible_profiles.sql` so discovery
-   has visible profiles immediately.
-5. In `Authentication > Providers`, enable the providers you want:
-   - Phone: enable phone sign-in and configure an SMS provider. If this is
-     off, Supabase returns `phone_provider_disabled` and the Flutter app will
-     disable the phone login button after reading the auth settings endpoint.
-   - Email: enable email/password sign-in for email signup and login.
-   - Google and Apple: enable each OAuth provider you want to show in the app.
-6. In `Authentication > URL Configuration`, add this redirect URL to
-   `Additional Redirect URLs`:
-   `io.sawalove.app://login-callback`
+1. Create a project at [supabase.com](https://supabase.com) (or use an
+   existing one). Note the **project ref** and **anon key** from
+   Project Settings → API.
+2. Install the CLI and link:
 
-## Flutter Connection
+   ```bash
+   npm i -g supabase
+   supabase login
+   cd supabase && supabase link --project-ref <your-project-ref>
+   ```
 
-The app reads these compile-time Dart defines:
+3. Apply the migrations **in order**:
+
+   ```bash
+   supabase db push
+   ```
+
+   Files applied: initial schema → RLS hardening → full backend schema →
+   full RLS → RPCs → auth config → alerts (pg_cron).
+
+4. Optional test data: `supabase/seed/visible_profiles.sql`.
+5. Deploy the Edge Functions:
+
+   ```bash
+   supabase functions deploy ai-icebreakers
+   supabase functions deploy ai-bio-suggestions
+   ```
+
+   Then set their secrets:
+
+   ```bash
+   supabase secrets set OPENAI_API_KEY=sk-... ALLOWED_ORIGINS=https://sawalove.com
+   ```
+
+   AI spend caps are configurable: `AI_GLOBAL_DAILY_CAP_CENTS` (default 500)
+   and `AI_USER_DAILY_CAP_CENTS` (default 25).
+
+6. Auth dashboard settings (one-time, see
+   `supabase/migrations/20261009030000_auth_config.sql` header for the full
+   list): enable the email/phone/Google/Apple providers you want, set the
+   password reset link expiry to 1 hour, enable leaked-password protection,
+   and configure the auth rate limits (recovery: 2/hour/IP).
+7. In Authentication → URL Configuration add
+   `io.sawalove.app://login-callback` to Additional Redirect URLs.
+
+## Security model
+
+| Layer | Where |
+| --- | --- |
+| Row Level Security | `supabase/migrations/20261009010000_rls_full.sql` |
+| Authorization (RPC + RLS checks) | `supabase/migrations/20261009020000_rpcs.sql` |
+| Input validation (types, lengths, enums) | CHECK constraints + RPC guards |
+| Rate limiting | `rate_limits` table + `rate_limit_take()` in every write RPC |
+| Password reset expiry | Dashboard setting (1 h) + flood limit 2/hour/IP |
+| CORS | Edge Functions (`ALLOWED_ORIGINS` secret) |
+| Error handling | RPC error codes mapped in `authErrorMessage()` |
+| Indexes | Every foreign key + query path in the schema migration |
+| Logging | `app_logs` table, written by RPCs/Edge Functions |
+| Alerts | `alerts.sql` pg_cron jobs → `public.alerts` (hook a webhook in Logs → Alerts) |
+
+## Blue-green deployment
+
+See `supabase/DEPLOY.md`. Migrations are additive-only; branches let you test
+schema + function changes against production data before promotion.
+
+## Flutter connection
+
+The app reads these compile-time Dart defines (`.env.release` for release
+builds, or `--dart-define` for debug):
 
 ```text
 SUPABASE_URL
@@ -35,19 +88,14 @@ SUPABASE_GOOGLE_AUTH_ENABLED
 SUPABASE_APPLE_AUTH_ENABLED
 ```
 
-`.env.release` already contains the values used by `scripts/build_release_aab.ps1`.
-For local development, run Flutter with the same defines:
-
-```powershell
-flutter run `
-  --dart-define=SUPABASE_URL=https://your-project-ref.supabase.co `
-  --dart-define=SUPABASE_ANON_KEY=your-public-anon-key `
-  --dart-define=SUPABASE_PROFILE_PHOTOS_BUCKET=profile-photos `
-  --dart-define=SUPABASE_AUTH_REDIRECT_TO=io.sawalove.app://login-callback
-```
-
-For release builds on this project, use:
-
 ```powershell
 .\scripts\build_release_aab.ps1
+```
+
+Debug:
+
+```bash
+flutter run \
+  --dart-define=SUPABASE_URL=https://your-project-ref.supabase.co \
+  --dart-define=SUPABASE_ANON_KEY=your-public-anon-key
 ```

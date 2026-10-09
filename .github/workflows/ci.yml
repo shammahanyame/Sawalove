@@ -1,15 +1,14 @@
 # SawaLove CI
 #
-# Backend: boots the real PHP API against a real MySQL 8 service container and
-# runs the full integration suite (113 assertions) plus the brute-force
-# rate-limit enforcement test. See backend/php/tests/REGRESSIONS.md for the
-# security regressions these tests permanently guard.
+# Backend: Supabase — SQL migrations are checked with squawk-style linting via
+# the supabase CLI (db lint needs a linked project, so CI does a syntax check
+# by applying migrations to a throwaway local Postgres) and Edge Functions are
+# type-checked with deno check.
 #
 # Frontend: flutter analyze + flutter test.
 #
 # NOTE: the git repo root IS the Flutter app (pubspec.yaml lives at the
-# repository root) — no `working-directory:` is needed, and backend paths
-# like backend/php are relative to that same root.
+# repository root).
 
 name: CI
 
@@ -19,22 +18,19 @@ on:
   pull_request:
 
 jobs:
-  backend-tests:
-    name: PHP API integration tests
+  supabase-checks:
+    name: Supabase migrations + edge functions
     runs-on: ubuntu-latest
 
     services:
-      mysql:
-        image: mysql:8.0
+      postgres:
+        image: postgres:15
         env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: sawalove_test
-          MYSQL_USER: sawalove
-          MYSQL_PASSWORD: testpass123
+          POSTGRES_PASSWORD: postgres
         ports:
-          - 3307:3306
+          - 5432:5432
         options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-cmd="pg_isready -U postgres"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=10
@@ -42,73 +38,49 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup PHP 8.3
-        uses: shivammathur/setup-php@v2
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
         with:
-          php-version: "8.3"
-          extensions: pdo_mysql, curl, fileinfo
-          coverage: none
+          version: latest
 
-      - name: Import database schema
+      # Apply every migration to a local postgres to guarantee the SQL parses
+      # and runs in order. auth/storage schemas are stubbed with the parts the
+      # migrations reference; on the real project Supabase provides them.
+      - name: Apply migrations to local Postgres
         run: |
-          mysql --host 127.0.0.1 --port 3307 -u sawalove -ptestpass123 \
-            sawalove_test < backend/php/schema.sql
-
-      - name: Start PHP API test server
-        working-directory: backend/php
-        run: |
-          APP_ENV=local \
-          APP_KEY=ci-test-key-not-for-production \
-          OTP_DEBUG_RESPONSE=true \
-          AUTH_RATE_LIMIT_MAX=1000 \
-          DB_DSN="mysql:host=127.0.0.1;port=3307;dbname=sawalove_test" \
-          DB_USER=sawalove \
-          DB_PASSWORD=testpass123 \
-          php -S 127.0.0.1:8110 -t public public/index.php > /tmp/api.log 2>&1 &
-
-          # Wait for /health to come up
-          for i in $(seq 1 30); do
-            if curl -sf http://127.0.0.1:8110/health | grep -q '"ok":true'; then
-              echo "API is healthy"
-              exit 0
-            fi
-            sleep 1
-          done
-          echo "API failed to become healthy"; cat /tmp/api.log; exit 1
-
-      - name: Run integration suite (113 assertions)
-        working-directory: backend/php
-        env:
-          DB_DSN: "mysql:host=127.0.0.1;port=3307;dbname=sawalove_test"
-          DB_USER: sawalove
-          DB_PASSWORD: testpass123
-        run: php -d error_reporting="E_ALL & ~E_DEPRECATED" tests/run_api_tests.php
-
-      - name: Run rate-limit enforcement test (fresh server, production defaults)
-        working-directory: backend/php
-        run: |
-          APP_ENV=local \
-          APP_KEY=ci-test-key-not-for-production \
-          DB_DSN="mysql:host=127.0.0.1;port=3307;dbname=sawalove_test" \
-          DB_USER=sawalove \
-          DB_PASSWORD=testpass123 \
-          php -S 127.0.0.1:8111 -t public public/index.php > /tmp/api-rl.log 2>&1 &
-
-          for i in $(seq 1 30); do
-            curl -sf http://127.0.0.1:8111/health > /dev/null && break
-            sleep 1
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+          export PGPASSWORD=postgres
+          psql -h 127.0.0.1 -U postgres -c "
+            create schema if not exists auth;
+            create schema if not exists storage;
+            create table if not exists auth.users (
+              id uuid primary key default gen_random_uuid(),
+              phone text, email text,
+              raw_user_meta_data jsonb not null default '{}'::jsonb
+            );
+            create table if not exists storage.buckets (
+              id text primary key, name text, public boolean,
+              file_size_limit bigint, allowed_mime_types text[]
+            );
+            create table if not exists storage.objects (
+              id uuid primary key default gen_random_uuid(),
+              bucket_id text, name text,
+              created_at timestamptz default now()
+            );
+          "
+          # cron schema is provided by the pg_cron extension on Supabase
+          psql -h 127.0.0.1 -U postgres -c "create schema if not exists cron;"
+          for f in supabase/migrations/*.sql; do
+            echo "== $f"
+            psql -h 127.0.0.1 -U postgres -v ON_ERROR_STOP=1 -f "$f" || exit 1
           done
 
-          php -d error_reporting="E_ALL & ~E_DEPRECATED" \
-            tests/run_rate_limit_test.php http://127.0.0.1:8111
-
-      - name: Run DB-free security unit tests (30 assertions)
-        working-directory: backend/php
-        run: php tests/run_ai_security_unit_tests.php
-
-      - name: Dump API server logs on failure
-        if: failure()
-        run: cat /tmp/api.log /tmp/api-rl.log 2>/dev/null || true
+      - name: Check edge functions compile (deno)
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: deno check
+        run: deno check --config supabase/functions/import_map.json supabase/functions/*/index.ts || deno check supabase/functions/*/index.ts
 
   frontend-tests:
     name: Flutter analyze + test

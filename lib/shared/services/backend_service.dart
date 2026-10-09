@@ -1,30 +1,39 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:sawalove/core/utils/logger.dart';
 
-const phpApiBaseUrl = String.fromEnvironment('API_BASE_URL');
-const apiPhoneAuthEnabled = bool.fromEnvironment(
-  'API_PHONE_AUTH_ENABLED',
+const supabaseUrlDefine = String.fromEnvironment('SUPABASE_URL');
+const supabaseAnonKeyDefine = String.fromEnvironment('SUPABASE_ANON_KEY');
+const supabaseProfilePhotosBucket =
+    String.fromEnvironment('SUPABASE_PROFILE_PHOTOS_BUCKET', defaultValue: 'profile-photos');
+const supabaseAuthRedirectTo =
+    String.fromEnvironment('SUPABASE_AUTH_REDIRECT_TO', defaultValue: 'io.sawalove.app://login-callback');
+const supabasePhoneAuthEnabled = bool.fromEnvironment(
+  'SUPABASE_PHONE_AUTH_ENABLED',
   defaultValue: true,
 );
-const apiEmailAuthEnabled = bool.fromEnvironment(
-  'API_EMAIL_AUTH_ENABLED',
+const supabaseEmailAuthEnabled = bool.fromEnvironment(
+  'SUPABASE_EMAIL_AUTH_ENABLED',
   defaultValue: true,
 );
-const apiGoogleAuthEnabled = bool.fromEnvironment(
-  'API_GOOGLE_AUTH_ENABLED',
+const supabaseGoogleAuthEnabled = bool.fromEnvironment(
+  'SUPABASE_GOOGLE_AUTH_ENABLED',
   defaultValue: false,
 );
-const apiAppleAuthEnabled = bool.fromEnvironment(
-  'API_APPLE_AUTH_ENABLED',
+const supabaseAppleAuthEnabled = bool.fromEnvironment(
+  'SUPABASE_APPLE_AUTH_ENABLED',
   defaultValue: false,
 );
+
+// Compatibility aliases (screens import these names from firebase_service.dart).
+const apiPhoneAuthEnabled = supabasePhoneAuthEnabled;
+const apiEmailAuthEnabled = supabaseEmailAuthEnabled;
+const apiGoogleAuthEnabled = supabaseGoogleAuthEnabled;
+const apiAppleAuthEnabled = supabaseAppleAuthEnabled;
 
 final backendServiceProvider = Provider<BackendService>((ref) {
   return BackendService();
@@ -49,117 +58,99 @@ class AuthProviderAvailability {
   });
 
   static const fromDartDefines = AuthProviderAvailability(
-    phone: apiPhoneAuthEnabled,
-    email: apiEmailAuthEnabled,
-    google: apiGoogleAuthEnabled,
-    apple: apiAppleAuthEnabled,
+    phone: supabasePhoneAuthEnabled,
+    email: supabaseEmailAuthEnabled,
+    google: supabaseGoogleAuthEnabled,
+    apple: supabaseAppleAuthEnabled,
   );
 }
 
+/// Supabase-backed implementation of the app's backend surface.
+///
+/// Auth: Supabase Auth (GoTrue) — sessions persist automatically.
+/// Data: PostgREST + security-definer RPCs (all authorization is RLS + RPC).
+/// Media: Supabase Storage `profile-photos` bucket.
+/// AI: Edge Functions with ledger-backed spend caps.
 class BackendService {
-  static const _sessionTokenKey = 'sawalove.php.session_token';
-  static const _sessionUserIdKey = 'sawalove.php.session_user_id';
-  static const _sessionExpiresAtKey = 'sawalove.php.session_expires_at';
-
-  static final StreamController<User?> _authController =
-      StreamController<User?>.broadcast();
-
-  static Future<void>? _sessionLoadFuture;
-  static String? _sessionToken;
-  static String? _sessionUserId;
-  static DateTime? _sessionExpiresAt;
-  static bool _lastLoadedSessionWasExpired = false;
+  static SupabaseClient? _client;
 
   String? _pendingOtpPhone;
-  Future<AuthProviderAvailability>? _providerAvailabilityFuture;
+  AuthProviderAvailability? _availability;
 
-  bool get isConfigured => phpApiBaseUrl.trim().isNotEmpty;
+  static SupabaseClient get client {
+    final c = _client;
+    if (c == null) {
+      throw const BackendAuthException(code: 'backend-not-configured');
+    }
+    return c;
+  }
 
-  bool get lastLoadedSessionWasExpired => _lastLoadedSessionWasExpired;
+  /// Initialize once from main() before runApp.
+  static Future<void> initialize() async {
+    if (supabaseUrlDefine.trim().isEmpty || supabaseAnonKeyDefine.trim().isEmpty) {
+      logger.w('SUPABASE_URL / SUPABASE_ANON_KEY missing; demo mode.');
+      return;
+    }
+    await Supabase.initialize(
+      url: supabaseUrlDefine,
+      publishableKey: supabaseAnonKeyDefine,
+    );
+    _client = Supabase.instance.client;
+  }
 
-  Future<void> loadLocalSession() => _ensureSessionLoaded();
+  bool get isConfigured => _client != null;
+
+  bool get lastLoadedSessionWasExpired => false;
+
+  Future<void> loadLocalSession() async {}
 
   Future<bool> hasValidSession({bool verifyRemote = false}) async {
     if (!isConfigured) return false;
-
-    await _ensureSessionLoaded();
-    if (_sessionUserId == null || _sessionToken == null) return false;
-    if (_isSessionExpired) {
-      await _clearSession();
-      _lastLoadedSessionWasExpired = true;
-      return false;
+    final session = client.auth.currentSession;
+    if (session == null) return false;
+    if (verifyRemote) {
+      try {
+        await client.auth.getUser();
+      } catch (e) {
+        logger.w('Saved Supabase session is not valid: $e');
+        await signOut();
+        return false;
+      }
     }
-
-    if (!verifyRemote) return true;
-
-    try {
-      final response = await _sendJson('GET', '/session');
-      await _storeSessionFromResponse(response);
-      return _sessionUserId != null;
-    } catch (e) {
-      logger.w('Saved PHP session is not valid: $e');
-      await _clearSession();
-      return false;
-    }
+    return true;
   }
 
   Future<AuthProviderAvailability> fetchAuthProviderAvailability({
     bool refresh = false,
   }) {
-    if (_providerAvailabilityFuture == null || refresh) {
-      _providerAvailabilityFuture = _loadAuthProviderAvailability();
+    if (_availability == null || refresh) {
+      // Providers are compile-time flags + dashboard settings. The dashboard
+      // state surfaces as specific GoTrue error codes at sign-in time, which
+      // authErrorMessage() maps to friendly copy.
+      _availability = AuthProviderAvailability.fromDartDefines;
     }
-    return _providerAvailabilityFuture!;
+    return Future.value(_availability!);
   }
 
-  Future<AuthProviderAvailability> _loadAuthProviderAvailability() async {
-    if (!isConfigured) return AuthProviderAvailability.fromDartDefines;
-
-    try {
-      final response = await _sendJson('GET', '/auth/providers');
-      final providers = response['providers'];
-      if (providers is! Map) return AuthProviderAvailability.fromDartDefines;
-
-      return AuthProviderAvailability(
-        phone: apiPhoneAuthEnabled &&
-            _providerEnabled(providers, 'phone', apiPhoneAuthEnabled),
-        email: apiEmailAuthEnabled &&
-            _providerEnabled(providers, 'email', apiEmailAuthEnabled),
-        google: apiGoogleAuthEnabled &&
-            _providerEnabled(providers, 'google', apiGoogleAuthEnabled),
-        apple: apiAppleAuthEnabled &&
-            _providerEnabled(providers, 'apple', apiAppleAuthEnabled),
-      );
-    } catch (e) {
-      logger.w('PHP auth providers unavailable: $e');
-      return AuthProviderAvailability.fromDartDefines;
-    }
-  }
-
-  bool _providerEnabled(
-      Map<dynamic, dynamic> providers, String key, bool fallback) {
-    final value = providers[key];
-    return value is bool ? value : fallback;
-  }
+  // ── AUTH ──────────────────────────────────────────────────────────────────
 
   Future<bool> signInWithPhone(String phone) async {
     final availability = await fetchAuthProviderAvailability();
     if (!availability.phone) {
-      throw BackendAuthException(code: 'phone-provider-disabled');
+      throw const BackendAuthException(code: 'phone-provider-disabled');
     }
-
     if (!isConfigured) {
       _pendingOtpPhone = phone;
       logger.i('Phone sign in demo mode for $phone');
       return true;
     }
 
-    await _sendJson(
-      'POST',
-      '/auth/phone/request',
-      body: {'phone': phone},
-    );
     _pendingOtpPhone = phone;
+    await client.auth.signInWithOtp(
+      phone: phone,
+      // The Supabase "OTP expiry" dashboard setting controls this (10 min).
+      shouldCreateUser: true,
+    );
     return true;
   }
 
@@ -171,18 +162,17 @@ class BackendService {
 
     final otpPhone = phone ?? _pendingOtpPhone;
     if (otpPhone == null || otpPhone.isEmpty) {
-      throw BackendAuthException(code: 'missing-phone');
+      throw const BackendAuthException(code: 'missing-phone');
     }
 
-    final response = await _sendJson(
-      'POST',
-      '/auth/phone/verify',
-      body: {
-        'phone': otpPhone,
-        'code': smsCode,
-      },
+    final response = await client.auth.verifyOTP(
+      type: OtpType.sms,
+      phone: otpPhone,
+      token: smsCode,
     );
-    await _storeSessionFromResponse(response);
+    if (response.session == null) {
+      throw const BackendAuthException(code: 'invalid_otp');
+    }
     _pendingOtpPhone = null;
     return true;
   }
@@ -195,25 +185,24 @@ class BackendService {
   }) async {
     final availability = await fetchAuthProviderAvailability();
     if (!availability.email) {
-      throw BackendAuthException(code: 'email-provider-disabled');
+      throw const BackendAuthException(code: 'email-provider-disabled');
     }
-
     if (!isConfigured) {
       logger.i('Email sign up demo mode for $email');
       return true;
     }
 
-    final response = await _sendJson(
-      'POST',
-      '/auth/email/signup',
-      body: {
-        'name': name,
-        'email': email,
-        'password': password,
-        'country': country,
-      },
+    final response = await client.auth.signUp(
+      email: email,
+      password: password,
+      data: {'name': name, 'country': country},
+      emailRedirectTo: supabaseAuthRedirectTo,
     );
-    await _storeSessionFromResponse(response);
+    if (response.session != null) {
+      logger.i('Signed up $email');
+    } else {
+      logger.i('Signed up $email; confirmation email sent');
+    }
     return true;
   }
 
@@ -223,114 +212,110 @@ class BackendService {
   }) async {
     final availability = await fetchAuthProviderAvailability();
     if (!availability.email) {
-      throw BackendAuthException(code: 'email-provider-disabled');
+      throw const BackendAuthException(code: 'email-provider-disabled');
     }
-
     if (!isConfigured) {
       logger.i('Email sign in demo mode for $email');
       return true;
     }
 
-    final response = await _sendJson(
-      'POST',
-      '/auth/email/signin',
-      body: {
-        'email': email,
-        'password': password,
-      },
-    );
-    await _storeSessionFromResponse(response);
+    await client.auth.signInWithPassword(email: email, password: password);
     return true;
   }
 
   Future<bool> signInWithGoogle() async {
     final availability = await fetchAuthProviderAvailability();
     if (!availability.google) {
-      throw BackendAuthException(code: 'google-provider-disabled');
+      throw const BackendAuthException(code: 'google-provider-disabled');
     }
-    return _signInWithOAuth('google');
+    if (!isConfigured) return true;
+    await client.auth.signInWithOAuth(
+      OAuthProvider.google,
+      redirectTo: supabaseAuthRedirectTo,
+    );
+    return true;
   }
 
   Future<bool> signInWithApple() async {
     final availability = await fetchAuthProviderAvailability();
     if (!availability.apple) {
-      throw BackendAuthException(code: 'apple-provider-disabled');
+      throw const BackendAuthException(code: 'apple-provider-disabled');
     }
-    return _signInWithOAuth('apple');
-  }
-
-  Future<bool> _signInWithOAuth(String provider) async {
-    if (!isConfigured) {
-      logger.i('$provider sign in demo mode');
-      return true;
-    }
-
-    final response = await _sendJson('POST', '/auth/oauth/$provider');
-    await _storeSessionFromResponse(response);
+    if (!isConfigured) return true;
+    await client.auth.signInWithOAuth(
+      OAuthProvider.apple,
+      redirectTo: supabaseAuthRedirectTo,
+    );
     return true;
   }
 
-  /// Saves the user's transaction PIN.
-  ///
-  /// SECURITY: the raw PIN is sent over TLS and hashed server-side with
-  /// password_hash() (bcrypt + per-user salt). Never send or store an
-  /// unsalted client-side hash of a short numeric code.
+  /// Sends a password reset email. The reset LINK expiry is enforced by
+  /// Supabase Auth (dashboard: "Password reset / recovery link expiry",
+  /// configured to 1 hour) and flood-limited (2/hour/IP).
+  Future<void> sendPasswordReset(String email) async {
+    if (!isConfigured) {
+      logger.i('Password reset demo mode for $email');
+      return;
+    }
+    await client.auth.resetPasswordForEmail(
+      email,
+      redirectTo: supabaseAuthRedirectTo,
+    );
+    try {
+      await client.rpc('log_event', params: {
+        'p_level': 'warn',
+        'p_event': 'password_reset_requested',
+        'p_context': {'email_domain': email.split('@').last},
+      });
+    } catch (_) {
+      // Logging must never block the user flow.
+    }
+  }
+
+  /// Saves the user's transaction PIN. Hashed server-side (bcrypt via
+  /// pgcrypto) inside the save_pin RPC; the raw PIN only travels over TLS.
   Future<void> savePin(String pin) async {
     if (!isConfigured) {
       logger.i('Save PIN demo mode');
       return;
     }
-
-    await _sendJson(
-      'POST',
-      '/me/pin',
-      body: {'pin': pin},
-      requiresAuth: true,
-    );
+    await client.rpc('save_pin', params: {'p_pin': pin});
   }
 
   Future<void> signOut() async {
-    if (isConfigured && _sessionToken != null) {
+    if (isConfigured) {
       try {
-        await _sendJson('POST', '/auth/signout');
+        await client.auth.signOut();
       } catch (e) {
-        logger.w('PHP sign out request failed: $e');
+        logger.w('Supabase sign out failed: $e');
       }
     }
-    await _clearSession();
   }
 
   bool get isSignedIn => currentUserId != null;
 
-  String? get currentUserId {
-    if (!isConfigured) return 'demo-user';
-    if (_isSessionExpired) return null;
-    return _sessionUserId;
-  }
+  String? get currentUserId => isConfigured ? client.auth.currentUser?.id : null;
 
   User? get currentUser {
     final uid = currentUserId;
     return uid == null ? null : User(uid: uid);
   }
 
-  Stream<User?> get authStateChanges async* {
-    await _ensureSessionLoaded();
-    yield currentUser;
-    yield* _authController.stream;
+  Stream<User?> get authStateChanges {
+    if (!isConfigured) return Stream.value(null);
+    return client.auth.onAuthStateChange
+        .map((event) => event.session == null ? null : User(uid: event.session!.user.id));
   }
+
+  // ── PROFILES + DISCOVERY ──────────────────────────────────────────────────
 
   Future<List<Map<String, dynamic>>> fetchVisibleUsers({int limit = 20}) async {
     if (!isConfigured) return _demoUsers.take(limit).toList();
 
-    final response = await _sendJson(
-      'GET',
-      '/users',
-      query: {
-        'visible': 'true',
-        'limit': '$limit',
-      },
-    );
-    return _readListOfMaps(response['users']).take(limit).toList();
+    final rows = await client.rpc('fetch_discovery_deck', params: {
+      'p_limit': limit,
+    });
+    return _readListOfMaps(rows).take(limit).toList();
   }
 
   Stream<List<Map<String, dynamic>>> watchVisibleUsers({int limit = 20}) {
@@ -349,6 +334,8 @@ class BackendService {
       }
 
       emit();
+      // Realtime would need a public channel; polling every 12s matches the
+      // previous behavior and respects RLS row filtering automatically.
       timer = Timer.periodic(const Duration(seconds: 12), (_) => emit());
       controller.onCancel = () => timer?.cancel();
     });
@@ -362,12 +349,13 @@ class BackendService {
           );
     }
 
-    final response = await _sendJson(
-      'GET',
-      '/users/${Uri.encodeComponent(uid)}',
-    );
-    final user = response['user'];
-    return user is Map ? Map<String, dynamic>.from(user) : null;
+    final rows = await client
+        .from('users')
+        .select(_publicProfileColumns)
+        .eq('id', uid)
+        .limit(1);
+    final list = _readListOfMaps(rows);
+    return list.isEmpty ? null : list.first;
   }
 
   Future<void> saveUserProfile(String uid, Map<String, dynamic> data) async {
@@ -376,12 +364,19 @@ class BackendService {
       return;
     }
 
-    await _sendJson(
-      'PUT',
-      '/users/${Uri.encodeComponent(uid)}',
-      body: data,
-      requiresAuth: true,
+    // Whitelist writable columns; protected columns (status/role/isPremium/
+    // visible) are additionally pinned server-side by the RLS restrictive
+    // policy, so even a malicious client cannot escalate.
+    const writable = {
+      'name', 'age', 'city', 'location', 'village', 'goal', 'intent',
+      'bio', 'photo', 'lat', 'lng', 'distance', 'preferences',
+    };
+    final update = Map.fromEntries(
+      data.entries.where((e) => writable.contains(e.key)),
     );
+    if (update.isEmpty) return;
+
+    await client.from('users').update(update).eq('id', uid);
   }
 
   Future<String?> uploadProfilePhoto({
@@ -394,9 +389,9 @@ class BackendService {
       return null;
     }
 
-    await _ensureSessionLoaded();
-    if (_sessionToken == null || currentUserId == null) {
-      throw BackendAuthException(code: 'not-authenticated');
+    final uid = currentUserId;
+    if (uid == null) {
+      throw const BackendAuthException(code: 'not-authenticated');
     }
 
     final extension = switch (contentType) {
@@ -404,43 +399,27 @@ class BackendService {
       'image/webp' => 'webp',
       _ => 'jpg',
     };
-    final request = http.MultipartRequest(
-      'POST',
-      _apiUri('/photos/profile'),
-    );
-    request.headers.addAll({
-      'Accept': 'application/json',
-      'Authorization': 'Bearer $_sessionToken',
-    });
-    request.fields['slot_index'] = '$slotIndex';
-    request.fields['content_type'] = contentType;
-    request.files.add(
-      http.MultipartFile.fromBytes(
-        'photo',
-        bytes,
-        filename:
-            'profile_${slotIndex}_${DateTime.now().millisecondsSinceEpoch}.$extension',
-      ),
-    );
+    final path = '$uid/slot_$slotIndex.$extension';
 
-    final streamed = await request.send().timeout(const Duration(seconds: 30));
-    final response = await http.Response.fromStream(streamed);
-    final decoded = _decodeResponse(response);
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw _exceptionFromResponse(response, decoded);
-    }
+    // Storage RLS restricts uploads to the owner's folder; the bucket caps
+    // size at 5 MB and MIME to jpeg/png/webp.
+    await client.storage.from(supabaseProfilePhotosBucket).uploadBinary(
+          path,
+          bytes,
+          fileOptions: FileOptions(upsert: true, contentType: contentType),
+        );
 
-    final url = decoded['url'];
-    return url is String && url.isNotEmpty ? url : null;
+    return client.storage.from(supabaseProfilePhotosBucket).getPublicUrl(path);
   }
+
+  // ── ACCOUNT OPS ───────────────────────────────────────────────────────────
 
   Future<void> pauseAccount() async {
     if (!isConfigured) {
       logger.i('Pause account demo mode');
       return;
     }
-
-    await _sendJson('POST', '/me/pause', requiresAuth: true);
+    await client.rpc('pause_account');
   }
 
   Future<void> requestAccountDeletion() async {
@@ -448,8 +427,7 @@ class BackendService {
       logger.i('Account deletion request demo mode');
       return;
     }
-
-    await _sendJson('POST', '/me/delete-request', requiresAuth: true);
+    await client.rpc('request_account_deletion');
     await signOut();
   }
 
@@ -458,35 +436,31 @@ class BackendService {
       logger.i('Data export request demo mode');
       return;
     }
-
-    await _sendJson('POST', '/me/data-export', requiresAuth: true);
+    await client.rpc('request_data_export');
   }
 
-  /// AI SUGGESTIONS — generated server-side through the capped gateway.
-  ///
+  // ── AI SUGGESTIONS (Edge Functions) ───────────────────────────────────────
+
   /// Returns null on any failure (not configured, offline, budget exhausted,
-  /// provider error) so callers can fall back to built-in content: the
-  /// feature degrades gracefully, it never blocks the user or errors out.
-  /// Server responses are already validated and clamped (≤6 items, ≤120
-  /// chars); the client clamps again defensively before rendering.
+  /// provider error) so callers fall back to built-in static content.
   Future<List<String>?> fetchAiIceBreakers({String about = ''}) async {
-    return _fetchAiSuggestions('/ai/icebreakers', about);
+    return _fetchAiSuggestions('ai-icebreakers', about);
   }
 
   Future<List<String>?> fetchAiBioSuggestions({String about = ''}) async {
-    return _fetchAiSuggestions('/ai/bio-suggestions', about);
+    return _fetchAiSuggestions('ai-bio-suggestions', about);
   }
 
-  Future<List<String>?> _fetchAiSuggestions(String path, String about) async {
+  Future<List<String>?> _fetchAiSuggestions(String functionName, String about) async {
     if (!isConfigured) return null;
     try {
-      final decoded = await _sendJson(
-        'POST',
-        path,
+      final response = await client.functions.invoke(
+        functionName,
         body: {'about': about},
-        requiresAuth: true,
       );
-      final raw = decoded['suggestions'];
+      final raw = response.data is Map
+          ? (response.data as Map)['suggestions']
+          : null;
       if (raw is! List) return null;
       final items = raw
           .whereType<String>()
@@ -497,384 +471,179 @@ class BackendService {
           .toList();
       return items.isEmpty ? null : items;
     } catch (_) {
-      // Includes BackendAuthException (not signed in), 429 budget/user caps,
-      // and network errors — all degrade to the caller's static fallback.
+      // Includes 429 budget caps and network errors — degrade gracefully.
       return null;
     }
   }
 
-  /// SWIPES — records a like/nope/super_like and returns the resulting
-  /// match state. The server creates a match when the target has already
-  /// liked us, and re-liking after an unmatch reactivates the conversation.
+  // ── SWIPES / MATCHES / MESSAGES ───────────────────────────────────────────
+
   Future<SwipeResult> sendSwipe({
     required String targetUserId,
     required String action, // 'like' | 'nope' | 'super_like'
   }) async {
-    final decoded = await _sendJson(
-      'POST',
-      '/swipes',
-      body: {
-        'targetUserId': targetUserId,
-        'action': action,
-      },
-      requiresAuth: true,
-    );
+    final decoded = await client.rpc('record_swipe', params: {
+      'p_target_id': targetUserId,
+      'p_action': action,
+    });
     return SwipeResult(
       matched: decoded['matched'] == true,
       matchId: decoded['match_id']?.toString(),
     );
   }
 
-  /// LIKES — users who liked us and we have not swiped yet ("Likes You" grid).
   Future<List<Map<String, dynamic>>> fetchIncomingLikes({int limit = 20}) async {
-    final decoded = await _sendJson(
-      'GET',
-      '/likes',
-      query: {'limit': '$limit'},
-      requiresAuth: true,
-    );
-    return _readListOfMaps(decoded['likes']);
+    final rows = await client.rpc('fetch_incoming_likes', params: {
+      'p_limit': limit,
+    });
+    return _readListOfMaps(rows);
   }
 
-  /// MATCHES — active matches with the other user's public profile and the
-  /// last message preview for the inbox.
   Future<List<Map<String, dynamic>>> fetchMatches({int limit = 30}) async {
-    final decoded = await _sendJson(
-      'GET',
-      '/matches',
-      query: {'limit': '$limit'},
-      requiresAuth: true,
-    );
-    return _readListOfMaps(decoded['matches']);
+    final rows = await client.rpc('fetch_matches', params: {'p_limit': limit});
+    final result = <Map<String, dynamic>>[];
+    for (final row in _readListOfMaps(rows)) {
+      final peer = row['peer'];
+      final entry = <String, dynamic>{
+        'match_id': row['match_id']?.toString(),
+        if (peer is Map) ...Map<String, dynamic>.from(peer),
+      };
+      final lastMessage = row['last_message'];
+      if (lastMessage is Map && lastMessage['body_preview'] != null) {
+        entry['last_message'] = lastMessage['body_preview'];
+      }
+      result.add(entry);
+    }
+    return result;
   }
 
-  /// MESSAGES — paginated chronological conversation for a match the caller
-  /// participates in. Server enforces access and unmatch state.
   Future<List<Map<String, dynamic>>> fetchMessages(
     String matchId, {
     int limit = 50,
   }) async {
-    final decoded = await _sendJson(
-      'GET',
-      '/matches/${Uri.encodeComponent(matchId)}/messages',
-      query: {'limit': '$limit'},
-      requiresAuth: true,
-    );
-    return _readListOfMaps(decoded['messages']);
+    final rows = await client.rpc('fetch_messages', params: {
+      'p_match_id': matchId,
+      'p_limit': limit,
+    });
+    return _readListOfMaps(rows);
   }
 
   Future<Map<String, dynamic>> sendMessage(
     String matchId,
     String body,
   ) async {
-    final decoded = await _sendJson(
-      'POST',
-      '/matches/${Uri.encodeComponent(matchId)}/messages',
-      body: {'body': body},
-      requiresAuth: true,
-    );
-    final message = decoded['message'];
-    if (message is Map) return Map<String, dynamic>.from(message);
-    throw BackendAuthException(code: 'invalid-message-response');
+    final msg = await client.rpc('send_message', params: {
+      'p_match_id': matchId,
+      'p_body': body,
+    });
+    return _readListOfMaps([msg]).first;
   }
 
-  /// UNMATCH — hides the conversation from this side. History stays readable
-  /// for the other side, and a future mutual like reactivates the match.
   Future<void> unmatch(String matchId) async {
-    await _sendJson(
-      'DELETE',
-      '/matches/${Uri.encodeComponent(matchId)}',
-      requiresAuth: true,
-    );
+    await client.rpc('unmatch', params: {'p_match_id': matchId});
   }
 
-  /// MATCH DETAIL — one match with the other user's public profile. Used by
-  /// the chat header to resolve the peer's uid for report/block actions.
   Future<Map<String, dynamic>?> fetchMatch(String matchId) async {
-    final decoded = await _sendJson(
-      'GET',
-      '/matches/${Uri.encodeComponent(matchId)}',
-      requiresAuth: true,
-    );
-    final match = decoded['match'];
-    if (match is Map) return Map<String, dynamic>.from(match);
+    final matches = await fetchMatches(limit: 100);
+    for (final m in matches) {
+      if (m['match_id'] == matchId) return m;
+    }
     return null;
   }
 
-  /// BLOCKING — hides both accounts from each other across discovery, likes,
-  /// matches, and chat. Idempotent on the server.
+  // ── BLOCKS ────────────────────────────────────────────────────────────────
+
   Future<void> blockUser(String uid) async {
-    await _sendJson(
-      'POST',
-      '/users/${Uri.encodeComponent(uid)}/block',
-      requiresAuth: true,
-    );
+    await client.rpc('block_user', params: {'p_target_id': uid});
   }
 
   Future<void> unblockUser(String uid) async {
-    await _sendJson(
-      'DELETE',
-      '/users/${Uri.encodeComponent(uid)}/block',
-      requiresAuth: true,
-    );
+    await client.rpc('unblock_user', params: {'p_target_id': uid});
   }
 
-  /// Accounts I have blocked (for the Blocked users settings screen).
   Future<List<Map<String, dynamic>>> fetchBlockedUsers() async {
-    final decoded = await _sendJson('GET', '/blocks', requiresAuth: true);
-    return _readListOfMaps(decoded['blocks']);
+    final rows = await client.rpc('fetch_blocked_users');
+    return _readListOfMaps(rows);
   }
 
-  /// REPORTING — files a report against another user. Reasons must match
-  /// the server's enum (harassment, fake_profile, inappropriate_photos,
-  /// scam, other). Throws BackendAuthException on API error so callers can
-  /// surface the message; returns the created report id.
+  // ── REPORTS + MODERATION ──────────────────────────────────────────────────
+
   Future<String> submitReport({
     required String reportedUserId,
     required String reason,
     String? details,
   }) async {
-    final decoded = await _sendJson(
-      'POST',
-      '/reports',
-      body: {
-        'reportedUserId': reportedUserId,
-        'reason': reason,
-        if (details != null && details.trim().isNotEmpty) 'details': details.trim(),
-      },
-      requiresAuth: true,
-    );
-    final report = decoded['report'];
-    if (report is Map) {
-      final id = report['id']?.toString();
-      if (id != null && id.isNotEmpty) return id;
-    }
-    return '';
+    final report = await client.rpc('submit_report', params: {
+      'p_reported_user_id': reportedUserId,
+      'p_reason': reason,
+      if (details != null && details.trim().isNotEmpty) 'p_details': details.trim(),
+    });
+    return report is Map ? (report['id']?.toString() ?? '') : '';
   }
 
-  /// MODERATION QUEUE — moderator+ only (server enforces; a 403 here means
-  /// the signed-in account is not a moderator). Returns [] when empty.
   Future<List<Map<String, dynamic>>> fetchModerationReports({
     String status = 'pending',
   }) async {
-    final decoded = await _sendJson(
-      'GET',
-      '/moderation/reports',
-      query: {'status': status},
-      requiresAuth: true,
-    );
-    final raw = decoded['reports'];
-    if (raw is! List) return [];
-    return [
-      for (final item in raw)
-        if (item is Map) Map<String, dynamic>.from(item),
-    ];
+    final rows = await client.rpc('fetch_moderation_reports', params: {
+      'p_status': status,
+    });
+    return _readListOfMaps(rows);
   }
 
-  /// Resolves a report. [outcome] is 'uphold' or 'dismiss'; upholding pauses
-  /// the reported account pending human review (server-side behavior).
   Future<void> resolveReport({
     required String reportId,
     required String outcome,
     String? note,
   }) async {
-    await _sendJson(
-      'POST',
-      '/moderation/reports/$reportId/resolve',
-      body: {
-        'outcome': outcome,
-        if (note != null && note.trim().isNotEmpty) 'note': note.trim(),
-      },
-      requiresAuth: true,
-    );
+    await client.rpc('resolve_report', params: {
+      'p_report_id': reportId,
+      'p_outcome': outcome,
+      if (note != null && note.trim().isNotEmpty) 'p_note': note.trim(),
+    });
   }
 
-  /// Pauses, bans, or reinstates a user (moderator+). The server revokes the
-  /// target's sessions immediately.
   Future<void> setUserStatus({
     required String userId,
     required String action, // 'pause' | 'ban' | 'reinstate'
     String? note,
   }) async {
-    await _sendJson(
-      'POST',
-      '/moderation/users/$userId/status',
-      body: {
-        'action': action,
-        if (note != null && note.trim().isNotEmpty) 'note': note.trim(),
-      },
-      requiresAuth: true,
-    );
+    await client.rpc('set_user_status', params: {
+      'p_user_id': userId,
+      'p_action': action,
+      if (note != null && note.trim().isNotEmpty) 'p_note': note.trim(),
+    });
   }
 
-  Future<Map<String, dynamic>> _sendJson(
-    String method,
-    String path, {
-    Map<String, dynamic>? body,
-    Map<String, String>? query,
-    bool requiresAuth = false,
+  Future<void> logClientEvent({
+    String level = 'info',
+    required String event,
+    Map<String, dynamic> context = const {},
   }) async {
-    if (!isConfigured) {
-      throw BackendAuthException(code: 'backend-not-configured');
+    if (!isConfigured) return;
+    try {
+      await client.rpc('log_event', params: {
+        'p_level': level,
+        'p_event': event,
+        'p_context': context,
+      });
+    } catch (_) {
+      // Logging must never block the user flow.
     }
-
-    await _ensureSessionLoaded();
-    if (requiresAuth && (_sessionToken == null || currentUserId == null)) {
-      throw BackendAuthException(code: 'not-authenticated');
-    }
-
-    final headers = <String, String>{
-      'Accept': 'application/json',
-      if (body != null) 'Content-Type': 'application/json',
-      if (_sessionToken != null) 'Authorization': 'Bearer $_sessionToken',
-    };
-    final uri = _apiUri(path, query: query);
-
-    final response = await switch (method) {
-      'GET' => http.get(uri, headers: headers),
-      'POST' => http.post(
-          uri,
-          headers: headers,
-          body: body == null ? null : jsonEncode(body),
-        ),
-      'PUT' => http.put(
-          uri,
-          headers: headers,
-          body: body == null ? null : jsonEncode(body),
-        ),
-      'DELETE' => http.delete(uri, headers: headers),
-      _ => throw ArgumentError('Unsupported method: $method'),
-    }
-        .timeout(const Duration(seconds: 20));
-
-    final decoded = _decodeResponse(response);
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw _exceptionFromResponse(response, decoded);
-    }
-    return decoded;
-  }
-
-  Uri _apiUri(String path, {Map<String, String>? query}) {
-    final normalizedBase = phpApiBaseUrl.trim().replaceFirst(RegExp(r'/+$'), '');
-    final normalizedPath = path.startsWith('/') ? path : '/$path';
-    final uri = Uri.parse('$normalizedBase$normalizedPath');
-    if (query == null || query.isEmpty) return uri;
-    return uri.replace(queryParameters: query);
-  }
-
-  Map<String, dynamic> _decodeResponse(http.Response response) {
-    if (response.body.trim().isEmpty) return <String, dynamic>{};
-    final decoded = jsonDecode(response.body);
-    if (decoded is Map<String, dynamic>) return decoded;
-    if (decoded is Map) return Map<String, dynamic>.from(decoded);
-    return {'data': decoded};
-  }
-
-  BackendAuthException _exceptionFromResponse(
-    http.Response response,
-    Map<String, dynamic> decoded,
-  ) {
-    final error = decoded['error'];
-    if (error is Map) {
-      final code = error['code']?.toString();
-      final message = error['message']?.toString();
-      return BackendAuthException(
-        code: code == null || code.isEmpty ? 'api-error' : code,
-        message: message,
-        statusCode: response.statusCode,
-      );
-    }
-
-    return BackendAuthException(
-      code: 'api-error',
-      message: response.reasonPhrase,
-      statusCode: response.statusCode,
-    );
-  }
-
-  Future<void> _ensureSessionLoaded() {
-    if (!isConfigured) return Future.value();
-    _sessionLoadFuture ??= _loadSession();
-    return _sessionLoadFuture!;
-  }
-
-  Future<void> _loadSession() async {
-    final prefs = await SharedPreferences.getInstance();
-    _sessionToken = prefs.getString(_sessionTokenKey);
-    _sessionUserId = prefs.getString(_sessionUserIdKey);
-    final rawExpiresAt = prefs.getString(_sessionExpiresAtKey);
-    _sessionExpiresAt =
-        rawExpiresAt == null ? null : DateTime.tryParse(rawExpiresAt);
-
-    if (_isSessionExpired) {
-      _lastLoadedSessionWasExpired = true;
-      await _clearSession(notify: false);
-    } else {
-      _lastLoadedSessionWasExpired = false;
-    }
-  }
-
-  bool get _isSessionExpired {
-    final expiresAt = _sessionExpiresAt;
-    return expiresAt != null && expiresAt.isBefore(DateTime.now().toUtc());
-  }
-
-  Future<void> _storeSessionFromResponse(Map<String, dynamic> response) async {
-    final session = response['session'];
-    if (session is! Map) return;
-
-    final token = session['token']?.toString();
-    final userId = session['user_id']?.toString();
-    final expiresAt = DateTime.tryParse(session['expires_at']?.toString() ?? '');
-    if (token == null || token.isEmpty || userId == null || userId.isEmpty) {
-      throw BackendAuthException(code: 'invalid-session-response');
-    }
-
-    _sessionToken = token;
-    _sessionUserId = userId;
-    _sessionExpiresAt = expiresAt;
-    _lastLoadedSessionWasExpired = false;
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_sessionTokenKey, token);
-    await prefs.setString(_sessionUserIdKey, userId);
-    if (expiresAt != null) {
-      await prefs.setString(_sessionExpiresAtKey, expiresAt.toIso8601String());
-    } else {
-      await prefs.remove(_sessionExpiresAtKey);
-    }
-
-    _authController.add(User(uid: userId));
-  }
-
-  Future<void> _clearSession({bool notify = true}) async {
-    _sessionToken = null;
-    _sessionUserId = null;
-    _sessionExpiresAt = null;
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_sessionTokenKey);
-    await prefs.remove(_sessionUserIdKey);
-    await prefs.remove(_sessionExpiresAtKey);
-
-    if (notify) _authController.add(null);
-  }
-
-  List<Map<String, dynamic>> _readListOfMaps(Object? value) {
-    if (value is! List) return const [];
-    return value
-        .whereType<Map>()
-        .map((row) => Map<String, dynamic>.from(row))
-        .toList();
   }
 }
+
+/// Columns any client may read from public.users — email/phone/pin_hash are
+/// excluded server-side by column grants too (defense in depth).
+const _publicProfileColumns =
+    'id, name, age, city, location, village, goal, intent, bio, photo, '
+    'visible, status, "isPremium", lat, lng, distance, preferences, created_at';
 
 class User {
   final String uid;
   User({required this.uid});
 }
 
-/// Result of POST /swipes.
+/// Result of record_swipe.
 class SwipeResult {
   final bool matched;
   final String? matchId;
@@ -887,7 +656,7 @@ class BackendAuthException implements Exception {
   final String? message;
   final int? statusCode;
 
-  BackendAuthException({
+  const BackendAuthException({
     required this.code,
     this.message,
     this.statusCode,
@@ -912,15 +681,12 @@ const _socialProviderDisabledMessage =
     'This social sign-in option is temporarily unavailable. Use email to continue.';
 
 bool isPhoneProviderDisabledAuthError(Object error) {
-  final code = _authErrorCode(error);
   final description = _authErrorDescription(error);
-  return code == 'phone_provider_disabled' ||
-      code == 'phone-provider-disabled' ||
-      description.contains('phone_provider_disabled') ||
+  return description.contains('phone_provider_disabled') ||
+      description.contains('phone provider is disabled') ||
       description.contains('unsupported phone provider') ||
-      (description.contains('phone provider') &&
-          (description.contains('disabled') ||
-              description.contains('unsupported')));
+      description.contains('phone provider') &&
+          (description.contains('disabled') || description.contains('unsupported'));
 }
 
 String authErrorMessage(Object error) {
@@ -943,15 +709,18 @@ String authErrorMessage(Object error) {
         return 'The email, phone, or password is incorrect.';
       case 'email_already_exists':
       case 'email-already-exists':
+      case 'user_already_exists':
         return 'An account already exists for that email address.';
       case 'invalid_otp':
       case 'otp_expired':
         return 'That OTP is invalid or expired. Request a new code and try again.';
       case 'over_request_rate_limit':
+      case 'over_rate_limit':
         return 'Too many attempts. Wait a moment, then try again.';
       case 'missing-phone':
         return 'Enter a phone number before verifying an OTP.';
       case 'not-authenticated':
+      case 'not_authenticated':
         return 'You need to sign in again.';
       case 'backend-not-configured':
         return 'The backend is not configured on this build.';
@@ -979,19 +748,19 @@ String authErrorMessage(Object error) {
   return 'Something went wrong while signing in. Please try again.';
 }
 
-String? _authErrorCode(Object error) {
-  if (error is BackendAuthException) return error.code;
-
-  final codeMatch =
-      RegExp(r'code:\s*([a-zA-Z0-9_-]+)').firstMatch(error.toString());
-  return codeMatch?.group(1);
-}
-
 String _authErrorDescription(Object error) {
   if (error is BackendAuthException) {
     return '${error.code} ${error.message ?? ''} $error'.toLowerCase();
   }
   return error.toString().toLowerCase();
+}
+
+List<Map<String, dynamic>> _readListOfMaps(Object? value) {
+  if (value is! List) return const [];
+  return value
+      .whereType<Map>()
+      .map((row) => Map<String, dynamic>.from(row))
+      .toList();
 }
 
 const _demoUsers = [

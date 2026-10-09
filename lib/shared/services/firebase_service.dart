@@ -15,14 +15,13 @@ export 'backend_service.dart'
         authErrorMessage,
         authProviderAvailabilityProvider,
         isPhoneProviderDisabledAuthError,
-        phpApiBaseUrl;
+        supabaseUrlDefine;
 
-const apiBaseUrl = phpApiBaseUrl;
+const apiBaseUrl = supabaseUrlDefine;
 
-// Compatibility names kept while the app finishes moving away from Firebase/
-// Supabase terminology.
-const supabaseUrl = phpApiBaseUrl;
-const supabaseAnonKey = '';
+// Compatibility names kept while screens migrate off Firebase terminology.
+const supabaseUrl = supabaseUrlDefine;
+const supabaseAnonKey = supabaseAnonKeyDefine;
 const supabasePhoneAuthEnabled = apiPhoneAuthEnabled;
 const supabaseEmailAuthEnabled = apiEmailAuthEnabled;
 const supabaseGoogleAuthEnabled = apiGoogleAuthEnabled;

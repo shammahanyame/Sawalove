@@ -44,22 +44,25 @@ val validatesReleaseApiConfig = gradle.startParameter.taskNames.any { taskName -
 
 if (validatesReleaseApiConfig) {
     val dartDefines = decodedDartDefines()
-    val apiBaseUrl = dartDefines["API_BASE_URL"]?.trim().orEmpty()
+    val supabaseUrl = dartDefines["SUPABASE_URL"]?.trim().orEmpty()
 
-    require(apiBaseUrl.isNotEmpty()) {
-        "Missing required release Dart define API_BASE_URL. Build with --dart-define=API_BASE_URL=..."
+    require(supabaseUrl.isNotEmpty()) {
+        "Missing required release Dart define SUPABASE_URL. Build with --dart-define=SUPABASE_URL=..."
     }
-    require(apiBaseUrl.startsWith("https://")) {
-        "API_BASE_URL must use https:// for a release App Bundle."
+    require(supabaseUrl.startsWith("https://")) {
+        "SUPABASE_URL must use https:// for a release App Bundle."
     }
-    require(!apiBaseUrl.contains("example.com", ignoreCase = true)) {
-        "API_BASE_URL still contains an example host."
+    require(!supabaseUrl.contains("example.com", ignoreCase = true)) {
+        "SUPABASE_URL still contains an example host."
     }
-    require(!apiBaseUrl.contains("localhost", ignoreCase = true) && !apiBaseUrl.contains("127.0.0.1")) {
-        "API_BASE_URL must point to a public HTTPS API, not localhost."
+    require(!supabaseUrl.contains("localhost", ignoreCase = true) && !supabaseUrl.contains("127.0.0.1")) {
+        "SUPABASE_URL must point to a public HTTPS API, not localhost."
     }
-    require(!apiBaseUrl.contains("10.0.2.2")) {
-        "API_BASE_URL must point to a public HTTPS API, not an emulator host."
+    require(!supabaseUrl.contains("10.0.2.2")) {
+        "SUPABASE_URL must point to a public HTTPS API, not an emulator host."
+    }
+    require((dartDefines["SUPABASE_ANON_KEY"] ?: "").trim().isNotEmpty()) {
+        "Missing required release Dart define SUPABASE_ANON_KEY."
     }
 
     // Play policy guards: a release bundle must not ship unfinished feature

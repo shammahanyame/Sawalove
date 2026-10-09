@@ -101,42 +101,22 @@ function Assert-PublicHttpsUrl {
         throw "$Name must start with https:// for a Play Store release App Bundle."
     }
     if ($Value -match "example\.com|localhost|127\.0\.0\.1|10\.0\.2\.2") {
-        throw "$Name must point to your deployed public PHP API, not an example or local host."
-    }
-}
-
-function Assert-ApiHealth {
-    param([string]$ApiBaseUrl)
-
-    $healthUrl = "$($ApiBaseUrl.TrimEnd('/'))/health"
-    try {
-        $health = Invoke-RestMethod -Method Get -Uri $healthUrl -TimeoutSec 20
-    } catch {
-        throw "Could not verify PHP API health at $healthUrl. Deploy the PHP API or rerun with -SkipApiPreflight if you already verified it manually. Error: $($_.Exception.Message)"
-    }
-
-    if ($null -eq $health.ok -or $health.ok -ne $true) {
-        throw "PHP API health check at $healthUrl did not return ok=true."
+        throw "$Name must point to your deployed public Supabase project, not an example or local host."
     }
 }
 
 Import-EnvFile -Path $EnvFile
 
-if ([string]::IsNullOrWhiteSpace($env:API_BASE_URL) -and
-    -not [string]::IsNullOrWhiteSpace($env:PHP_API_BASE_URL)) {
-    $env:API_BASE_URL = $env:PHP_API_BASE_URL
+Assert-PublicHttpsUrl -Name "SUPABASE_URL" -Value $env:SUPABASE_URL
+
+if ([string]::IsNullOrWhiteSpace($env:SUPABASE_ANON_KEY)) {
+    throw "SUPABASE_ANON_KEY is missing from $EnvFile."
 }
 
-Assert-PublicHttpsUrl -Name "API_BASE_URL" -Value $env:API_BASE_URL
-
-$phoneAuthEnabled = Get-BoolEnv -Name "API_PHONE_AUTH_ENABLED" -Default $true
-$emailAuthEnabled = Get-BoolEnv -Name "API_EMAIL_AUTH_ENABLED" -Default $true
-$googleAuthEnabled = Get-BoolEnv -Name "API_GOOGLE_AUTH_ENABLED" -Default $false
-$appleAuthEnabled = Get-BoolEnv -Name "API_APPLE_AUTH_ENABLED" -Default $false
-
-if (-not $SkipApiPreflight) {
-    Assert-ApiHealth -ApiBaseUrl $env:API_BASE_URL
-}
+$phoneAuthEnabled = Get-BoolEnv -Name "SUPABASE_PHONE_AUTH_ENABLED" -Default $true
+$emailAuthEnabled = Get-BoolEnv -Name "SUPABASE_EMAIL_AUTH_ENABLED" -Default $true
+$googleAuthEnabled = Get-BoolEnv -Name "SUPABASE_GOOGLE_AUTH_ENABLED" -Default $false
+$appleAuthEnabled = Get-BoolEnv -Name "SUPABASE_APPLE_AUTH_ENABLED" -Default $false
 
 $flutterSdk = Get-LocalProperty -Name "flutter.sdk"
 if ([string]::IsNullOrWhiteSpace($flutterSdk)) {
@@ -167,11 +147,14 @@ if ($Clean) {
 }
 
 & $flutter build appbundle --release `
-    "--dart-define=API_BASE_URL=$env:API_BASE_URL" `
-    "--dart-define=API_PHONE_AUTH_ENABLED=$($phoneAuthEnabled.ToString().ToLowerInvariant())" `
-    "--dart-define=API_EMAIL_AUTH_ENABLED=$($emailAuthEnabled.ToString().ToLowerInvariant())" `
-    "--dart-define=API_GOOGLE_AUTH_ENABLED=$($googleAuthEnabled.ToString().ToLowerInvariant())" `
-    "--dart-define=API_APPLE_AUTH_ENABLED=$($appleAuthEnabled.ToString().ToLowerInvariant())"
+    "--dart-define=SUPABASE_URL=$env:SUPABASE_URL" `
+    "--dart-define=SUPABASE_ANON_KEY=$env:SUPABASE_ANON_KEY" `
+    "--dart-define=SUPABASE_PROFILE_PHOTOS_BUCKET=$env:SUPABASE_PROFILE_PHOTOS_BUCKET" `
+    "--dart-define=SUPABASE_AUTH_REDIRECT_TO=$env:SUPABASE_AUTH_REDIRECT_TO" `
+    "--dart-define=SUPABASE_PHONE_AUTH_ENABLED=$($phoneAuthEnabled.ToString().ToLowerInvariant())" `
+    "--dart-define=SUPABASE_EMAIL_AUTH_ENABLED=$($emailAuthEnabled.ToString().ToLowerInvariant())" `
+    "--dart-define=SUPABASE_GOOGLE_AUTH_ENABLED=$($googleAuthEnabled.ToString().ToLowerInvariant())" `
+    "--dart-define=SUPABASE_APPLE_AUTH_ENABLED=$($appleAuthEnabled.ToString().ToLowerInvariant())"
 
 if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
