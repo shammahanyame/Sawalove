@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/theme/theme.dart';
 import '../../../shared/models/photo_slot.dart';
 import '../../../shared/providers/like_provider.dart';
+import '../../../shared/services/backend_service.dart';
 import 'providers/photo_viewer_provider.dart';
 import 'package:sawalove/l10n/app_localizations.dart';
 
@@ -39,7 +40,6 @@ class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen>
   late ScrollController _thumbController;
   late AnimationController _heartController;
   final List<TransformationController> _transformControllers = [];
-  TapDownDetails? _lastTapDownDetails;
 
   @override
   void initState() {
@@ -51,18 +51,82 @@ class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen>
       duration: const Duration(milliseconds: 400),
     );
 
-    for (int i = 0; i < widget.photos.length; i++) {
-      final ctrl = TransformationController();
-      ctrl.addListener(() => _onTransformChanged(i, ctrl));
-      _transformControllers.add(ctrl);
-    }
+    _createTransformControllers();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       ref
           .read(photoViewerProvider.notifier)
           .init(initialIndex: _safeInitialIndex);
       _scrollThumbnailIntoView(_safeInitialIndex);
       _hideSystemUI();
+    });
+  }
+
+  void _createTransformControllers() {
+    for (var i = 0; i < widget.photos.length; i++) {
+      final index = i;
+      final controller = TransformationController();
+      controller.addListener(() => _onTransformChanged(index, controller));
+      _transformControllers.add(controller);
+    }
+  }
+
+  bool _samePhotos(List<PhotoSlot> first, List<PhotoSlot> second) {
+    if (first.length != second.length) return false;
+
+    for (var i = 0; i < first.length; i++) {
+      final a = first[i];
+      final b = second[i];
+      if (a.url != b.url ||
+          a.localFile != b.localFile ||
+          a.caption != b.caption ||
+          a.faceDetected != b.faceDetected ||
+          a.checkStatus != b.checkStatus ||
+          a.uploadProgress != b.uploadProgress) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @override
+  void didUpdateWidget(covariant PhotoViewerScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    final profileChanged = oldWidget.profileUid != widget.profileUid;
+    final photosChanged = !_samePhotos(oldWidget.photos, widget.photos);
+    final initialIndexChanged = oldWidget.initialIndex != widget.initialIndex;
+    if (!profileChanged && !photosChanged && !initialIndexChanged) return;
+
+    if (photosChanged) {
+      for (final controller in _transformControllers) {
+        controller.dispose();
+      }
+      _transformControllers.clear();
+      _createTransformControllers();
+    } else if (profileChanged || initialIndexChanged) {
+      for (final controller in _transformControllers) {
+        controller.value = Matrix4.identity();
+      }
+    }
+
+    final previousIndex = ref.read(photoViewerProvider).currentIndex;
+    final targetIndex = profileChanged || initialIndexChanged
+        ? _safeInitialIndex
+        : (widget.photos.isEmpty
+            ? 0
+            : previousIndex.clamp(0, widget.photos.length - 1).toInt());
+    ref.read(photoViewerProvider.notifier).setIndex(targetIndex);
+    ref.read(photoViewerProvider.notifier).setZoomed(false);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _pageController.hasClients && widget.photos.isNotEmpty) {
+        final currentIndex = ref.read(photoViewerProvider).currentIndex;
+        _pageController.jumpToPage(
+          currentIndex.clamp(0, widget.photos.length - 1).toInt(),
+        );
+      }
     });
   }
 
@@ -105,6 +169,8 @@ class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen>
 
   void _onPageChanged(int index) {
     ref.read(photoViewerProvider.notifier).setIndex(index);
+    ref.read(photoViewerProvider.notifier).setZoomed(
+        _transformControllers[index].value.getMaxScaleOnAxis() > 1.05);
     _scrollThumbnailIntoView(index);
   }
 
@@ -116,44 +182,40 @@ class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen>
     );
   }
 
-  void _onDoubleTap() {
+  Future<void> _onDoubleTap() async {
     if (widget.photos.isEmpty) return;
 
-    final viewerState = ref.read(photoViewerProvider);
-    final currentIndex =
-        viewerState.currentIndex.clamp(0, widget.photos.length - 1).toInt();
-
-    if (viewerState.isZoomed) {
-      _transformControllers[currentIndex].value = Matrix4.identity();
-      return;
-    }
-
-    // Zoom to 2.5x at tap position
-    if (_lastTapDownDetails != null) {
-      final ctrl = _transformControllers[currentIndex];
-      final RenderBox box = context.findRenderObject() as RenderBox;
-      final Offset local =
-          box.globalToLocal(_lastTapDownDetails!.globalPosition);
-      final Size size = box.size;
-      final Offset center = Offset(size.width / 2, size.height / 2);
-      final Offset offset = local - center;
-
-      final matrix = Matrix4.identity()
-        ..translateByDouble(-offset.dx * 1.5, -offset.dy * 1.5, 0, 1)
-        ..scaleByDouble(2.5, 2.5, 2.5, 1);
-      ctrl.value = matrix;
-    }
-
-    // Trigger like
     final alreadyLiked = ref.read(likeProvider(widget.profileUid));
     if (alreadyLiked) {
       _showAlreadyLikedToast();
       return;
     }
 
-    ref.read(likeProvider(widget.profileUid).notifier).like();
+    final likeNotifier = ref.read(likeProvider(widget.profileUid).notifier);
+    likeNotifier.like();
     _heartController.forward(from: 0);
     _showLikeFlash();
+
+    final backend = ref.read(backendServiceProvider);
+    if (!backend.isConfigured || widget.profileUid.startsWith('demo-')) return;
+
+    try {
+      final result = await backend.sendSwipe(
+        targetUserId: widget.profileUid,
+        action: 'like',
+      );
+      if (mounted && result.matched && result.matchId != null) {
+        context.push('/match/${result.matchId}');
+      }
+    } catch (_) {
+      likeNotifier.unlike();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Could not send like. Please try again.'),
+        ),
+      );
+    }
   }
 
   void _showLikeFlash() {
@@ -173,7 +235,10 @@ class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen>
       ),
     );
     overlay.insert(entry);
-    Future.delayed(const Duration(milliseconds: 150), entry.remove);
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (entry.mounted) entry.remove();
+      entry.dispose();
+    });
   }
 
   void _showAlreadyLikedToast() {
@@ -181,24 +246,23 @@ class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(l10n.photoViewerAlreadyLiked),
-        action: SnackBarAction(
-          label: l10n.photoViewerUndo,
-          onPressed: () {
-            // ref.read(rewindModalProvider.notifier).show();
-          },
-        ),
         duration: const Duration(seconds: 3),
       ),
     );
   }
 
-  void _onDoubleTapDown(TapDownDetails details, int index) {
-    _lastTapDownDetails = details;
-  }
-
-  void _onShare() {
+  Future<void> _onShare() async {
     final link = 'sawalove://profile/${widget.profileUid}';
-    Clipboard.setData(ClipboardData(text: link));
+    try {
+      await Clipboard.setData(ClipboardData(text: link));
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not copy profile link.')),
+      );
+      return;
+    }
+    if (!mounted) return;
     final l10n = AppLocalizations.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(l10n.photoViewerLinkCopied)),
@@ -216,8 +280,6 @@ class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen>
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => _ReportSheet(
-        profileUid: widget.profileUid,
-        photoUrl: photoUrl,
         onReasonSelected: (reason) {
           Navigator.of(context).pop();
           final qReason = Uri.encodeQueryComponent(reason);
@@ -232,6 +294,7 @@ class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen>
 
   @override
   void dispose() {
+    _restoreSystemUI();
     _pageController.dispose();
     _thumbController.dispose();
     _heartController.dispose();
@@ -272,7 +335,6 @@ class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen>
                   onPageChanged: _onPageChanged,
                   onThumbnailTap: _onThumbnailTap,
                   onDoubleTap: _onDoubleTap,
-                  onDoubleTapDown: _onDoubleTapDown,
                   name: widget.name,
                   age: widget.age,
                   city: widget.city,
@@ -293,7 +355,6 @@ class _PhotoViewerScreenState extends ConsumerState<PhotoViewerScreen>
                 onPageChanged: _onPageChanged,
                 onThumbnailTap: _onThumbnailTap,
                 onDoubleTap: _onDoubleTap,
-                onDoubleTapDown: _onDoubleTapDown,
                 name: widget.name,
                 age: widget.age,
                 city: widget.city,
@@ -326,7 +387,6 @@ class _PortraitLayout extends StatelessWidget {
   final ValueChanged<int> onPageChanged;
   final ValueChanged<int> onThumbnailTap;
   final VoidCallback onDoubleTap;
-  final void Function(TapDownDetails, int) onDoubleTapDown;
   final String name;
   final int? age;
   final String? city;
@@ -347,7 +407,6 @@ class _PortraitLayout extends StatelessWidget {
     required this.onPageChanged,
     required this.onThumbnailTap,
     required this.onDoubleTap,
-    required this.onDoubleTapDown,
     required this.name,
     required this.age,
     required this.city,
@@ -387,7 +446,6 @@ class _PortraitLayout extends StatelessWidget {
           itemBuilder: (context, index) {
             final photo = photos[index];
             return GestureDetector(
-              onDoubleTapDown: (details) => onDoubleTapDown(details, index),
               onDoubleTap: onDoubleTap,
               child: Semantics(
                 label:
@@ -516,7 +574,6 @@ class _LandscapeLayout extends StatelessWidget {
   final ValueChanged<int> onPageChanged;
   final ValueChanged<int> onThumbnailTap;
   final VoidCallback onDoubleTap;
-  final void Function(TapDownDetails, int) onDoubleTapDown;
   final String name;
   final int? age;
   final String? city;
@@ -535,7 +592,6 @@ class _LandscapeLayout extends StatelessWidget {
     required this.onPageChanged,
     required this.onThumbnailTap,
     required this.onDoubleTap,
-    required this.onDoubleTapDown,
     required this.name,
     required this.age,
     required this.city,
@@ -576,8 +632,6 @@ class _LandscapeLayout extends StatelessWidget {
                 itemCount: photos.length,
                 itemBuilder: (context, index) {
                   return GestureDetector(
-                    onDoubleTapDown: (details) =>
-                        onDoubleTapDown(details, index),
                     onDoubleTap: onDoubleTap,
                     child: InteractiveViewer(
                       transformationController: transformControllers[index],
@@ -736,7 +790,8 @@ class _PhotoImage extends StatelessWidget {
     return CachedNetworkImage(
       imageUrl: url,
       fit: fit,
-      placeholder: (context, url) => Container(color: SawaLoveTheme.darkSurfaceContainer),
+      placeholder: (context, url) =>
+          Container(color: SawaLoveTheme.darkSurfaceContainer),
       errorWidget: (context, url, error) => const _MissingPhotoPlaceholder(),
     );
   }
@@ -750,8 +805,8 @@ class _MissingPhotoPlaceholder extends StatelessWidget {
     return Container(
       color: SawaLoveTheme.darkSurfaceContainerHigh,
       alignment: Alignment.center,
-      child:
-          const Icon(Icons.image_not_supported, color: SawaLoveTheme.onSurfaceVariant, size: 64),
+      child: const Icon(Icons.image_not_supported,
+          color: SawaLoveTheme.onSurfaceVariant, size: 64),
     );
   }
 }
@@ -1011,13 +1066,9 @@ class _PinchHintPill extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 class _ReportSheet extends StatelessWidget {
-  final String profileUid;
-  final String photoUrl;
   final ValueChanged<String> onReasonSelected;
 
   const _ReportSheet({
-    required this.profileUid,
-    required this.photoUrl,
     required this.onReasonSelected,
   });
 
