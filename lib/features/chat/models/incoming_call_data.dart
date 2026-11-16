@@ -5,6 +5,7 @@ class IncomingCallData {
   final String callerName;
   final String? callerAvatar;
   final String matchId;
+  final String? callId;
   final String? token;
   
   // Contextual badges
@@ -20,6 +21,7 @@ class IncomingCallData {
     required this.callerName,
     this.callerAvatar,
     required this.matchId,
+    this.callId,
     this.token,
     this.superLikedYou = false,
     this.isVerified = false,
@@ -33,6 +35,7 @@ class IncomingCallData {
       callerName: map['callerName'] as String,
       callerAvatar: map['callerAvatar'] as String?,
       matchId: map['matchId'] as String,
+      callId: map['callId'] as String?,
       token: map['token'] as String?,
       superLikedYou: map['superLikedYou'] as bool? ?? false,
       isVerified: map['isVerified'] as bool? ?? false,
@@ -49,6 +52,7 @@ class IncomingCallData {
       'callerName': callerName,
       'callerAvatar': callerAvatar,
       'matchId': matchId,
+      'callId': callId,
       'token': token,
       'superLikedYou': superLikedYou,
       'isVerified': isVerified,
@@ -62,6 +66,7 @@ class IncomingCallData {
     String? callerName,
     String? callerAvatar,
     String? matchId,
+    String? callId,
     String? token,
     bool? superLikedYou,
     bool? isVerified,
@@ -73,6 +78,7 @@ class IncomingCallData {
       callerName: callerName ?? this.callerName,
       callerAvatar: callerAvatar ?? this.callerAvatar,
       matchId: matchId ?? this.matchId,
+      callId: callId ?? this.callId,
       token: token ?? this.token,
       superLikedYou: superLikedYou ?? this.superLikedYou,
       isVerified: isVerified ?? this.isVerified,

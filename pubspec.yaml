@@ -14,6 +14,14 @@ dependencies:
   # State & Routing
   flutter_riverpod: ^2.5.1
   go_router: ^14.2.7
+  # Incoming-call ringing (FCM). Client ids come from --dart-define; no
+  # google-services.json is checked in.
+  firebase_core: ^4.15.2
+  firebase_messaging: ^16.7.1
+  # Agora RTC video calls (App Certificate stays server-side).
+  # Pinned: 6.4+ ships a native module that needs NDK 27+ tuning we can't do
+  # from app config, and this version builds against NDK 26.
+  agora_rtc_engine: 6.3.2
   # UI
   google_fonts: ^6.3.2
   intl: ^0.20.2

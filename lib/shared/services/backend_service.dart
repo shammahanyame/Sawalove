@@ -380,7 +380,7 @@ class BackendService {
   }
 
   Future<String?> uploadProfilePhoto({
-    required Uint8List bytes,
+    required List<int> bytes,
     required int slotIndex,
     String contentType = 'image/jpeg',
   }) async {
@@ -402,14 +402,354 @@ class BackendService {
     final path = '$uid/slot_$slotIndex.$extension';
 
     // Storage RLS restricts uploads to the owner's folder; the bucket caps
-    // size at 5 MB and MIME to jpeg/png/webp.
+    // size at 5 MB and MIME to jpeg/png/webp. The compressor hands back a
+    // plain List<int>, which storage_client will not accept directly.
     await client.storage.from(supabaseProfilePhotosBucket).uploadBinary(
           path,
-          bytes,
+          Uint8List.fromList(bytes),
           fileOptions: FileOptions(upsert: true, contentType: contentType),
         );
 
     return client.storage.from(supabaseProfilePhotosBucket).getPublicUrl(path);
+  }
+
+  // ── CALLS (Agora signalling) ──────────────────────────────────────────────
+
+  /// Starts or rejoins the ring for [matchId] and returns the wire fields of
+  /// the call row: `call_id`, `channel_name`, `caller_id`, `callee_id`.
+  Future<Map<String, dynamic>> startCall(String matchId) async {
+    if (!isConfigured) {
+      throw const BackendAuthException(code: 'backend-not-configured');
+    }
+    final call = _asMap(
+      await client.rpc('start_call', params: {'p_match_id': matchId}),
+    );
+    if (call == null) {
+      throw StateError('start_call returned no call');
+    }
+    return call;
+  }
+
+  /// Reads one call the signed-in user is part of, or null when it is gone.
+  Future<Map<String, dynamic>?> fetchCall(String callId) async {
+    if (!isConfigured) return null;
+    final rows = _readListOfMaps(
+      await client.rpc('fetch_call', params: {'p_call_id': callId}),
+    );
+    return rows.isEmpty ? null : rows.first;
+  }
+
+  /// The callee accepts the ring.
+  Future<void> answerCall(String callId) async {
+    if (!isConfigured) return;
+    await client.rpc('answer_call', params: {'p_call_id': callId});
+  }
+
+  /// Either side hangs up; `declined` is the callee refusing the ring.
+  Future<void> endCall(String callId, {bool declined = false}) async {
+    if (!isConfigured) return;
+    await client.rpc('end_call', params: {
+      'p_call_id': callId,
+      'p_status': declined ? 'declined' : 'ended',
+    });
+  }
+
+  /// Asks the `agora-token` function for a short-lived channel token. The App
+  /// Certificate never reaches the client; the call row authorizes this.
+  Future<Map<String, dynamic>> fetchAgoraToken(String callId) async {
+    if (!isConfigured) {
+      throw const BackendAuthException(code: 'backend-not-configured');
+    }
+    final response = await client.functions.invoke(
+      'agora-token',
+      body: {'call_id': callId},
+    );
+    final data = _asMap(response.data) ?? const <String, dynamic>{};
+    if ((data['token']?.toString() ?? '').isEmpty) {
+      throw StateError('agora-token returned no token');
+    }
+    return data;
+  }
+
+  /// Best-effort ring for the callee's devices. A build without push support
+  /// must not stop the call from connecting over RTC.
+  Future<void> notifyIncomingCall(String callId) async {
+    if (!isConfigured) return;
+    try {
+      await client.functions.invoke('notify-call', body: {'call_id': callId});
+    } catch (e) {
+      logger.w('Could not send the incoming-call ring: $e');
+    }
+  }
+
+  /// The newest still-ringing call addressed to the signed-in user, shaped
+  /// like the push payload. This is the foreground fallback for devices that
+  /// never receive an FCM message (no Firebase credentials, notifications
+  /// denied, web). RLS already limits the read to the user's own calls.
+  Future<Map<String, dynamic>?> fetchIncomingRing({
+    Duration window = const Duration(seconds: 60),
+  }) async {
+    if (!isConfigured) return null;
+    final uid = currentUserId;
+    if (uid == null) return null;
+
+    final since = DateTime.now().toUtc().subtract(window).toIso8601String();
+    final rows = _readListOfMaps(await client
+        .from('calls')
+        .select('id, match_id, caller_id, callee_id, status, started_at')
+        .eq('callee_id', uid)
+        .eq('status', 'ringing')
+        .gte('started_at', since)
+        .order('started_at', ascending: false)
+        .limit(1));
+    if (rows.isEmpty) return null;
+
+    final row = rows.first;
+    var caller = const <String, dynamic>{};
+    try {
+      caller = _asMap(await client
+              .from('users')
+              .select('id, name, photo, faith')
+              .eq('id', row['caller_id'])
+              .maybeSingle()) ??
+          const <String, dynamic>{};
+    } catch (e) {
+      // The ring still works without the caller's name or photo.
+      logger.w('Could not load the calling profile: $e');
+    }
+    return normalizeIncomingRing(row, caller);
+  }
+
+  /// Turns a ringing `calls` row into the extras `IncomingCallScreen` reads,
+  /// matching the keys of `PushService.incomingCallPayload`.
+  static Map<String, dynamic>? normalizeIncomingRing(
+    Map<String, dynamic> callRow, [
+    Map<String, dynamic> caller = const {},
+  ]) {
+    final callId = callRow['id']?.toString() ?? '';
+    if (callId.isEmpty) return null;
+    final callerId = callRow['caller_id']?.toString() ??
+        caller['id']?.toString() ??
+        '';
+    if (callerId.isEmpty) return null;
+
+    return <String, dynamic>{
+      'callId': callId,
+      'callerId': callerId,
+      'callerName': caller['name']?.toString() ?? 'Someone',
+      'callerAvatar': caller['photo']?.toString() ?? '',
+      'matchId': callRow['match_id']?.toString() ?? '',
+      'faith': caller['faith']?.toString() ?? '',
+      'superLikedYou': false,
+      'isVerified': false,
+    };
+  }
+
+  /// Stores this device's FCM token so `notify-call` can reach it.
+  Future<void> registerPushToken(
+    String token, {
+    String platform = 'android',
+  }) async {
+    if (!isConfigured) return;
+    final uid = currentUserId;
+    if (uid == null) return;
+    await client.from('push_tokens').upsert(
+          pushTokenRow(token: token, userId: uid, platform: platform),
+        );
+  }
+
+  /// The row `push_tokens` keeps for a device. Pulled out of
+  /// [registerPushToken] so the mapping is verifiable without a project.
+  static Map<String, dynamic> pushTokenRow({
+    required String token,
+    required String userId,
+    String platform = 'android',
+    DateTime? seenAt,
+  }) {
+    return <String, dynamic>{
+      'token': token,
+      'user_id': userId,
+      'platform': platform,
+      'last_seen_at': (seenAt ?? DateTime.now()).toUtc().toIso8601String(),
+    };
+  }
+
+  // ── WIRE FORMAT MAPPING ───────────────────────────────────────────────────
+
+  /// Flattens `fetch_matches` rows into what the inbox reads: the peer under
+  /// `user`, the timestamp as `matchedAt`, and the last message preview.
+  static List<Map<String, dynamic>> normalizeMatches(
+    List<Map<String, dynamic>> rows,
+  ) {
+    return rows.map((row) {
+      final peer = _asMap(row['peer']) ?? _asMap(row['user']) ?? const {};
+      final matchedAt = row['created_at'] ?? row['matchedAt'];
+      final rawLast = row['last_message'];
+      final lastBody =
+          rawLast is Map ? (rawLast['body_preview'] ?? rawLast['body']) : rawLast;
+      final lastAt = rawLast is Map ? rawLast['at'] : null;
+      final matchId = row['match_id'] ?? row['id'];
+
+      final match = <String, dynamic>{
+        ...row,
+        'id': matchId,
+        'match_id': matchId,
+        'matchedAt': matchedAt,
+        'name': row['name'] ?? peer['name'],
+        'user': peer,
+      };
+
+      if (lastBody != null) {
+        match['lastMessage'] = {
+          'body': lastBody,
+          'at': lastAt ?? matchedAt,
+        };
+        match['last_message'] = lastBody;
+      } else {
+        match['lastMessage'] = null;
+        match.remove('last_message');
+      }
+      return match;
+    }).toList();
+  }
+
+  /// Restores chronological order (the RPC returns newest first) and flags the
+  /// signed-in user's own messages.
+  static List<Map<String, dynamic>> normalizeMessages(
+    List<Map<String, dynamic>> rows, {
+    String? currentUserId,
+  }) {
+    final messages = rows.map((row) {
+      final senderId = row['sender_id'] ?? row['senderId'];
+      return <String, dynamic>{
+        ...row,
+        'senderId': senderId,
+        'createdAt': row['created_at'] ?? row['createdAt'],
+        'fromMe': currentUserId != null && senderId == currentUserId,
+      };
+    }).toList();
+
+    messages.sort((a, b) {
+      final left = a['createdAt']?.toString() ?? '';
+      final right = b['createdAt']?.toString() ?? '';
+      final byTime = left.compareTo(right);
+      if (byTime != 0) return byTime;
+      return (a['id']?.toString() ?? '').compareTo(b['id']?.toString() ?? '');
+    });
+    return messages;
+  }
+
+  // ── CALL HISTORY ──────────────────────────────────────────────────────────
+
+  /// Recent calls involving the signed-in user, newest first. RLS on `calls`
+  /// already restricts the read to calls this user took part in.
+  Future<List<Map<String, dynamic>>> fetchCallHistory({int limit = 50}) async {
+    if (!isConfigured) return const [];
+    final uid = currentUserId;
+    if (uid == null) return const [];
+
+    final rows = _readListOfMaps(await client
+        .from('calls')
+        .select(
+          'id, match_id, caller_id, callee_id, status, started_at, answered_at, ended_at',
+        )
+        .or('caller_id.eq.$uid,callee_id.eq.$uid')
+        .order('started_at', ascending: false)
+        .limit(limit));
+    if (rows.isEmpty) return const [];
+
+    // Names and photos live on `users`, not on the call row.
+    final peerIds = <String>{};
+    for (final row in rows) {
+      final peerId = row['caller_id']?.toString() == uid
+          ? row['callee_id']?.toString()
+          : row['caller_id']?.toString();
+      if (peerId != null && peerId.isNotEmpty) peerIds.add(peerId);
+    }
+
+    var profiles = const <String, Map<String, dynamic>>{};
+    if (peerIds.isNotEmpty) {
+      try {
+        final users = _readListOfMaps(await client
+            .from('users')
+            .select('id, name, photo')
+            .inFilter('id', peerIds.toList()));
+        profiles = {
+          for (final user in users) user['id']?.toString() ?? '': user,
+        };
+      } catch (e) {
+        // A missing profile only costs the display name, never the list.
+        logger.w('Could not load call peers: $e');
+      }
+    }
+
+    return normalizeCallHistory(rows, currentUserId: uid, profiles: profiles);
+  }
+
+  /// Turns `calls` rows into what the history list renders.
+  static List<Map<String, dynamic>> normalizeCallHistory(
+    List<Map<String, dynamic>> rows, {
+    required String currentUserId,
+    Map<String, Map<String, dynamic>> profiles = const {},
+  }) {
+    final history = rows.map((row) {
+      final callerId = row['caller_id']?.toString() ?? '';
+      final calleeId = row['callee_id']?.toString() ?? '';
+      final outgoing = callerId == currentUserId;
+      final peerId = outgoing ? calleeId : callerId;
+      final peer = profiles[peerId] ?? const <String, dynamic>{};
+      final status = row['status']?.toString() ?? 'ended';
+      final duration = _callSeconds(
+        row['answered_at']?.toString(),
+        row['ended_at']?.toString(),
+      );
+
+      final String label;
+      if (status == 'declined') {
+        label = 'Declined';
+      } else if (status == 'missed' || status == 'ringing') {
+        label = outgoing ? 'No answer' : 'Missed';
+      } else {
+        label = outgoing ? 'Outgoing' : 'Incoming';
+      }
+
+      return <String, dynamic>{
+        ...row,
+        'matchId': row['match_id'],
+        'peerId': peerId,
+        'peerName': peer['name'] ?? 'SawaLove member',
+        'peerPhoto': peer['photo'],
+        'outgoing': outgoing,
+        'status': status,
+        'missed': !outgoing && (status == 'missed' || status == 'ringing'),
+        'startedAt': row['started_at'] ?? row['created_at'],
+        'durationSeconds': duration,
+        'durationLabel': _formatCallDuration(duration),
+        'label': label,
+      };
+    }).toList();
+
+    history.sort(
+      (a, b) => (b['startedAt'] ?? '')
+          .toString()
+          .compareTo((a['startedAt'] ?? '').toString()),
+    );
+    return history;
+  }
+
+  static int _callSeconds(String? answeredAt, String? endedAt) {
+    if (answeredAt == null || endedAt == null) return 0;
+    final answered = DateTime.tryParse(answeredAt);
+    final ended = DateTime.tryParse(endedAt);
+    if (answered == null || ended == null) return 0;
+    final seconds = ended.difference(answered).inSeconds;
+    return seconds > 0 ? seconds : 0;
+  }
+
+  static String _formatCallDuration(int seconds) {
+    final minutes = seconds ~/ 60;
+    final rest = seconds % 60;
+    return '$minutes:${rest.toString().padLeft(2, '0')}';
   }
 
   // ── ACCOUNT OPS ───────────────────────────────────────────────────────────
@@ -753,6 +1093,11 @@ String _authErrorDescription(Object error) {
     return '${error.code} ${error.message ?? ''} $error'.toLowerCase();
   }
   return error.toString().toLowerCase();
+}
+
+Map<String, dynamic>? _asMap(Object? value) {
+  if (value is! Map) return null;
+  return Map<String, dynamic>.from(value);
 }
 
 List<Map<String, dynamic>> _readListOfMaps(Object? value) {

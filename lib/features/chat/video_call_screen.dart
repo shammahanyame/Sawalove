@@ -1,155 +1,223 @@
+import 'dart:async';
+
+import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:flutter/material.dart';
-import 'package:sawalove/core/theme/theme.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sawalove/core/theme/theme.dart';
 
-class VideoCallScreen extends StatefulWidget {
-  const VideoCallScreen({super.key});
+import 'providers/video_call_provider.dart';
+
+/// Agora-backed video call screen.
+///
+/// Opened as the caller with `matchId` (the provider starts the ring) or as the
+/// callee with `callId` from the push payload (the provider answers it).
+class VideoCallScreen extends ConsumerWidget {
+  final String? matchId;
+  final String? callId;
+  final String remoteName;
+  final String? remoteAvatar;
+
+  const VideoCallScreen({
+    super.key,
+    this.matchId,
+    this.callId,
+    this.remoteName = 'SawaLove call',
+    this.remoteAvatar,
+  });
 
   @override
-  State<VideoCallScreen> createState() => _VideoCallScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final params = VideoCallParams(
+      matchId: matchId ?? '',
+      callId: callId,
+      remoteName: remoteName,
+      remoteAvatar: remoteAvatar,
+    );
+    final provider = videoCallProvider(params);
+    final state = ref.watch(provider);
+    final notifier = ref.read(provider.notifier);
+    final remote = notifier.remoteController;
+    final local = notifier.localController;
+    final finished =
+        state.state == CallState.summary || state.state == CallState.ended;
 
-class _VideoCallScreenState extends State<VideoCallScreen> {
-  bool _isMuted = false;
-  bool _isSpeakerOn = true;
-  bool _isVideoOn = true;
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
-        child: Column(
+        child: Stack(
+          fit: StackFit.expand,
           children: [
-            // Top bar
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.call_end, color: SawaLoveTheme.errorColor, size: 32),
-                    onPressed: () => context.pop(),
-                  ),
-                  const Column(
+            if (!finished && remote != null && state.remoteJoined)
+              AgoraVideoView(controller: remote)
+            else
+              Container(
+                color: SawaLoveTheme.darkSurfaceContainerHigh,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Amaka N.', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600)),
-                      Text('00:01:23', style: TextStyle(color: Colors.white70)),
-                    ],
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.more_vert, color: Colors.white),
-                    onPressed: () {},
-                  ),
-                ],
-              ),
-            ),
-            // Video feeds
-            Expanded(
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  // Main video (local)
-                  Container(
-                    color: SawaLoveTheme.darkSurfaceContainerHigh,
-                    child: const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.videocam_off, color: Colors.white54, size: 64),
-                          Text('Amaka N.', style: TextStyle(color: Colors.white, fontSize: 18)),
-                          Text('Remote Video', style: TextStyle(color: Colors.white54)),
-                        ],
+                      Icon(
+                        finished ? Icons.call_end : Icons.videocam_off,
+                        color: Colors.white54,
+                        size: 64,
                       ),
-                    ),
-                  ),
-                  // Small preview (self)
-                  Positioned(
-                    top: 100,
-                    right: 16,
-                    child: Container(
-                      width: 120,
-                      height: 160,
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
-                      ),
-                      child: const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.person, color: Colors.white, size: 48),
-                            Text('You', style: TextStyle(color: Colors.white)),
-                          ],
+                      const SizedBox(height: 12),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        child: Text(
+                          finished
+                              ? (state.errorMessage ?? 'Call ended')
+                              : (state.errorMessage ?? 'Connecting…'),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                          ),
                         ),
                       ),
-                    ),
+                      if (!finished) ...[
+                        const SizedBox(height: 6),
+                        Text(
+                          state.remoteName ?? remoteName,
+                          style: const TextStyle(color: Colors.white54),
+                        ),
+                      ],
+                    ],
                   ),
-                ],
+                ),
+              ),
+            // Self preview, top-right, while the camera is on.
+            if (!finished && local != null && !state.camOff)
+              Positioned(
+                top: 88,
+                right: 16,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: SizedBox(
+                    width: 120,
+                    height: 160,
+                    child: AgoraVideoView(controller: local),
+                  ),
+                ),
+              ),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      tooltip: 'Close',
+                      icon: const Icon(Icons.close, color: Colors.white),
+                      onPressed: () => _close(context, notifier),
+                    ),
+                    Column(
+                      children: [
+                        Text(
+                          state.remoteName ?? remoteName,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        Text(
+                          state.formattedDuration,
+                          style: const TextStyle(color: Colors.white70),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: 48),
+                  ],
+                ),
               ),
             ),
-            // Controls
-            Container(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _controlButton(
-                    icon: Icons.mic,
-                    isActive: !_isMuted,
-                    onTap: () => setState(() => _isMuted = !_isMuted),
-                    activeColor: Colors.white,
-                    inactiveColor: Colors.white54,
-                  ),
-                  _controlButton(
-                    icon: Icons.switch_video,
-                    isActive: _isSpeakerOn,
-                    onTap: () => setState(() => _isSpeakerOn = !_isSpeakerOn),
-                    activeColor: Colors.white,
-                    inactiveColor: Colors.white54,
-                  ),
-                  GestureDetector(
-                    onTap: () => context.pop(),
-                    child: Container(
-                      width: 72,
-                      height: 72,
-                      decoration: const BoxDecoration(
-                        color: SawaLoveTheme.errorColor,
-                        shape: BoxShape.circle,
+            if (!finished)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _controlButton(
+                        icon: state.micMuted ? Icons.mic_off : Icons.mic,
+                        isActive: !state.micMuted,
+                        onTap: notifier.toggleMic,
                       ),
-                      child: const Icon(Icons.call_end, color: Colors.white, size: 32),
-                    ),
+                      _controlButton(
+                        icon: Icons.switch_video,
+                        isActive: true,
+                        onTap: notifier.flipCamera,
+                      ),
+                      GestureDetector(
+                        onTap: () => _close(context, notifier),
+                        child: Container(
+                          width: 72,
+                          height: 72,
+                          decoration: const BoxDecoration(
+                            color: SawaLoveTheme.errorColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.call_end,
+                            color: Colors.white,
+                            size: 32,
+                          ),
+                        ),
+                      ),
+                      _controlButton(
+                        icon: state.camOff
+                            ? Icons.videocam_off
+                            : Icons.videocam,
+                        isActive: !state.camOff,
+                        onTap: notifier.toggleCamera,
+                      ),
+                      const SizedBox(width: 56),
+                    ],
                   ),
-                  _controlButton(
-                    icon: Icons.videocam,
-                    isActive: _isVideoOn,
-                    onTap: () => setState(() => _isVideoOn = !_isVideoOn),
-                    activeColor: Colors.white,
-                    inactiveColor: Colors.white54,
-                  ),
-                  _controlButton(
-                    icon: Icons.screen_share,
-                    isActive: false,
-                    onTap: () {},
-                    activeColor: Colors.white,
-                    inactiveColor: Colors.white54,
-                  ),
-                ],
+                ),
               ),
-            ),
+            if (finished)
+              Positioned(
+                left: 24,
+                right: 24,
+                bottom: 32,
+                child: ElevatedButton(
+                  onPressed: () => _close(context, notifier),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: SawaLoveTheme.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  child: const Text('Done'),
+                ),
+              ),
           ],
         ),
       ),
     );
   }
 
+  void _close(BuildContext context, VideoCallNotifier notifier) {
+    unawaited(notifier.hangUp());
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/chat');
+    }
+  }
+
   Widget _controlButton({
     required IconData icon,
     required bool isActive,
     required VoidCallback onTap,
-    required Color activeColor,
-    required Color inactiveColor,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -162,13 +230,9 @@ class _VideoCallScreenState extends State<VideoCallScreen> {
         ),
         child: Icon(
           icon,
-          color: isActive ? activeColor : inactiveColor,
+          color: isActive ? Colors.white : Colors.white54,
         ),
       ),
     );
   }
 }
-
-// Note: Add agora_rtc_engine: ^6.3.2 to pubspec.yaml for real video call
-// Initialize AgoraEngineController in initState
-

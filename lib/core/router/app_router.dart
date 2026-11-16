@@ -56,6 +56,8 @@ import '../../features/matches/likes_matches_screen.dart';
 // Chat
 import '../../features/chat/chat_list_screen.dart';
 import '../../features/chat/chat_detail_screen.dart';
+import '../../features/chat/call_history_screen.dart';
+import '../../features/chat/models/incoming_call_data.dart';
 import '../../features/chat/incoming_call_screen.dart'
     hide DeclinedCallScreen, BusyUnavailableScreen;
 import '../../features/chat/video_call_screen.dart';
@@ -310,15 +312,36 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       // ── Calls (Agora not integrated yet — gated in release) ────────────
       GoRoute(
           path: '/call/incoming',
-          builder: gated(kShowCalls, (c, s) => const IncomingCallScreen(),
+          builder: gated(
+              kShowCalls,
+              (c, s) => IncomingCallScreen(
+                  callData: s.extra is IncomingCallData
+                      ? s.extra as IncomingCallData
+                      : null),
               feature: 'Calls')),
       GoRoute(
+          path: '/call/history',
+          builder: gated(kShowCalls, (c, s) => const CallHistoryScreen(),
+              feature: 'Call history')),
+      GoRoute(
           path: '/call/video',
-          builder: gated(kShowCalls, (c, s) => const VideoCallScreen(),
+          builder: gated(
+              kShowCalls,
+              (c, s) => VideoCallScreen(
+                  matchId: s.uri.queryParameters['matchId'],
+                  callId: s.uri.queryParameters['callId'],
+                  remoteName:
+                      s.uri.queryParameters['name'] ?? 'SawaLove call'),
               feature: 'Video calls')),
       GoRoute(
           path: '/chat/video-call',
-          builder: gated(kShowCalls, (c, s) => const VideoCallScreen(),
+          builder: gated(
+              kShowCalls,
+              (c, s) => VideoCallScreen(
+                  matchId: s.uri.queryParameters['matchId'],
+                  callId: s.uri.queryParameters['callId'],
+                  remoteName:
+                      s.uri.queryParameters['name'] ?? 'SawaLove call'),
               feature: 'Video calls')),
       GoRoute(
         path: '/call/declined',

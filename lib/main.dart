@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'app.dart';
 import 'shared/services/backend_service.dart';
+import 'shared/services/call_ringer.dart';
+import 'shared/services/push_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,6 +14,10 @@ Future<void> main() async {
   const isReleaseBuild = bool.fromEnvironment('dart.vm.product');
 
   await BackendService.initialize();
+  // No-op unless the build was given FIREBASE_* dart-defines.
+  await PushService.initialize();
+  // Foreground fallback so calls still ring without Firebase keys.
+  CallRinger.initialize();
 
   if (!BackendService().isConfigured) {
     if (isReleaseBuild) {

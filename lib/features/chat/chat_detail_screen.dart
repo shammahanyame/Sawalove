@@ -80,6 +80,21 @@ class _ChatDetailScreenState extends ConsumerState<ChatDetailScreen> {
         ),
         actions: [
           IconButton(
+            tooltip: 'Video call',
+            icon: const Icon(Icons.videocam_outlined),
+            // The call screen starts the ring itself from this match id, so
+            // the button only needs the peer's display name.
+            onPressed: () {
+              final query = <String, String>{
+                'matchId': widget.matchId,
+                if (peerName != null && peerName.isNotEmpty) 'name': peerName,
+              };
+              context.push(
+                Uri(path: '/chat/video-call', queryParameters: query).toString(),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.more_vert),
             onPressed: () => showModalBottomSheet<void>(
               context: context,

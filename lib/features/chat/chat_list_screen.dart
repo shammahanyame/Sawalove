@@ -74,6 +74,13 @@ class _ChatListScreenState extends ConsumerState<ChatListScreen>
               ),
           ],
         ),
+        actions: [
+          IconButton(
+            tooltip: 'Call history',
+            icon: const Icon(Icons.call_outlined),
+            onPressed: () => context.push('/call/history'),
+          ),
+        ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(36 + 1), // +1 for border
           child: Column(

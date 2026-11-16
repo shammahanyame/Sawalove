@@ -57,7 +57,14 @@ class _IncomingCallScreenState extends State<IncomingCallScreen> {
   void _onAccept() {
     _autoDismissTimer?.cancel();
     // Navigate to video call
-    context.go('/chat/video-call', extra: _callData.matchId);
+    // The callee joins the Agora channel by call id; the caller passes the
+    // match id instead and the provider starts the ring.
+    final query = <String, String>{
+      'matchId': _callData.matchId,
+      'name': _callData.callerName,
+      if (_callData.callId != null) 'callId': _callData.callId!,
+    };
+    context.go(Uri(path: '/chat/video-call', queryParameters: query).toString());
   }
 
   void _onDecline() {

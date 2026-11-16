@@ -64,7 +64,59 @@ public HTTPS `API_BASE_URL`.
 - Confirm `android/key.properties` points to the upload keystore used for Play
   Store signing.
 
-## 5. Build Production
+## 5. Calls (Agora + FCM)
+
+Video calls need four client values and three Edge Function secrets. Nothing
+is checked in. Without the Agora id the video screen stays disabled; without
+the FCM values calls still ring while the app is open (`CallRinger` polls for a
+ringing call every few seconds) but cannot wake a closed app:
+
+```powershell
+flutter run `
+  --dart-define=AGORA_APP_ID=<32-char Agora app id> `
+  --dart-define=FIREBASE_API_KEY=<firebase web api key> `
+  --dart-define=FIREBASE_APP_ID=1:<sender>:android:<hash> `
+  --dart-define=FIREBASE_MESSAGING_SENDER_ID=<sender id> `
+  --dart-define=FIREBASE_PROJECT_ID=<firebase project id>
+```
+
+`AGORA_APP_ID` gates the video call screen and the `FIREBASE_*` values gate
+push; no `google-services.json` is required because the options are passed at
+runtime.
+
+Server side (`supabase secrets set`), from the project root:
+
+```powershell
+supabase secrets set AGORA_APP_ID=<32-char Agora app id>
+supabase secrets set AGORA_APP_CERTIFICATE=<Agora app certificate>
+supabase secrets set FCM_SERVICE_ACCOUNT="<firebase service account json, one line>"
+```
+
+Optional: `FIREBASE_PROJECT_ID` if the service account belongs to a different
+project, and `ALLOWED_ORIGINS` for the functions' CORS header.
+
+Then deploy the two functions once:
+
+```powershell
+supabase functions deploy agora-token --no-verify-jwt=false
+supabase functions deploy notify-call --no-verify-jwt=false
+```
+
+Android creates the high-importance `incoming_calls` channel in
+`MainActivity` at startup, and the manifest points FCM at it, so a ring buzzes
+even with the app closed. The `calls` table and its RPCs come from
+`supabase/migrations/20261115010000_calls.sql` (`supabase db push`).
+
+Android builds pin NDK `26.3.11579264` (see `android/build.gradle.kts`):
+`agora_rtc_engine` links its bundled `iris_rendering_android` module without
+libc++, which NDK 27 rejects with `undefined symbol: operator new(unsigned
+long)`. Install it once if the Android SDK reports it missing:
+
+```powershell
+sdkmanager "ndk;26.3.11579264"
+```
+
+## 6. Build Production
 
 ```powershell
 .\scripts\build_release_aab.ps1
