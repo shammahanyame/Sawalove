@@ -1,0 +1,74 @@
+[
+  {
+    "id": "catholic",
+    "name": "Catholic",
+    "nameFr": "Catholique",
+    "hasDenominations": true,
+    "denominations": [
+      {"id": "roman_catholic", "name": "Roman Catholic", "nameFr": "Catholique Romain"},
+      {"id": "charismatic_catholic", "name": "Charismatic Catholic", "nameFr": "Catholique Charismatique"},
+      {"id": "latin_mass", "name": "Traditional Latin Mass", "nameFr": "Messe Traditionnelle Latine"}
+    ]
+  },
+  {
+    "id": "protestant",
+    "name": "Protestant",
+    "nameFr": "Protestant",
+    "hasDenominations": true,
+    "denominations": [
+      {"id": "baptist", "name": "Baptist", "nameFr": "Baptiste"},
+      {"id": "presbyterian", "name": "Presbyterian", "nameFr": "Presbytérien"},
+      {"id": "methodist", "name": "Methodist", "nameFr": "Méthodiste"},
+      {"id": "lutheran", "name": "Lutheran", "nameFr": "Luthérien"},
+      {"id": "anglican", "name": "Anglican", "nameFr": "Anglican"},
+      {"id": "evangelical", "name": "Evangelical", "nameFr": "Évangélique"},
+      {"id": "pentecostal", "name": "Pentecostal", "nameFr": "Pentecôtiste"},
+      {"id": "apostolic", "name": "Apostolic", "nameFr": "Apostolique"},
+      {"id": "cpdac", "name": "CPDAC", "nameFr": "CPDAC"},
+      {"id": "full_gospel", "name": "Full Gospel", "nameFr": "Évangile Complet"}
+    ]
+  },
+  {
+    "id": "muslim",
+    "name": "Muslim",
+    "nameFr": "Musulman",
+    "hasDenominations": true,
+    "denominations": [
+      {"id": "sunni", "name": "Sunni", "nameFr": "Sunnite"},
+      {"id": "shia", "name": "Shia", "nameFr": "Chiite"},
+      {"id": "sufi", "name": "Sufi", "nameFr": "Soufi"},
+      {"id": "ahmadiyya", "name": "Ahmadiyya", "nameFr": "Ahmadiyya"}
+    ]
+  },
+  {
+    "id": "adventist",
+    "name": "Adventist",
+    "nameFr": "Adventiste",
+    "hasDenominations": false
+  },
+  {
+    "id": "traditional",
+    "name": "Traditional",
+    "nameFr": "Traditionnel",
+    "hasDenominations": true,
+    "denominations": [
+      {"id": "beti", "name": "Beti", "nameFr": "Beti"},
+      {"id": "bamileke", "name": "Bamileke", "nameFr": "Bamiléké"},
+      {"id": "grassfields", "name": "Grassfields", "nameFr": "Grassfields"},
+      {"id": "other_trad", "name": "Other Traditional", "nameFr": "Autre Traditionnel"}
+    ]
+  },
+  {
+    "id": "no_religion",
+    "name": "No religion",
+    "nameFr": "Sans religion",
+    "hasDenominations": false
+  },
+  {
+    "id": "other",
+    "name": "Other",
+    "nameFr": "Autre",
+    "hasDenominations": true,
+    "denominations": []
+  }
+]
